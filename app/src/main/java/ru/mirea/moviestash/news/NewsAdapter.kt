@@ -2,6 +2,7 @@ package ru.mirea.moviestash.news
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,9 +34,10 @@ class NewsAdapter(private val news: List<News>) :
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val item = news[position]
         holder.binding.news = item
-        item.bmp?.let {
-            holder.binding.newsImage.setImageBitmap(it)
-        }
+        if (item.bmp != null)
+            holder.binding.newsImage.setImageBitmap(item.bmp)
+        else
+            holder.binding.newsImage.setImageResource(R.drawable.newsholder)
         holder.itemView.setOnClickListener {
             context.startActivity(Intent(context, NewsActivity::class.java).putExtra("NEW", item))
         }

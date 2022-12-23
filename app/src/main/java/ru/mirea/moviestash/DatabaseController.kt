@@ -103,14 +103,13 @@ object DatabaseController {
                         while (rs.next())
                             hsh = rs.getString("start_registration")
                         val randNum = decrypt(hsh, bytes)
-                        query = connection.prepareStatement("CALL register_user(?, ?, ?, ?)")
+                        query = connection.prepareCall("CALL register_user(?, ?, ?, ?)")
                         query.setString(1, username)
                         query.setString(2, email)
                         query.setString(3, login)
                         val pass = encrypt(password, randNum)
                         query.setString(4, pass)
-                        query.executeUpdate()
-                        message = Result.Success(true)
+                        message = Result.Success(query.execute())
                     } catch (e: PSQLException) {
                         message = Result.Error(e)
                         Log.d("DEBUG", e.message.toString())
@@ -128,11 +127,11 @@ object DatabaseController {
             mutex.withLock {
                 result = try {
                     if (connection.isValid(0)) {
-                        connection.prepareStatement("CALL update_user(?, ?, ?)").apply {
+                        connection.prepareCall("CALL update_user(?, ?, ?)").apply {
                             setString(1, nick)
                             setString(2, email)
                             setInt(3, user!!.uid)
-                            executeUpdate()
+                            execute()
                         }
                         Result.Success(true)
                     }
@@ -395,23 +394,22 @@ object DatabaseController {
                     if (connection.isValid(0)) {
                         val query =
                             if (rating.toInt() == 0){
-                                connection.prepareStatement("CALL delete_star(?)").apply {
+                                connection.prepareCall("CALL delete_star(?)").apply {
                                     setInt(1, id)
                                 }
                             }
                         else if (update)
-                                connection.prepareStatement("CALL update_star(?, ?)").apply {
+                                connection.prepareCall("CALL update_star(?, ?)").apply {
                                     setInt(1, id)
                                     setShort(2, rating)
                                 }
                         else
-                            connection.prepareStatement("CALL add_star(?, ?, ?)").apply {
+                            connection.prepareCall("CALL add_star(?, ?, ?)").apply {
                                 setInt(1, id)
                                 setInt(2, user!!.uid)
                                 setShort(3, rating)
                             }
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
                         Result.Error(Exception("Ошибка запроса 10"))
                 } catch (e: PSQLException) {
@@ -630,12 +628,12 @@ object DatabaseController {
             mutex.withLock {
                 data = try {
                     if (connection.isValid(0)) {
-                        val query = connection.prepareStatement("CALL delete_collection(?)")
+                        val query = connection.prepareCall("CALL delete_collection(?)")
                         query.setInt(1, cid)
-                        query.executeUpdate()
+                        query.execute()
                         Result.Success(true)
                     } else
-                        Result.Error(Exception("Ошибка запроса 20"))
+                        Result.Error(Exception("Ошибка запроса"))
                 } catch (e: PSQLException) {
                     Log.d("DEBUG", e.stackTraceToString())
                     Result.Error(e)
@@ -651,12 +649,11 @@ object DatabaseController {
             mutex.withLock {
                 data = try {
                     if (connection.isValid(0)) {
-                        val query = connection.prepareStatement("CALL delete_review(?)")
+                        val query = connection.prepareCall("CALL delete_review(?)")
                         query.setInt(1, rid)
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
-                        Result.Error(Exception("Ошибка запроса 21"))
+                        Result.Error(Exception("Ошибка запроса"))
                 } catch (e: PSQLException) {
                     Log.d("DEBUG", e.stackTraceToString())
                     Result.Error(e)
@@ -674,16 +671,15 @@ object DatabaseController {
                     if (connection.isValid(0)) {
                         val query =
                             if (ban)
-                                connection.prepareStatement("CALL ban_user_by_id(?, ?)").apply {
+                                connection.prepareCall("CALL ban_user_by_id(?, ?)").apply {
                                     setInt(1, uid)
                                     setString(2, reason)
                                 }
                             else
-                                connection.prepareStatement("CALL unban_user_by_id(?)").apply {
+                                connection.prepareCall("CALL unban_user_by_id(?)").apply {
                                     setInt(1, uid)
                                 }
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
                         Result.Error(Exception("Ошибка запроса 22"))
                 } catch (e: PSQLException) {
@@ -754,7 +750,7 @@ object DatabaseController {
                     if (connection.isValid(0)) {
                         val query =
                             if (id != 0)
-                                connection.prepareStatement("CALL update_new(?, ?, ?, ?)").apply {
+                                connection.prepareCall("CALL update_new(?, ?, ?, ?)").apply {
                                     setString(1, description)
                                     setString(2, title)
                                     setInt(3, id)
@@ -764,7 +760,7 @@ object DatabaseController {
                                         setNull(4, Types.VARCHAR)
                                 }
                             else
-                                connection.prepareStatement("CALL add_new(?, ?, ?, ?)").apply {
+                                connection.prepareCall("CALL add_new(?, ?, ?, ?)").apply {
                                     setString(1, title)
                                     setString(2, description)
                                     setInt(3, user!!.uid)
@@ -773,10 +769,9 @@ object DatabaseController {
                                     else
                                         setNull(4, Types.VARCHAR)
                                 }
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
-                        Result.Error(Exception("Ошибка запроса 24"))
+                        Result.Error(Exception("Ошибка запроса"))
                 } catch (e: PSQLException) {
                     if (e.message.toString().contains("duplicate key"))
                         Result.Error(Exception("Вы уже делали обзор на этот фильм"))
@@ -833,12 +828,11 @@ object DatabaseController {
             mutex.withLock {
                 data = try {
                     if (connection.isValid(0)) {
-                        val query = connection.prepareStatement("CALL delete_new(?)")
+                        val query = connection.prepareCall("CALL delete_new(?)")
                         query.setInt(1, nid)
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
-                        Result.Error(Exception("Ошибка запроса 27"))
+                        Result.Error(Exception("Ошибка запроса"))
                 } catch (e: PSQLException) {
                     Result.Error(e)
                 }
@@ -859,24 +853,23 @@ object DatabaseController {
                     if (connection.isValid(0)) {
                         val query =
                             if (update)
-                                connection.prepareStatement("CALL update_review(?, ?, ?, ?)").apply {
+                                connection.prepareCall("CALL update_review(?, ?, ?, ?)").apply {
                                     setString(1, title)
                                     setString(2, description)
                                     setShort(3, opinion.toShort())
                                     setInt(4, id)
                                 }
                             else
-                                connection.prepareStatement("CALL add_review(?, ?, ?, ?, ?)").apply {
+                                connection.prepareCall("CALL add_review(?, ?, ?, ?, ?)").apply {
                                     setString(1, title)
                                     setString(2, description)
                                     setInt(3, id)
                                     setInt(4, user!!.uid)
                                     setShort(5, opinion.toShort())
                                 }
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
-                        Result.Error(Exception("Ошибка запроса 28"))
+                        Result.Error(Exception("Ошибка запроса"))
                 } catch (e: PSQLException) {
                     if (e.message.toString().contains("duplicate key"))
                         Result.Error(Exception("Вы уже делали обзор на этот фильм"))
@@ -920,14 +913,13 @@ object DatabaseController {
                     if (connection.isValid(0)) {
                         val query =
                             if (update)
-                                connection.prepareStatement("CALL update_collection(?, ?, ?)")
+                                connection.prepareCall("CALL update_collection(?, ?, ?)")
                             else
-                                connection.prepareStatement("CALL add_collection(?, ?, ?)")
+                                connection.prepareCall("CALL add_collection(?, ?, ?)")
                         query.setString(1, name)
                         query.setString(2, description)
                         query.setInt(3, uid)
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
                         Result.Error(Exception("Ошибка запроса 30"))
                 } catch (e: PSQLException) {
@@ -947,15 +939,14 @@ object DatabaseController {
                     if (connection.isValid(0)) {
                         val query =
                             if (add)
-                                connection.prepareStatement("CALL add_film_to_collection(?, ?)")
+                                connection.prepareCall("CALL add_film_to_collection(?, ?)")
                             else
-                                connection.prepareStatement("CALL delete_film_from_collection(?, ?)")
+                                connection.prepareCall("CALL delete_film_from_collection(?, ?)")
                         query.setInt(1, cid)
                         query.setInt(2, fid)
-                        query.executeUpdate()
-                        Result.Success(true)
+                        Result.Success(query.execute())
                     } else
-                        Result.Error(Exception("Ошибка запроса 31"))
+                        Result.Error(Exception("Ошибка запроса"))
                 } catch (e: PSQLException) {
                     Log.d("DEBUG", e.stackTraceToString())
                     Result.Error(e)

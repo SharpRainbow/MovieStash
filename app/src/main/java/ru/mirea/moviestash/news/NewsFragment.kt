@@ -167,6 +167,7 @@ class NewsFragment : Fragment() {
                             catch (e: UnknownHostException) {
                                 Log.d("DEBUG", e.stackTraceToString())
                             }
+                            Log.d("DEBUG", tmp.toString())
                             news.add(tmp)
                         }
                         if (news.size > 0) {

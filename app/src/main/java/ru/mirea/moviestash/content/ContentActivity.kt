@@ -49,6 +49,7 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
     private lateinit var crew: RecyclerView
     private var content: Content? = null
     private var rating: UserStar? = null
+    private var isRefreshing = false
     private val castList: MutableList<CelebrityInContent> by lazy {
         mutableListOf()
     }
@@ -123,7 +124,11 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                             DatabaseController.setRating(rating!!.sid, newRating.toShort(), true)
                     DatabaseController.checkConnection()
                     when (result) {
-                        is Result.Success<Boolean> -> { dlg.dismiss() }
+                        is Result.Success<Boolean> -> {
+                            dlg.dismiss()
+                            binding.contentRefresher.isRefreshing = true
+                            onRefresh()
+                        }
                         is Result.Error -> {
                             Toast.makeText(
                                 this@ContentActivity,
@@ -271,6 +276,9 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
     }
 
     override fun onRefresh() {
+        if (isRefreshing)
+            return
+        isRefreshing = true
         content?.let{
             binding.film = it
             //it.bitmap?.let { dr ->
@@ -444,9 +452,10 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                 when(val result: Result<ResultSet> = DatabaseController.getRating(it.id)){
                     is Result.Success<ResultSet> -> {
                         result.data.let { set ->
-                            if (set.next()) {
-                                rating = UserStar(set.getInt("sid"), set.getShort("rating"))
-                            }
+                            rating = if (set.next()) {
+                                UserStar(set.getInt("sid"), set.getShort("rating"))
+                            } else
+                                null
                         }
                     }
                     is Result.Error -> {
@@ -473,6 +482,7 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                     }
                 }
                 binding.contentRefresher.isRefreshing = false
+                isRefreshing = false
             }
         }
     }
