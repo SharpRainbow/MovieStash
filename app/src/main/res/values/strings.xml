@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MovieStash</string>
+    <string name="fish">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="loading">Загрузка</string>
+    <string name="out_date">Дата выхода: %1$s</string>
+    <string name="countries_of_prod">Страны производства: %1$s</string>
+    <string name="format">%.1f</string>
+    <string name="money">%1$d $</string>
+    <string name="ban_message">Ваш аккаунт заблокирован %1$s по причине: %2$s</string>
+    <string-array name="opinion">
+        <item>Плохо</item>
+        <item>Нейтрально</item>
+        <item>Хорошо</item>
+    </string-array>
+</resources>

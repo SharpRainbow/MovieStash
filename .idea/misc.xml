@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/add_to_list.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/background_round.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/bottom_navigation_background.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/bottom_navigation_coloe_selector.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/bottom_navigation_color_background.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/bottom_navigation_color_selector.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/col_shape.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/content_item.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/filled_star.xml" value="0.2385" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/ic_kinopoisk_icon_main.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/ic_round_home_24.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/kp.xml" value="0.2075" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/drawable/mvstsh.xml" value="0.125" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/col_item.xml" value="0.536" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/content_item.xml" value="0.536" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/fragment_account.xml" value="0.536" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/fragment_collection.xml" value="0.25" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/fragment_collections.xml" value="0.22826086956521738" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/fragment_home.xml" value="0.22357723577235772" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/fragment_login.xml" value="0.1621376811594203" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/fragment_news.xml" value="0.22826086956521738" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layout/news_item.xml" value="0.22780797101449277" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/drawable/divider.xml" value="0.1" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/drawable/rb_custom.xml" value="0.184" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_banned_users.xml" value="0.2359375" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_collection.xml" value="0.17192982456140352" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_content.xml" value="0.23099133782483156" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_news.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_news_editor.xml" value="0.24818840579710144" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_person.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_person_list.xml" value="0.25" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_register.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_review.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_review_editor.xml" value="0.21875" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_review_list.xml" value="0.24818840579710144" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_search.xml" value="0.2" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/activity_user_collection.xml" value="0.2359375" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/collections_dialog.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/dialog_add_list.xml" value="0.536" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/dialog_ban.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/dialog_collections.xml" value="0.25" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/dialog_rating.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/fragment_first.xml" value="0.1816123188405797" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/fragment_search_movie.xml" value="0.2391304347826087" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/fragment_search_person.xml" value="0.2359375" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/item_banned_user.xml" value="0.24818840579710144" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/item_co_mainl.xml" value="0.25" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/item_person.xml" value="0.4392764857881137" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/item_review.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/item_searched.xml" value="0.24547101449275363" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/item_user_col.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/activities/layout/rating_dialog.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/fragment_account.xml" value="0.10964912280701754" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/fragment_collection.xml" value="0.22780797101449277" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/fragment_home.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/fragment_login.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/fragment_news.xml" value="0.2" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/fragment_search_movie.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/fragment_search_person.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/fragments/layout/item_searched.xml" value="0.24547101449275363" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/col_item.xml" value="0.22780797101449277" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/content_item.xml" value="0.6" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/dialog_add_list.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/dialog_ban.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/dialog_collections.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/dialog_rating.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/item_col.xml" value="0.25" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/item_content.xml" value="0.536" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/item_news.xml" value="0.4" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/item_person.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/item_review.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/item_user_col.xml" value="0.18840579710144928" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/layouts/items/layout/news_item.xml" value="0.264" />
+        <entry key="..\:/Kotlin/Android/MovieStash/app/src/main/res/menu/bottom_items.xml" value="0.25" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

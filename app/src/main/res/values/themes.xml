@@ -1,0 +1,31 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MovieStash" parent="Theme.Material3.DayNight">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/button_color</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >#cae9ff</item>
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="Theme.MovieStash.NoActionBar" parent="Theme.MovieStash">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="MyCardViewStyle" parent="Theme.AppCompat.Light">
+        <item name="cardCornerRadius">10dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardMaxElevation">4dp</item>
+        <item name="cardBackgroundColor">#ECFEFF</item>
+    </style>
+    <style name="ToolbarColoredBackArrow" parent="Theme.MovieStash">
+        <item name="android:textColorSecondary">@color/black</item>
+    </style>
+    <style name="Theme.MovieStash.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.MovieStash.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
