@@ -76,7 +76,7 @@ class CollectionActivity : AppCompatActivity() {
                             ).show()
                         }
                     }
-                    if (col.uid > 0 || isModerator)
+                    if (col.uid > 0 || (col.uid == 0 && isModerator))
                         colItems.adapter = ContentAdapter(films) {
                             val bld = AlertDialog.Builder(this@CollectionActivity)
                             bld.setTitle("Удалить из коллекции?")

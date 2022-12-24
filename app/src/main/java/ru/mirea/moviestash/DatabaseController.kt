@@ -789,7 +789,8 @@ object DatabaseController {
             mutex.withLock {
                 data = try {
                     if (connection.isValid(0)) {
-                        val query = connection.prepareStatement("SELECT * FROM news LIMIT ? OFFSET ?")
+                        val query = connection.prepareStatement("SELECT * FROM news ORDER BY " +
+                                "news_date DESC LIMIT ? OFFSET ?")
                         query.setInt(1, limit)
                         query.setInt(2, offset)
                         Result.Success(query.executeQuery())

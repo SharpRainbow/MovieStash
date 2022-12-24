@@ -38,8 +38,7 @@
                 android:layout_width="100dp"
                 android:layout_height="80dp"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/newsholder"
-                tools:srcCompat="@tools:sample/avatars" />
+                app:srcCompat="@drawable/noimage" />
         </androidx.cardview.widget.CardView>
 
         <TextView

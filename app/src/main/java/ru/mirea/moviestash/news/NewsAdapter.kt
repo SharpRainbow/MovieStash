@@ -37,7 +37,7 @@ class NewsAdapter(private val news: List<News>) :
         if (item.bmp != null)
             holder.binding.newsImage.setImageBitmap(item.bmp)
         else
-            holder.binding.newsImage.setImageResource(R.drawable.newsholder)
+            holder.binding.newsImage.setImageResource(R.drawable.noimage)
         holder.itemView.setOnClickListener {
             context.startActivity(Intent(context, NewsActivity::class.java).putExtra("NEW", item))
         }

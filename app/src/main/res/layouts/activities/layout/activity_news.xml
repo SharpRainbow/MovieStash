@@ -84,7 +84,7 @@
                             android:layout_height="200dp"
                             android:layout_gravity="center"
                             android:scaleType="centerCrop"
-                            app:srcCompat="@drawable/newsholder"
+                            app:srcCompat="@drawable/noimage"
                             tools:src="@tools:sample/backgrounds/scenic" />
                     </androidx.cardview.widget.CardView>
 
