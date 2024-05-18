@@ -1,7 +1,6 @@
 package ru.mirea.moviestash.news
 
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -114,9 +113,7 @@ class NewsEditorActivity : AppCompatActivity() {
         binding.imageNews.setOnClickListener {
             binding.saveNewsBtn.isEnabled = false
             pickImage.launch(
-                Intent(
-                    Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI
-                )
+                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             )
         }
         binding.saveNewsBtn.setOnClickListener {
@@ -147,10 +144,7 @@ class NewsEditorActivity : AppCompatActivity() {
                 }
                 val result: Result<Boolean> =
                     if (::news.isInitialized) DatabaseController.addModNews(
-                        title,
-                        desc,
-                        news.id,
-                        imageLink
+                        title, desc, news.id, imageLink
                     )
                     else DatabaseController.addModNews(title, desc, 0, imageLink)
                 when (result) {
@@ -167,12 +161,11 @@ class NewsEditorActivity : AppCompatActivity() {
     }
 
     private fun getFileFromUri(uri: Uri): File? {
-        val cursor: Cursor? = uri.let {
-            this.contentResolver.query(
-                it, arrayOf(MediaStore.Images.ImageColumns.DATA), null, null, null
-            )
+        return this.contentResolver.query(
+            uri, arrayOf(MediaStore.Images.ImageColumns.DATA), null, null, null
+        )?.use { cursor ->
+            cursor.moveToFirst()
+            cursor.getString(0)?.let { file -> File(file) }
         }
-        cursor?.moveToFirst()
-        return cursor?.getString(0)?.let { File(it) }
     }
 }

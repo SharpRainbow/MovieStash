@@ -52,9 +52,9 @@ class PersonActivity : AppCompatActivity() {
                         ).show()
                     }
                 }
-                when (val result: Result<List<ru.mirea.moviestash.entites.Celebrity>> =
+                when (val result: Result<List<Celebrity>> =
                     DatabaseController.getPerson(it.id)) {
-                    is Result.Success<List<ru.mirea.moviestash.entites.Celebrity>> -> {
+                    is Result.Success<List<Celebrity>> -> {
                         result.data.let { set ->
                             if (set.isNotEmpty()) {
                                 it.height = set[0].height

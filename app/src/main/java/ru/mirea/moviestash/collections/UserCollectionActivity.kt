@@ -204,9 +204,9 @@ class UserCollectionActivity : AppCompatActivity() {
                 }
             }
             DatabaseController.user?.let {
-                when (val result: Result<List<ru.mirea.moviestash.entites.Collection>> =
+                when (val result: Result<List<Collection>> =
                     DatabaseController.getUserCols(it.id)) {
-                    is Result.Success<List<ru.mirea.moviestash.entites.Collection>> -> {
+                    is Result.Success<List<Collection>> -> {
                         result.data.let { set ->
                             prevSize = cols.size
                             cols.addAll(set)

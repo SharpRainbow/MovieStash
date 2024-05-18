@@ -4,16 +4,17 @@ import java.sql.Date;
 import java.sql.Time;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class Utils {
 
     public static String dateToString(Date date) {
         if (date == null) return "";
-        return new SimpleDateFormat("dd.MM.yyyy").format(date);
+        return new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date);
     }
 
     public static String timeToString(Time time) {
-        return new SimpleDateFormat("HH ч mm мин").format(time);
+        return new SimpleDateFormat("HH ч mm мин", Locale.getDefault()).format(time);
     }
 
     public static String formatMoney(long money) {
