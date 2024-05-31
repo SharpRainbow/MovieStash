@@ -127,7 +127,7 @@ class LogInFragment : Fragment() {
         val saveSnackBar =
             Snackbar.make(binding.root, "Сохранить логин и пароль?", Snackbar.LENGTH_LONG)
         val params = saveSnackBar.view.layoutParams as CoordinatorLayout.LayoutParams
-        params.gravity = Gravity.TOP
+        params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
         saveSnackBar.view.layoutParams = params
         saveSnackBar.setAction("ОК") {
             DatabaseController.user?.let { user ->

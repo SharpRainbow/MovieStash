@@ -18,6 +18,7 @@ import ru.mirea.moviestash.databinding.FragmentHomeBinding
 import ru.mirea.moviestash.entites.Collection
 import ru.mirea.moviestash.entites.Genre
 import ru.mirea.moviestash.news.NewsAdapter
+import java.net.ConnectException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -84,8 +85,12 @@ class HomeFragment : Fragment(), ChildFragment {
                                     )
                                 }
                             }
-                        } catch (e: UnknownHostException) {
+                        }
+                        catch (e: UnknownHostException) {
                             Log.d("DEBUG", e.stackTraceToString())
+                        }
+                        catch (e: ConnectException) {
+                            showToast("Не удалось получить изображения!")
                         }
                     }
                     homeDataModel.addAllFilms(set)
@@ -138,6 +143,9 @@ class HomeFragment : Fragment(), ChildFragment {
                             }
                         } catch (e: UnknownHostException) {
                             Log.d("DEBUG", e.stackTraceToString())
+                        }
+                        catch (e: ConnectException) {
+                            showToast("Не удалось получить изображения!")
                         }
                     }
                     homeDataModel.addAllNews(set)

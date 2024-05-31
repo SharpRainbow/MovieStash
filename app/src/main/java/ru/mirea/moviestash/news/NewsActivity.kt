@@ -16,9 +16,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mirea.moviestash.DatabaseController
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.ActivityNewsBinding
 import ru.mirea.moviestash.entites.News
+import java.net.ConnectException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -31,13 +33,7 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         super.onCreate(savedInstanceState)
         binding = ActivityNewsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.newsToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-
         bindListeners()
-
         intent.getParcelableExtra<News>("NEW")?.let {
             news = it
         }
@@ -46,14 +42,20 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             news.image?.let {
                 lifecycleScope.launch {
                     var bmp: Bitmap? = null
-                    withContext(Dispatchers.IO) {
-                        try {
+                    try {
+                        withContext(Dispatchers.IO) {
                             bmp = BitmapFactory.decodeStream(
                                 URL(it).openConnection().getInputStream()
                             )
-                        } catch (e: UnknownHostException) {
-                            Log.d("DEBUG", e.stackTraceToString())
                         }
+                    } catch (e: UnknownHostException) {
+                        Log.d("DEBUG", e.stackTraceToString())
+                    } catch (e: ConnectException) {
+                        Toast.makeText(
+                            this@NewsActivity,
+                            "Не удалось получить изображения!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     bmp?.let { b ->
                         binding.imageNews.setImageBitmap(b)
@@ -65,6 +67,12 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun bindListeners() {
+        binding.newsToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
         binding.refreshNews.setOnRefreshListener(this)
         binding.editNews.setOnClickListener {
             if (!::news.isInitialized) return@setOnClickListener
@@ -121,16 +129,6 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun onRefresh() {
         if (!::news.isInitialized) return
         lifecycleScope.launch {
@@ -169,6 +167,12 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                                 }
                             } catch (e: UnknownHostException) {
                                 Log.d("DEBUG", e.stackTraceToString())
+                            } catch (e: ConnectException) {
+                                Toast.makeText(
+                                    this@NewsActivity,
+                                    "Не удалось получить изображения!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                             news = tmp
                             binding.news = news

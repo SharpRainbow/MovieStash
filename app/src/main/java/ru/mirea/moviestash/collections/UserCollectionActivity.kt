@@ -31,10 +31,6 @@ class UserCollectionActivity : AppCompatActivity() {
         bindViews()
         bindListeners()
         refresh()
-        setSupportActionBar(binding.userListToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
     }
 
     private fun bindViews() {
@@ -130,17 +126,13 @@ class UserCollectionActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
+    private fun bindListeners() {
+        binding.userListToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
             }
         }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun bindListeners() {
         binding.addToUserCol.setOnClickListener {
             val bld = AlertDialog.Builder(this)
             val view = layoutInflater.inflate(R.layout.dialog_add_list, null)

@@ -1,18 +1,19 @@
 package ru.mirea.moviestash.search
 
-import android.R.id.home
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.ViewPagerAdapter
 import ru.mirea.moviestash.databinding.ActivitySearchBinding
 import java.util.Timer
@@ -21,7 +22,6 @@ import java.util.TimerTask
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var searchView: EditText
     private lateinit var adapter: ViewPagerAdapter
     private var query = ""
 
@@ -32,10 +32,8 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        bindViews()
         bindListeners()
-
+        window.statusBarColor = resources.getColor(R.color.item_background, theme)
         adapter = ViewPagerAdapter(this, listOf("Фильмы", "Знаменитости"))
         binding.searchTabs.adapter = adapter
         TabLayoutMediator(binding.tabs, binding.searchTabs) { tab, position ->
@@ -50,25 +48,32 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
         })
-
-        searchView.postDelayed({
-            searchView.isFocusableInTouchMode = true
-            searchView.requestFocus()
-            val keyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            keyboard.showSoftInput(searchView, 0)
-        }, 200)
-    }
-
-    private fun bindViews() {
-        searchView = binding.contentSearcher
-
-        setSupportActionBar(binding.customToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        window.statusBarColor = Color.parseColor("#ECFEFF")
+        binding.contentSearcher.apply {
+            postDelayed({
+                isFocusableInTouchMode = true
+                requestFocus()
+                val keyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                keyboard.showSoftInput(this, 0)
+            }, 200)
+        }
     }
 
     private fun bindListeners() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+                overridePendingTransition(
+                    com.google.android.material.R.anim.abc_fade_in,
+                    com.google.android.material.R.anim.abc_fade_out
+                )
+            }
+        })
+        binding.customToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
         binding.contentSearcher.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -94,30 +99,20 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchInFragment() {
-        val curFrag = adapter.fragments[binding.searchTabs.currentItem]
-        if (curFrag is SearchMovieFragment) {
-            curFrag.afterTextChanged(query)
-        } else if (curFrag is SearchPersonFragment) {
-            curFrag.afterTextChanged(query)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            home -> {
-                onBackPressed()
-                return true
+        lifecycleScope.launch {
+            var curFrag =
+                supportFragmentManager.findFragmentByTag("f${binding.tabs.selectedTabPosition}")
+            while (curFrag == null) {
+                delay(1)
+                curFrag =
+                    supportFragmentManager.findFragmentByTag("f${binding.tabs.selectedTabPosition}")
+            }
+            if (curFrag is SearchMovieFragment) {
+                curFrag.afterTextChanged(query)
+            } else if (curFrag is SearchPersonFragment) {
+                curFrag.afterTextChanged(query)
             }
         }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        finish()
-        overridePendingTransition(
-            com.google.android.material.R.anim.abc_fade_in,
-            com.google.android.material.R.anim.abc_fade_out
-        )
     }
 
     fun showNotFound() {

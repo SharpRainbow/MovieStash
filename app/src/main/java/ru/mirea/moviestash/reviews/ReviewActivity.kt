@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -34,10 +35,12 @@ class ReviewActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             review = it
         }
         bindListeners()
-        setSupportActionBar(binding.reviewToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.reviewToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     override fun onResume() {
@@ -46,6 +49,12 @@ class ReviewActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     }
 
     private fun bindListeners() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                setResult(RESULT_OK)
+                finish()
+            }
+        })
         lifecycleScope.launch {
             when (val result: Result<Boolean> = DatabaseController.isModerator()) {
                 is Result.Success<Boolean> -> if (result.data && DatabaseController.user?.id != review.user?.id) {
@@ -134,8 +143,7 @@ class ReviewActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 lifecycleScope.launch {
                     when (val res: Result<Boolean> = DatabaseController.deleteReview(review.id)) {
                         is Result.Success<Boolean> -> {
-                            setResult(RESULT_OK)
-                            finish()
+                            onBackPressedDispatcher.onBackPressed()
                         }
 
                         is Result.Error -> {
@@ -155,23 +163,6 @@ class ReviewActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
         binding.refreshRvw.setOnRefreshListener(this)
     }
-
-    override fun onBackPressed() {
-        setResult(RESULT_OK)
-        super.onBackPressed()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-
 
     override fun onRefresh() {
         if (!::review.isInitialized) return

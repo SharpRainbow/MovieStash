@@ -1,10 +1,13 @@
 package ru.mirea.moviestash.celebrities
 
+import android.app.Activity
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -14,10 +17,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mirea.moviestash.DatabaseController
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.ActivityPersonListBinding
 import ru.mirea.moviestash.entites.Celebrity
+import java.net.ConnectException
 import java.net.URL
+import java.net.UnknownHostException
 
 class PersonList : AppCompatActivity() {
 
@@ -31,10 +37,8 @@ class PersonList : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPersonListBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         movieId = intent.getIntExtra("ID", -1)
         type = intent.getCharExtra("TYPE", 'A')
-
         if (type == 'A')
             binding.personType.text = "Актеры"
         else
@@ -44,14 +48,14 @@ class PersonList : AppCompatActivity() {
             Toast.makeText(this, "Ошибка!", Toast.LENGTH_SHORT).show()
             finish()
         }
-
         bindViews()
         loadContent()
-
-        setSupportActionBar(binding.personListToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.personListToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun bindViews() {
@@ -100,11 +104,23 @@ class PersonList : AppCompatActivity() {
                         result.data.let { set ->
                             for (c in set) {
                                 c.img?.let { img ->
-                                    withContext(Dispatchers.IO) {
-                                        c.bmp = BitmapFactory.decodeStream(
-                                            URL(img).openConnection().getInputStream()
-                                        )
+
+                                    try {
+                                        withContext(Dispatchers.IO) {
+                                            c.bmp = BitmapFactory.decodeStream(
+                                                URL(img).openConnection().getInputStream()
+                                            )
+                                        }
+                                    } catch (e: UnknownHostException) {
+                                        Log.d("DEBUG", e.stackTraceToString())
+                                    } catch (e: ConnectException) {
+                                        Toast.makeText(
+                                            this@PersonList,
+                                            "Не удалось получить изображения!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
+
                                 }
                             }
                             personList.addAll(set)
@@ -138,10 +154,20 @@ class PersonList : AppCompatActivity() {
                                     else
                                         "${c.role}, ${c.description}"
                                 c.img?.let { img ->
-                                    withContext(Dispatchers.IO) {
-                                        c.bmp = BitmapFactory.decodeStream(
-                                            URL(img).openConnection().getInputStream()
-                                        )
+                                    try {
+                                        withContext(Dispatchers.IO) {
+                                            c.bmp = BitmapFactory.decodeStream(
+                                                URL(img).openConnection().getInputStream()
+                                            )
+                                        }
+                                    } catch (e: UnknownHostException) {
+                                        Log.d("DEBUG", e.stackTraceToString())
+                                    } catch (e: ConnectException) {
+                                        Toast.makeText(
+                                            this@PersonList,
+                                            "Не удалось получить изображения!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
@@ -166,15 +192,5 @@ class PersonList : AppCompatActivity() {
             }
             binding.personPb.visibility = View.INVISIBLE
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 }

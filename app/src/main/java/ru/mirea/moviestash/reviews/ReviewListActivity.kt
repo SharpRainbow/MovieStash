@@ -3,6 +3,7 @@ package ru.mirea.moviestash.reviews
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.DatabaseController
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.ActivityReviewListBinding
 import ru.mirea.moviestash.entites.Review
@@ -31,7 +33,6 @@ class ReviewListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityReviewListBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         movieId = intent.getIntExtra("ID", -1)
         if (movieId == -1) {
             Toast.makeText(this, "Ошибка!", Toast.LENGTH_SHORT).show()
@@ -40,10 +41,18 @@ class ReviewListActivity : AppCompatActivity() {
         bindViews()
         loading = true
         loadContent()
-        setSupportActionBar(binding.reviewListToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                setResult(RESULT_OK)
+                finish()
+            }
+        })
+        binding.reviewListToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun bindViews() {
@@ -108,18 +117,4 @@ class ReviewListActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        setResult(RESULT_OK)
-        super.onBackPressed()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 }

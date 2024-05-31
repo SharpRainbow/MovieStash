@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.DatabaseController
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.ActivityBannedUsersBinding
 import ru.mirea.moviestash.entites.SiteUser
@@ -28,11 +29,12 @@ class BannedUsersActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         bindViews()
         binding.bannedUsersRefr.isRefreshing = true
         onRefresh()
-
-        setSupportActionBar(binding.bannedUsersToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.bannedUsersToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun bindViews() {
@@ -103,13 +105,4 @@ class BannedUsersActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 }

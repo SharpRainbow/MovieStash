@@ -68,7 +68,7 @@ class AccountFragment : Fragment(), ChildFragment {
             is Result.Success<Boolean> -> {
                 if (result.data) {
                     binding.bannedUsers.visibility = View.VISIBLE
-                } else binding.bannedUsers.visibility = View.GONE
+                } else binding.bannedUsers.visibility = View.INVISIBLE
             }
 
             is Result.Error -> {
@@ -82,7 +82,7 @@ class AccountFragment : Fragment(), ChildFragment {
                 binding.banMessage.text = getString(
                     R.string.ban_message, Utils.dateToString(it.banDate), it.banReason
                 )
-            } else binding.banMessage.visibility = View.GONE
+            } else binding.banMessage.visibility = View.INVISIBLE
         }
         isRefreshing = false
         return true

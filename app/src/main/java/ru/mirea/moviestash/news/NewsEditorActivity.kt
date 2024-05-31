@@ -27,6 +27,7 @@ import ru.mirea.moviestash.entites.News
 import ru.mirea.moviestash.network.ImgurResponse
 import ru.mirea.moviestash.network.WebClient
 import java.io.File
+import java.net.ConnectException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -92,14 +93,20 @@ class NewsEditorActivity : AppCompatActivity() {
                 imageLink = link
                 lifecycleScope.launch {
                     var bmp: Bitmap? = null
-                    withContext(Dispatchers.IO) {
-                        try {
+                    try {
+                        withContext(Dispatchers.IO) {
                             bmp = BitmapFactory.decodeStream(
                                 URL(link).openConnection().getInputStream()
                             )
-                        } catch (e: UnknownHostException) {
-                            Log.d("DEBUG", e.stackTraceToString())
                         }
+                    } catch (e: UnknownHostException) {
+                        Log.d("DEBUG", e.stackTraceToString())
+                    } catch (e: ConnectException) {
+                        Toast.makeText(
+                            this@NewsEditorActivity,
+                            "Не удалось получить изображения!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     bmp?.let { b ->
                         binding.imageNews.setImageBitmap(b)

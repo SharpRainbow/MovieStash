@@ -2,6 +2,8 @@ package ru.mirea.moviestash.collections
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
+import android.util.TypedValue
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -13,12 +15,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mirea.moviestash.DatabaseController
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.content.ContentAdapter
 import ru.mirea.moviestash.databinding.ActivityCollectionBinding
 import ru.mirea.moviestash.entites.Collection
 import ru.mirea.moviestash.entites.Content
+import java.net.ConnectException
 import java.net.URL
+import java.net.UnknownHostException
 
 
 class CollectionActivity : AppCompatActivity() {
@@ -29,6 +34,7 @@ class CollectionActivity : AppCompatActivity() {
     private var offset = 0
     private val films = mutableListOf<Content>()
     private var loading = false
+    private val COLUMN_WIDTH = 120f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,15 +113,23 @@ class CollectionActivity : AppCompatActivity() {
             colItems.adapter = ContentAdapter(films) {}
             loadContent()
         }
-        setSupportActionBar(binding.colToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.colToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun bindViews() {
         colItems = binding.colItems
-        colItems.layoutManager = GridLayoutManager(this, 3)
+        val metrics = resources.displayMetrics
+        val columnsCount = metrics.widthPixels / TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            COLUMN_WIDTH,
+            metrics
+        )
+        colItems.layoutManager = GridLayoutManager(this, columnsCount.toInt())
         colItems.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -125,16 +139,6 @@ class CollectionActivity : AppCompatActivity() {
                 }
             }
         })
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun loadContent() {
@@ -166,12 +170,22 @@ class CollectionActivity : AppCompatActivity() {
                     val prevSize = films.size
                     result.data.let { set ->
                         for (c in set) {
-                            withContext(Dispatchers.IO) {
-                                c.image?.let {
-                                    c.bmp = BitmapFactory.decodeStream(
-                                        URL(it).openConnection().getInputStream()
-                                    )
+                            try {
+                                withContext(Dispatchers.IO) {
+                                    c.image?.let {
+                                        c.bmp = BitmapFactory.decodeStream(
+                                            URL(it).openConnection().getInputStream()
+                                        )
+                                    }
                                 }
+                            } catch (e: UnknownHostException) {
+                                Log.d("DEBUG", e.stackTraceToString())
+                            } catch (e: ConnectException) {
+                                Toast.makeText(
+                                    this@CollectionActivity,
+                                    "Не удалось получить изображения!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                         films.addAll(set)

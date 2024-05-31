@@ -20,6 +20,7 @@ import ru.mirea.moviestash.DatabaseController
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.FragmentNewsBinding
 import ru.mirea.moviestash.entites.News
+import java.net.ConnectException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -92,6 +93,9 @@ class NewsFragment : Fragment(), ChildFragment {
                             }
                         } catch (e: UnknownHostException) {
                             Log.d("DEBUG", e.stackTraceToString())
+                        }
+                        catch (e: ConnectException) {
+                            showToast("Не удалось получить изображения!")
                         }
                     }
                     newsModel.addAll(set)

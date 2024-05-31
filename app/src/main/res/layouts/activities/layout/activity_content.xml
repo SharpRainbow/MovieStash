@@ -39,7 +39,7 @@
                         android:id="@+id/contentImage"
                         android:layout_width="match_parent"
                         android:layout_height="245dp"
-                        android:background="#ECFEFF"
+                        android:background="@color/item_background"
                         android:padding="10dp"
                         app:srcCompat="@drawable/plchldr" />
 

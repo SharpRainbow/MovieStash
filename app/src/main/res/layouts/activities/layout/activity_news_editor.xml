@@ -35,8 +35,9 @@
                 android:id="@+id/headerNews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text='@{news.title ?? ""}'
-                android:hint="Заголовок" />
+                android:hint="Заголовок"
+                android:inputType="text|textCapSentences"
+                android:text='@{news.title ?? ""}' />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.cardview.widget.CardView
@@ -72,10 +73,10 @@
             android:ems="10"
             android:gravity="start|top"
             android:hint="Описание"
-            android:text='@{news.description ?? ""}'
-            android:inputType="textMultiLine"
+            android:inputType="text|textCapSentences|textMultiLine"
             android:padding="20dp"
             android:scrollbars="vertical"
+            android:text='@{news.description ?? ""}'
             app:layout_constraintBottom_toTopOf="@+id/saveNewsBtn"
             app:layout_constraintEnd_toEndOf="@+id/textInputNews"
             app:layout_constraintHorizontal_bias="0.0"

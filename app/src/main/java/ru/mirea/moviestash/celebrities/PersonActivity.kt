@@ -13,11 +13,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mirea.moviestash.DatabaseController
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.content.ContentAdapter
 import ru.mirea.moviestash.databinding.ActivityPersonBinding
 import ru.mirea.moviestash.entites.Celebrity
 import ru.mirea.moviestash.entites.Content
+import java.net.ConnectException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -67,14 +69,20 @@ class PersonActivity : AppCompatActivity() {
                             binding.person = it
                             it.img?.let { img ->
                                 var bmp: Bitmap? = null
-                                withContext(Dispatchers.IO) {
-                                    try {
+                                try {
+                                    withContext(Dispatchers.IO) {
                                         bmp = BitmapFactory.decodeStream(
                                             URL(img).openConnection().getInputStream()
                                         )
-                                    } catch (e: UnknownHostException) {
-                                        Log.d("DEBUG", e.stackTraceToString())
                                     }
+                                } catch (e: UnknownHostException) {
+                                    Log.d("DEBUG", e.stackTraceToString())
+                                } catch (e: ConnectException) {
+                                    Toast.makeText(
+                                        this@PersonActivity,
+                                        "Не удалось получить изображения!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                                 bmp?.let { b ->
                                     binding.personProfileImage.setImageBitmap(b)
@@ -104,6 +112,12 @@ class PersonActivity : AppCompatActivity() {
                                     }
                                 } catch (e: UnknownHostException) {
                                     Log.d("DEBUG", e.stackTraceToString())
+                                } catch (e: ConnectException) {
+                                    Toast.makeText(
+                                        this@PersonActivity,
+                                        "Не удалось получить изображения!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                             filmList.addAll(set)
@@ -121,19 +135,12 @@ class PersonActivity : AppCompatActivity() {
                 }
             }
         }
-        setSupportActionBar(binding.personToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
+        binding.personToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
             }
         }
-        return super.onOptionsItemSelected(item)
     }
+
 }

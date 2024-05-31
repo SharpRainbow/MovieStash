@@ -52,6 +52,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             when (msg) {
                 is Result.Success<String> -> {
                     connected = true
+                    if (login.isNotEmpty())
+                        getCurrentFragment()?.let {
+                            if (it is AccountHolderFragment)
+                                it.logIn()
+                        }
                 }
 
                 is Result.Error -> {
@@ -91,7 +96,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 }
             }
             binding.appBarLayout.visibility =
-                if ((destination as? FragmentNavigator.Destination)?.className == AccountHolderFragment::class.java.name) View.GONE
+                if ((destination as? FragmentNavigator.Destination)?.className == AccountHolderFragment::class.java.name) View.INVISIBLE
                 else View.VISIBLE
         }
         binding.bottomNavigation.setupWithNavController(navController)

@@ -12,4 +12,5 @@
     <color name="secondary_color">@android:color/darker_gray</color>
     <color name="background">#cae9ff</color>
     <color name="fab_color">#80CAFF</color>
+    <color name="item_background">#ECFEFF</color>
 </resources>

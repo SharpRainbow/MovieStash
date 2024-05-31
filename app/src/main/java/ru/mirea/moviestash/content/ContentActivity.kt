@@ -35,13 +35,14 @@ import ru.mirea.moviestash.entites.Celebrity
 import ru.mirea.moviestash.entites.Content
 import ru.mirea.moviestash.entites.Country
 import ru.mirea.moviestash.entites.Genre
+import ru.mirea.moviestash.entites.Review
 import ru.mirea.moviestash.entites.UserStar
 import ru.mirea.moviestash.network.WebClient
 import ru.mirea.moviestash.reviews.ReviewAdapter
 import ru.mirea.moviestash.reviews.ReviewEditorActivity
 import ru.mirea.moviestash.reviews.ReviewListActivity
 import ru.mirea.moviestash.search.SearchMovies
-import ru.mirea.moviestash.entites.Review
+import java.net.ConnectException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -62,53 +63,55 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
     private val reviews: MutableList<Review> by lazy {
         mutableListOf()
     }
-    private val activityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
-        Log.d("ERROR", result.resultCode.toString())
-        if (result.resultCode == RESULT_OK) {
-            content?.let {
-                lifecycleScope.launch {
-                    when (val res: Result<List<Review>> =
-                        DatabaseController.getReviews(it.id, 5, 0, true)) {
-                        is Result.Success<List<Review>> -> {
-                            res.data.let { set ->
-                                val size = reviews.size
-                                reviews.clear()
-                                binding.reviewRecycler.adapter?.notifyItemRangeRemoved(0, size)
-                                if (set.isNotEmpty()) {
-                                    reviews.addAll(set)
-                                    binding.reviewRecycler.adapter?.notifyItemRangeInserted(0, set.size)
+    private val activityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                content?.let {
+                    lifecycleScope.launch {
+                        when (val res: Result<List<Review>> =
+                            DatabaseController.getReviews(it.id, 5, 0, true)) {
+                            is Result.Success<List<Review>> -> {
+                                res.data.let { set ->
+                                    val size = reviews.size
+                                    reviews.clear()
+                                    binding.reviewRecycler.adapter?.notifyItemRangeRemoved(0, size)
+                                    if (set.isNotEmpty()) {
+                                        reviews.addAll(set)
+                                        binding.reviewRecycler.adapter?.notifyItemRangeInserted(
+                                            0,
+                                            set.size
+                                        )
+                                    }
                                 }
+
                             }
 
-                        }
-
-                        is Result.Error -> {
-                            Toast.makeText(
-                                this@ContentActivity, res.exception.message, Toast.LENGTH_SHORT
-                            ).show()
+                            is Result.Error -> {
+                                Toast.makeText(
+                                    this@ContentActivity, res.exception.message, Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContentBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         bindViews()
         bindListeners()
-
         content = intent.getParcelableExtra("CONTENT")
         binding.contentRefresher.isRefreshing = true
         onRefresh()
-
-        setSupportActionBar(binding.contToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.contToolbar.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun bindViews() {
@@ -200,6 +203,7 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                         )) {
                         is Result.Success<Boolean> -> {
                             dlg.dismiss()
+                            Toast.makeText(this@ContentActivity, "Фильм добвлен в коллекцию!", Toast.LENGTH_SHORT).show()
                         }
 
                         is Result.Error -> {
@@ -259,16 +263,6 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
         binding.contentRefresher.setOnRefreshListener(this)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun getMovieRating(name: String) {
         val film = WebClient.kinopoiskAPI.getFilm(name)
         film.enqueue(object : Callback<SearchMovies> {
@@ -316,14 +310,20 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
             lifecycleScope.launch {
                 it.image?.let { img ->
                     var bmp: Bitmap? = null
-                    withContext(Dispatchers.IO) {
-                        try {
+                    try {
+                        withContext(Dispatchers.IO) {
                             bmp = BitmapFactory.decodeStream(
                                 URL(img).openConnection().getInputStream()
                             )
-                        } catch (e: UnknownHostException) {
-                            Log.d("DEBUG", e.stackTraceToString())
                         }
+                    } catch (e: UnknownHostException) {
+                        Log.d("DEBUG", e.stackTraceToString())
+                    } catch (e: ConnectException) {
+                        Toast.makeText(
+                            this@ContentActivity,
+                            "Не удалось получить изображения!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     bmp?.let { b ->
                         binding.contentImage.setImageBitmap(b)
@@ -393,6 +393,12 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                                         }
                                     } catch (e: UnknownHostException) {
                                         Log.d("DEBUG", e.stackTraceToString())
+                                    } catch (e: ConnectException) {
+                                        Toast.makeText(
+                                            this@ContentActivity,
+                                            "Не удалось получить изображения!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
@@ -415,10 +421,20 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                                 c.description = if (c.description.isEmpty()) c.role
                                 else "${c.role}, ${c.description}"
                                 c.img?.let { img ->
-                                    withContext(Dispatchers.IO) {
-                                        c.bmp = BitmapFactory.decodeStream(
-                                            URL(img).openConnection().getInputStream()
-                                        )
+                                    try {
+                                        withContext(Dispatchers.IO) {
+                                            c.bmp = BitmapFactory.decodeStream(
+                                                URL(img).openConnection().getInputStream()
+                                            )
+                                        }
+                                    } catch (e: UnknownHostException) {
+                                        Log.d("DEBUG", e.stackTraceToString())
+                                    } catch (e: ConnectException) {
+                                        Toast.makeText(
+                                            this@ContentActivity,
+                                            "Не удалось получить изображения!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
@@ -439,7 +455,8 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                     is Result.Success<List<Review>> -> {
                         result.data.let { set ->
                             if (set.isNotEmpty()) reviews.addAll(set)
-                            binding.reviewRecycler.adapter = ReviewAdapter(reviews, activityLauncher)
+                            binding.reviewRecycler.adapter =
+                                ReviewAdapter(reviews, activityLauncher)
                         }
 
                     }

@@ -18,6 +18,7 @@ import ru.mirea.moviestash.DatabaseController
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.FragmentSearchPersonBinding
 import ru.mirea.moviestash.entites.Celebrity
+import java.net.ConnectException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -87,17 +88,13 @@ class SearchPersonFragment : Fragment() {
             when (val result: Result<Boolean> = DatabaseController.checkConnection()) {
                 is Result.Success<Boolean> -> {
                     if (!result.data) {
-                        Toast.makeText(
-                            context, "Ошибка сетевого запроса", Toast.LENGTH_SHORT
-                        ).show()
+                        showToast("Ошибка сетевого запроса")
                         return@launch
                     }
                 }
 
                 is Result.Error -> {
-                    Toast.makeText(
-                        context, result.exception.message, Toast.LENGTH_SHORT
-                    ).show()
+                    showToast(result.exception.message ?: "Ошибка запроса")
                 }
             }
             when (val result: Result<List<Celebrity>> =
@@ -117,6 +114,9 @@ class SearchPersonFragment : Fragment() {
                             } catch (e: UnknownHostException) {
                                 Log.d("DEBUG", e.stackTraceToString())
                             }
+                            catch (e: ConnectException) {
+                                showToast("Не удалось получить изображения!")
+                            }
                         }
                         searchedItems.addAll(set)
                         if (offset == 0) binding.searchPersonRv.adapter?.notifyItemRangeChanged(
@@ -132,9 +132,7 @@ class SearchPersonFragment : Fragment() {
                 }
 
                 is Result.Error -> {
-                    Toast.makeText(
-                        context, result.exception.message, Toast.LENGTH_SHORT
-                    ).show()
+                    showToast(result.exception.message ?: "Ошибка запроса")
                 }
             }
             (activity as SearchActivity).hidePb()
@@ -142,6 +140,13 @@ class SearchPersonFragment : Fragment() {
         }
     }
 
+    private fun showToast(message: String) {
+        context?.let {
+            Toast.makeText(
+                it, message, Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     companion object {
 

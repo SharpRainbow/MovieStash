@@ -9,19 +9,15 @@ import ru.mirea.moviestash.search.SearchPersonFragment
 class ViewPagerAdapter(activity: AppCompatActivity, private val names: List<String>) :
     FragmentStateAdapter(activity) {
 
-    val fragments = mutableListOf<Fragment>()
-
-    init {
-        fragments.add(SearchMovieFragment.newInstance())
-        fragments.add(SearchPersonFragment.newInstance())
-    }
-
     override fun getItemCount(): Int {
-        return fragments.size
+        return names.size
     }
 
     override fun createFragment(position: Int): Fragment {
-        return fragments[position]
+        return when (position) {
+            0 -> SearchMovieFragment.newInstance()
+            else -> SearchPersonFragment.newInstance()
+        }
     }
 
     fun getName(position: Int): String {

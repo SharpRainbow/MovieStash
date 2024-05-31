@@ -35,11 +35,6 @@ class ReviewEditorActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        setResult(RESULT_OK)
-        super.onBackPressed()
-    }
-
     private fun bindViews() {
         title = binding.headerEd
         description = binding.descriptionEd
