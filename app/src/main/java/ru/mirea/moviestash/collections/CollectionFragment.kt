@@ -3,6 +3,7 @@ package ru.mirea.moviestash.collections
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.ChildFragment
 import ru.mirea.moviestash.DatabaseController
@@ -26,7 +26,6 @@ import ru.mirea.moviestash.entites.Collection
 class CollectionFragment : Fragment(), ChildFragment {
 
     private lateinit var binding: FragmentCollectionBinding
-    private lateinit var colContainer: RecyclerView
     private var isRefreshing = false
     private var offset = 0
     private lateinit var collectionsModel: CollectionsModel
@@ -45,11 +44,10 @@ class CollectionFragment : Fragment(), ChildFragment {
     }
 
     private fun bindViews() {
-        colContainer = binding.colRcVw
-        colContainer.layoutManager = GridLayoutManager(context, 2)
+        binding.colRcVw.layoutManager = GridLayoutManager(context, 2)
         lifecycleScope.launch {
             when (val result: Result<Boolean> = DatabaseController.isModerator()) {
-                is Result.Success<Boolean> -> if (result.data) colContainer.adapter =
+                is Result.Success<Boolean> -> if (result.data) binding.colRcVw.adapter =
                     CollectionAdapter(collectionsModel.getAll(), false) {
                         if (it.id <= 0) return@CollectionAdapter
                         val bld = AlertDialog.Builder(requireContext())
@@ -120,9 +118,10 @@ class CollectionFragment : Fragment(), ChildFragment {
                         dlg.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                         dlg.show()
                     }
-                else colContainer.adapter = CollectionAdapter(collectionsModel.getAll(), false) {}
+                else binding.colRcVw.adapter =
+                    CollectionAdapter(collectionsModel.getAll(), false) {}
 
-                is Result.Error -> showToast(result.exception.message ?: "Ошибка")
+                is Result.Error -> Log.e("ERROR", result.exception.message.toString())
             }
         }
 
@@ -159,7 +158,7 @@ class CollectionFragment : Fragment(), ChildFragment {
                     val prevSize = collectionsModel.getSize()
                     collectionsModel.addAll(set)
                     if (set.isNotEmpty()) {
-                        colContainer.adapter?.notifyItemRangeInserted(prevSize, set.size)
+                        binding.colRcVw.adapter?.notifyItemRangeInserted(prevSize, set.size)
                         offset += set.size
                     } else showToast("Ничего не найдено")
                 }
@@ -168,6 +167,7 @@ class CollectionFragment : Fragment(), ChildFragment {
             is Result.Error -> {
                 showToast(result.exception.message ?: "Ошибка")
                 isRefreshing = false
+                collectionsModel.clear()
                 return false
             }
         }

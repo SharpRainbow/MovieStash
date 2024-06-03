@@ -4,7 +4,6 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -21,9 +20,8 @@ import ru.mirea.moviestash.content.ContentAdapter
 import ru.mirea.moviestash.databinding.ActivityCollectionBinding
 import ru.mirea.moviestash.entites.Collection
 import ru.mirea.moviestash.entites.Content
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 
 class CollectionActivity : AppCompatActivity() {
@@ -70,11 +68,7 @@ class CollectionActivity : AppCompatActivity() {
                     }
                 }
 
-                is Result.Error -> {
-                    Toast.makeText(
-                        this@CollectionActivity, result.exception.message, Toast.LENGTH_SHORT
-                    ).show()
-                }
+                is Result.Error -> Log.e("ERROR", result.exception.message.toString())
             }
             if ((col.uid ?: -1) > 0 || (col.uid == null && isModerator)) colItems.adapter =
                 ContentAdapter(films) {
@@ -115,6 +109,7 @@ class CollectionActivity : AppCompatActivity() {
         }
         binding.colToolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(resources.getColor(R.color.text_color, theme))
             setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
@@ -178,9 +173,8 @@ class CollectionActivity : AppCompatActivity() {
                                         )
                                     }
                                 }
-                            } catch (e: UnknownHostException) {
-                                Log.d("DEBUG", e.stackTraceToString())
-                            } catch (e: ConnectException) {
+                            } catch (e: IOException) {
+                                Log.e("ERROR", e.stackTraceToString())
                                 Toast.makeText(
                                     this@CollectionActivity,
                                     "Не удалось получить изображения!",

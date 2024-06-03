@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -13,11 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/background"
-        android:elevation="0dp"
-        android:visibility="visible"
-        app:elevation="0dp">
+        android:visibility="visible">
 
         <androidx.appcompat.widget.Toolbar
+            android:id="@+id/mainToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll">
@@ -33,6 +31,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/background_round"
                 android:drawableStart="@drawable/ic_baseline_search_24"
+                android:drawableTint="?attr/colorControlNormal"
                 android:drawablePadding="18dp"
                 android:elevation="5dp"
                 android:padding="15dp"
@@ -80,7 +79,7 @@
         android:background="@drawable/bottom_navigation_background"
         android:elevation="8dp"
         app:itemIconTint="@drawable/bottom_navigation_color_selector"
-        app:itemTextColor="#4A5671"
+        app:itemTextColor="@color/icon_color"
         app:labelVisibilityMode="selected"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -20,9 +19,8 @@ import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.ActivityNewsBinding
 import ru.mirea.moviestash.entites.News
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -48,9 +46,8 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                                 URL(it).openConnection().getInputStream()
                             )
                         }
-                    } catch (e: UnknownHostException) {
-                        Log.d("DEBUG", e.stackTraceToString())
-                    } catch (e: ConnectException) {
+                    } catch (e: IOException) {
+                        Log.e("ERROR", e.stackTraceToString())
                         Toast.makeText(
                             this@NewsActivity,
                             "Не удалось получить изображения!",
@@ -69,6 +66,7 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun bindListeners() {
         binding.newsToolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(resources.getColor(R.color.text_color, theme))
             setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
@@ -122,9 +120,7 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                     }
                 }
 
-                is Result.Error -> Toast.makeText(
-                    this@NewsActivity, result.exception.message, Toast.LENGTH_SHORT
-                ).show()
+                is Result.Error -> Log.e("ERROR", result.exception.message.toString())
             }
         }
     }
@@ -165,9 +161,8 @@ class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                                 bmp?.let {
                                     binding.imageNews.setImageBitmap(it)
                                 }
-                            } catch (e: UnknownHostException) {
-                                Log.d("DEBUG", e.stackTraceToString())
-                            } catch (e: ConnectException) {
+                            } catch (e: IOException) {
+                                Log.e("ERROR", e.stackTraceToString())
                                 Toast.makeText(
                                     this@NewsActivity,
                                     "Не удалось получить изображения!",

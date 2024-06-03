@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -9,91 +9,84 @@
             type="ru.mirea.moviestash.entites.News" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background"
-        tools:context=".reviews.ReviewActivity">
+        android:fillViewport="true">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputNews"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:textColorHint="@color/secondary_color"
-            app:boxCornerRadiusBottomEnd="10dp"
-            app:boxCornerRadiusBottomStart="10dp"
-            app:boxCornerRadiusTopEnd="10dp"
-            app:boxCornerRadiusTopStart="10dp"
-            app:circularflow_defaultRadius="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background"
+            android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/headerNews"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputNews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Заголовок"
-                android:inputType="text|textCapSentences"
-                android:text='@{news.title ?? ""}' />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:textColorHint="@color/secondary_color"
+                app:boxCornerRadiusBottomEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusTopStart="10dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardNews"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textInputNews">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/headerNews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Заголовок"
+                    android:inputType="text|textCapSentences"
+                    android:text='@{news.title ?? ""}' />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/imageNews"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardNews"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:clickable="true"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/r_placeholder"
-                tools:srcCompat="@drawable/r_placeholder" />
-        </androidx.cardview.widget.CardView>
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                app:cardCornerRadius="10dp">
 
-        <EditText
-            android:id="@+id/descriptionNews"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/background_round"
-            android:elevation="5dp"
-            android:ems="10"
-            android:gravity="start|top"
-            android:hint="Описание"
-            android:inputType="text|textCapSentences|textMultiLine"
-            android:padding="20dp"
-            android:scrollbars="vertical"
-            android:text='@{news.description ?? ""}'
-            app:layout_constraintBottom_toTopOf="@+id/saveNewsBtn"
-            app:layout_constraintEnd_toEndOf="@+id/textInputNews"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/textInputNews"
-            app:layout_constraintTop_toBottomOf="@id/cardNews"
-            app:layout_constraintVertical_bias="0.0" />
+                <ImageView
+                    android:id="@+id/imageNews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:clickable="true"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/r_placeholder"
+                    tools:srcCompat="@drawable/r_placeholder" />
+            </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/saveNewsBtn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Сохранить"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/descriptionNews" />
+            <EditText
+                android:id="@+id/descriptionNews"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/background_round"
+                android:elevation="5dp"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="Описание"
+                android:inputType="text|textCapSentences|textMultiLine"
+                android:minHeight="200dp"
+                android:padding="20dp"
+                android:scrollbars="vertical"
+                android:text='@{news.description ?? ""}' />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/saveNewsBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Сохранить" />
+
+        </LinearLayout>
+    </ScrollView>
 </layout>

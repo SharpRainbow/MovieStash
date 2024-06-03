@@ -3,7 +3,7 @@ package ru.mirea.moviestash.collections
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.MenuItem
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -116,9 +116,7 @@ class UserCollectionActivity : AppCompatActivity() {
                 when (val result: Result<Boolean> = DatabaseController.isModerator()) {
                     is Result.Success<Boolean> -> if (result.data) publish.visibility = View.VISIBLE
 
-                    is Result.Error -> Toast.makeText(
-                        this@UserCollectionActivity, result.exception.message, Toast.LENGTH_SHORT
-                    ).show()
+                    is Result.Error -> Log.e("ERROR", result.exception.message.toString())
                 }
             }
             dlg.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -129,6 +127,7 @@ class UserCollectionActivity : AppCompatActivity() {
     private fun bindListeners() {
         binding.userListToolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(resources.getColor(R.color.text_color, theme))
             setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }

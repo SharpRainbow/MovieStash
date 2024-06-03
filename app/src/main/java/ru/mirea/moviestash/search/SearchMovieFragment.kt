@@ -17,9 +17,8 @@ import kotlinx.coroutines.withContext
 import ru.mirea.moviestash.DatabaseController
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.FragmentSearchMovieBinding
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 class SearchMovieFragment : Fragment() {
 
@@ -107,10 +106,8 @@ class SearchMovieFragment : Fragment() {
                                         )
                                     }
                                 }
-                            } catch (e: UnknownHostException) {
-                                Log.d("DEBUG", e.stackTraceToString())
-                            }
-                            catch (e: ConnectException) {
+                            } catch (e: IOException) {
+                                Log.e("ERROR", e.stackTraceToString())
                                 showToast("Не удалось получить изображения!")
                             }
                         }

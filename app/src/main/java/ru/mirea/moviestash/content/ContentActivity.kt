@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -42,9 +41,8 @@ import ru.mirea.moviestash.reviews.ReviewAdapter
 import ru.mirea.moviestash.reviews.ReviewEditorActivity
 import ru.mirea.moviestash.reviews.ReviewListActivity
 import ru.mirea.moviestash.search.SearchMovies
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -108,6 +106,7 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
         onRefresh()
         binding.contToolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(resources.getColor(R.color.text_color, theme))
             setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
@@ -203,7 +202,11 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                         )) {
                         is Result.Success<Boolean> -> {
                             dlg.dismiss()
-                            Toast.makeText(this@ContentActivity, "Фильм добвлен в коллекцию!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@ContentActivity,
+                                "Фильм добвлен в коллекцию!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
                         is Result.Error -> {
@@ -316,9 +319,8 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                                 URL(img).openConnection().getInputStream()
                             )
                         }
-                    } catch (e: UnknownHostException) {
-                        Log.d("DEBUG", e.stackTraceToString())
-                    } catch (e: ConnectException) {
+                    } catch (e: IOException) {
+                        Log.e("ERROR", e.stackTraceToString())
                         Toast.makeText(
                             this@ContentActivity,
                             "Не удалось получить изображения!",
@@ -391,9 +393,8 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                                                 URL(img).openConnection().getInputStream()
                                             )
                                         }
-                                    } catch (e: UnknownHostException) {
-                                        Log.d("DEBUG", e.stackTraceToString())
-                                    } catch (e: ConnectException) {
+                                    } catch (e: IOException) {
+                                        Log.e("ERROR", e.stackTraceToString())
                                         Toast.makeText(
                                             this@ContentActivity,
                                             "Не удалось получить изображения!",
@@ -427,9 +428,8 @@ class ContentActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                                                 URL(img).openConnection().getInputStream()
                                             )
                                         }
-                                    } catch (e: UnknownHostException) {
-                                        Log.d("DEBUG", e.stackTraceToString())
-                                    } catch (e: ConnectException) {
+                                    } catch (e: IOException) {
+                                        Log.e("ERROR", e.stackTraceToString())
                                         Toast.makeText(
                                             this@ContentActivity,
                                             "Не удалось получить изображения!",

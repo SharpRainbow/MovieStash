@@ -8,9 +8,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="button_color">#4A5671</color>
+    <color name="icon_color">#4A5671</color>
     <color name="text_color">#DE000000</color>
+    <color name="secondary_text_color">#ff49454f</color>
+    <color name="button_text_color">@color/white</color>
     <color name="secondary_color">@android:color/darker_gray</color>
     <color name="background">#cae9ff</color>
     <color name="fab_color">#80CAFF</color>
     <color name="item_background">#ECFEFF</color>
+    <color name="background_secondary">@color/white</color>
 </resources>

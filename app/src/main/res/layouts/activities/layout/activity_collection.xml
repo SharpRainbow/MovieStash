@@ -22,9 +22,11 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
         android:elevation="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_scrollFlags="scroll">
+
         <TextView
             android:id="@+id/collectionName"
             android:layout_width="wrap_content"
@@ -56,13 +58,15 @@
 
     <TextView
         android:id="@+id/colDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="10dp"
         android:text="@{collection.description}"
         android:textColor="@color/secondary_color"
         android:textSize="16sp"
         android:visibility="@{collection.description.isEmpty() ? View.GONE : View.VISIBLE}"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/colToolbar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

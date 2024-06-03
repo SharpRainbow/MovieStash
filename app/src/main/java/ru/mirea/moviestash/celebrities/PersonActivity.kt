@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -19,9 +18,8 @@ import ru.mirea.moviestash.content.ContentAdapter
 import ru.mirea.moviestash.databinding.ActivityPersonBinding
 import ru.mirea.moviestash.entites.Celebrity
 import ru.mirea.moviestash.entites.Content
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 class PersonActivity : AppCompatActivity() {
 
@@ -75,9 +73,8 @@ class PersonActivity : AppCompatActivity() {
                                             URL(img).openConnection().getInputStream()
                                         )
                                     }
-                                } catch (e: UnknownHostException) {
-                                    Log.d("DEBUG", e.stackTraceToString())
-                                } catch (e: ConnectException) {
+                                } catch (e: IOException) {
+                                    Log.e("ERROR", e.stackTraceToString())
                                     Toast.makeText(
                                         this@PersonActivity,
                                         "Не удалось получить изображения!",
@@ -110,9 +107,8 @@ class PersonActivity : AppCompatActivity() {
                                             )
                                         }
                                     }
-                                } catch (e: UnknownHostException) {
-                                    Log.d("DEBUG", e.stackTraceToString())
-                                } catch (e: ConnectException) {
+                                } catch (e: IOException) {
+                                    Log.e("ERROR", e.stackTraceToString())
                                     Toast.makeText(
                                         this@PersonActivity,
                                         "Не удалось получить изображения!",
@@ -137,6 +133,7 @@ class PersonActivity : AppCompatActivity() {
         }
         binding.personToolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(resources.getColor(R.color.text_color, theme))
             setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }

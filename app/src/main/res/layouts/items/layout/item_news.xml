@@ -48,7 +48,7 @@
             android:layout_marginEnd="20dp"
             android:maxLines="3"
             android:text="@{news.title}"
-            android:textColor="#000000"
+            android:textColor="@color/text_color"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cardNewsImg"

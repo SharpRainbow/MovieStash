@@ -16,11 +16,11 @@ import ru.mirea.moviestash.collections.CollectionAdapter
 import ru.mirea.moviestash.content.ContentAdapter
 import ru.mirea.moviestash.databinding.FragmentHomeBinding
 import ru.mirea.moviestash.entites.Collection
+import ru.mirea.moviestash.entites.Content
 import ru.mirea.moviestash.entites.Genre
 import ru.mirea.moviestash.news.NewsAdapter
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 class HomeFragment : Fragment(), ChildFragment {
 
@@ -72,9 +72,9 @@ class HomeFragment : Fragment(), ChildFragment {
             homeDataModel.clearFilms()
             binding.contentsMain.adapter?.notifyItemRangeRemoved(0, prevSize)
         }
-        when (val result: Result<List<ru.mirea.moviestash.entites.Content>> =
+        when (val result: Result<List<Content>> =
             DatabaseController.getMainPageCont()) {
-            is Result.Success<List<ru.mirea.moviestash.entites.Content>> -> {
+            is Result.Success<List<Content>> -> {
                 result.data.let { set ->
                     for (c in set) {
                         try {
@@ -85,11 +85,8 @@ class HomeFragment : Fragment(), ChildFragment {
                                     )
                                 }
                             }
-                        }
-                        catch (e: UnknownHostException) {
-                            Log.d("DEBUG", e.stackTraceToString())
-                        }
-                        catch (e: ConnectException) {
+                        } catch (e: IOException) {
+                            Log.e("ERROR", e.stackTraceToString())
                             showToast("Не удалось получить изображения!")
                         }
                     }
@@ -141,10 +138,8 @@ class HomeFragment : Fragment(), ChildFragment {
                                     )
                                 }
                             }
-                        } catch (e: UnknownHostException) {
-                            Log.d("DEBUG", e.stackTraceToString())
-                        }
-                        catch (e: ConnectException) {
+                        } catch (e: IOException) {
+                            Log.e("ERROR", e.stackTraceToString())
                             showToast("Не удалось получить изображения!")
                         }
                     }

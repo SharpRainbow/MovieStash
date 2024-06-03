@@ -71,7 +71,8 @@ object DatabaseController {
                         realPass = getShaHash(password, login)
                     }
                     val newConnectionSource = JdbcConnectionSource(jdbcUrl, login, realPass)
-                    val newConnection = newConnectionSource.getReadWriteConnection("").underlyingConnection
+                    val newConnection =
+                        newConnectionSource.getReadWriteConnection("").underlyingConnection
                     connectionSource = newConnectionSource
                     connection = newConnection
                     message = if (connection?.isValid(0) == true) {
@@ -88,8 +89,7 @@ object DatabaseController {
                 } catch (e: PSQLException) {
                     if (e.message?.contains("password authentication failed") == true) {
                         message = Result.Error(Exception("Неверные учетные данные!"))
-                    }
-                    else {
+                    } else {
                         Log.e("ERROR", "Log in error", e)
                         message = Result.Error(Exception("Произошла непредвиденная ошибка"))
                     }
@@ -269,7 +269,7 @@ object DatabaseController {
                         contentQueryBuilder.limit(6)
                         val res = contentDao.query(contentQueryBuilder.prepare())
                         Result.Success(res)
-                    } else Result.Error(Exception("Ошибка запроса 4"))
+                    } else Result.Error(Exception("Не удалось получить данные"))
                 } catch (e: PSQLException) {
                     Result.Error(e)
                 }
@@ -811,7 +811,7 @@ object DatabaseController {
                         newQueryBuilder.offset(offset.toLong())
                         val res = newDao.query(newQueryBuilder.prepare())
                         Result.Success(res)
-                    } else Result.Error(Exception("Ошибка запроса 25"))
+                    } else Result.Error(Exception(""))
                 } catch (e: PSQLException) {
                     Result.Error(e)
                 }
@@ -910,7 +910,7 @@ object DatabaseController {
                         if (result.next()) {
                             Result.Success(result.getBoolean("pg_has_role"))
                         } else Result.Error(Exception("Запрос не вернул результатов"))
-                    } else Result.Error(Exception("Ошибка запроса 29"))
+                    } else Result.Error(Exception("Нет соединения с сервером"))
                 } catch (e: PSQLException) {
                     Log.d("DEBUG", e.stackTraceToString())
                     Result.Error(e)

@@ -9,7 +9,6 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background"
         tools:context=".search.SearchActivity">
 
         <com.google.android.material.appbar.AppBarLayout
@@ -27,8 +26,7 @@
                 android:id="@+id/customToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:theme="@style/ToolbarColoredBackArrow">
+                android:gravity="center">
 
                 <EditText
                     android:id="@+id/contentSearcher"

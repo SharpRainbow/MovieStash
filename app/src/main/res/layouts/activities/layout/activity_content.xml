@@ -33,6 +33,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/background_secondary"
                     android:orientation="vertical">
 
                     <ImageView
@@ -84,6 +85,7 @@
                             android:layout_weight="1"
                             android:background="@android:color/transparent"
                             android:drawableTop="@drawable/add_to_list"
+                            android:drawableTint="?attr/colorControlNormal"
                             android:text="Добавить"
                             android:textAllCaps="false"
                             android:textColor="@color/text_color"
@@ -96,6 +98,7 @@
                             android:layout_weight="1"
                             android:background="@android:color/transparent"
                             android:drawableTop="@drawable/rate"
+                            android:drawableTint="?attr/colorControlNormal"
                             android:onClickListener="@{rateContent}"
                             android:text="Оценить"
                             android:textAllCaps="false"
@@ -228,6 +231,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableStart="@drawable/country"
+                        android:drawableTint="?attr/colorControlNormal"
                         android:drawablePadding="10dp"
                         android:gravity="center_vertical"
                         android:padding="10dp"
@@ -240,6 +244,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableStart="@drawable/release_date"
+                        android:drawableTint="?attr/colorControlNormal"
                         android:drawablePadding="10dp"
                         android:gravity="center_vertical"
                         android:padding="10dp"
@@ -251,6 +256,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableStart="@drawable/time_len"
+                        android:drawableTint="?attr/colorControlNormal"
                         android:drawablePadding="10dp"
                         android:gravity="center_vertical"
                         android:padding="10dp"
@@ -262,6 +268,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableStart="@drawable/budget"
+                        android:drawableTint="?attr/colorControlNormal"
                         android:drawablePadding="10dp"
                         android:gravity="center_vertical"
                         android:padding="10dp"
@@ -273,6 +280,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableStart="@drawable/box_office"
+                        android:drawableTint="?attr/colorControlNormal"
                         android:drawablePadding="10dp"
                         android:padding="10dp"
                         android:text="@{Utils.formatMoney(film.boxOffice)}"

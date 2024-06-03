@@ -2,6 +2,7 @@ package ru.mirea.moviestash.user_management
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -71,9 +72,7 @@ class AccountFragment : Fragment(), ChildFragment {
                 } else binding.bannedUsers.visibility = View.INVISIBLE
             }
 
-            is Result.Error -> {
-                showToast(result.exception.message ?: "Ошибка")
-            }
+            is Result.Error -> Log.e("ERROR", result.exception.message.toString())
         }
         DatabaseController.refreshUserData()
         DatabaseController.user?.let {

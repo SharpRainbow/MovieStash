@@ -18,9 +18,8 @@ import ru.mirea.moviestash.DatabaseController
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.databinding.FragmentSearchPersonBinding
 import ru.mirea.moviestash.entites.Celebrity
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 class SearchPersonFragment : Fragment() {
 
@@ -111,10 +110,8 @@ class SearchPersonFragment : Fragment() {
                                         )
                                     }
                                 }
-                            } catch (e: UnknownHostException) {
-                                Log.d("DEBUG", e.stackTraceToString())
-                            }
-                            catch (e: ConnectException) {
+                            } catch (e: IOException) {
+                                Log.e("ERROR", e.stackTraceToString())
                                 showToast("Не удалось получить изображения!")
                             }
                         }

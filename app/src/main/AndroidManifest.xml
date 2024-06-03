@@ -13,8 +13,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MovieStash.NoActionBar"
-        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.MovieStash"
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
         <activity
@@ -31,9 +30,7 @@
             android:exported="false" />
         <activity
             android:name=".reviews.ReviewActivity"
-            android:exported="false"
-            android:label="@string/title_activity_review"
-            android:theme="@style/Theme.MovieStash.NoActionBar.NoActionBar" />
+            android:exported="false" />
         <activity
             android:name=".collections.UserCollectionActivity"
             android:exported="false" />
@@ -60,6 +57,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
+            android:theme="@style/Theme.MovieStash.Starting"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

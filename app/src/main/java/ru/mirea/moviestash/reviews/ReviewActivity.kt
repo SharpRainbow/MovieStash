@@ -4,7 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.MenuItem
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -37,6 +37,7 @@ class ReviewActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         bindListeners()
         binding.reviewToolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(resources.getColor(R.color.text_color, theme))
             setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
@@ -95,9 +96,7 @@ class ReviewActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     }
                 }
 
-                is Result.Error -> Toast.makeText(
-                    this@ReviewActivity, result.exception.message, Toast.LENGTH_SHORT
-                ).show()
+                is Result.Error -> Log.e("ERROR", result.exception.message.toString())
             }
         }
         binding.banFab.setOnClickListener {

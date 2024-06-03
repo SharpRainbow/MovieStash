@@ -31,6 +31,7 @@ class BannedUsersActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         onRefresh()
         binding.bannedUsersToolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(resources.getColor(R.color.text_color, theme))
             setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }

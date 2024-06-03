@@ -1,6 +1,7 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Base application theme. -->
-    <style name="Theme.MovieStash" parent="Theme.Material3.DayNight">
+    <style name="Theme.MovieStash" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/button_color</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -12,20 +13,16 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" >@color/background</item>
         <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@color/background</item>
     </style>
-    <style name="Theme.MovieStash.NoActionBar" parent="Theme.MovieStash">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-    <style name="MyCardViewStyle" parent="Theme.AppCompat.Light">
+    <style name="MyCardViewStyle" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="cardCornerRadius">10dp</item>
         <item name="cardElevation">2dp</item>
         <item name="cardMaxElevation">4dp</item>
         <item name="cardBackgroundColor">@color/item_background</item>
     </style>
-    <style name="ToolbarColoredBackArrow" parent="Theme.MovieStash">
-        <item name="android:textColorSecondary">@color/black</item>
+    <style name="Theme.MovieStash.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.MovieStash</item>
     </style>
-    <style name="Theme.MovieStash.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="Theme.MovieStash.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

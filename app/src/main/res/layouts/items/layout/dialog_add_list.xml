@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="250dp"
     android:layout_gravity="center"
@@ -58,63 +59,67 @@
 
     <TextView
         android:id="@+id/addBtn"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="15dp"
         android:clickable="true"
         android:text="Сохранить"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/cancelBtn" />
 
     <TextView
         android:id="@+id/hideColBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="10dp"
         android:text="Скрыть"
         android:visibility="gone"
-        app:layout_constraintBaseline_toBaselineOf="@id/cancelBtn"
-        app:layout_constraintEnd_toStartOf="@+id/deleteUsrColBtn"
+        app:layout_constraintBaseline_toBaselineOf="@+id/publishColBtn"
+        app:layout_constraintEnd_toStartOf="@+id/publishColBtn"
         app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/deleteUsrColBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="10dp"
         android:clickable="true"
         android:text="Удалить"
         android:visibility="gone"
         app:layout_constraintBaseline_toBaselineOf="@+id/cancelBtn"
-        app:layout_constraintEnd_toStartOf="@+id/cancelBtn" />
+        app:layout_constraintEnd_toStartOf="@+id/cancelBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/publishColBtn" />
 
     <TextView
         android:id="@+id/publishColBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="10dp"
         android:clickable="true"
         android:text="Опубликовать"
         android:visibility="gone"
-        app:layout_constraintBaseline_toBaselineOf="@+id/cancelBtn"
+        app:layout_constraintBaseline_toBaselineOf="@+id/deleteUsrColBtn"
         app:layout_constraintEnd_toStartOf="@+id/deleteUsrColBtn"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/hideColBtn" />
 
     <TextView
         android:id="@+id/cancelBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="10dp"
         android:clickable="true"
         android:text="Отмена"
         app:layout_constraintBaseline_toBaselineOf="@+id/addBtn"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/addBtn" />
+        app:layout_constraintEnd_toStartOf="@+id/addBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/deleteUsrColBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

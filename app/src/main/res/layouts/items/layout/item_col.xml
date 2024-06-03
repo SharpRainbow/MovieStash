@@ -25,7 +25,8 @@
             android:layout_margin="20dp"
             android:breakStrategy="balanced"
             android:gravity="center"
-            android:text="Коллекция" />
+            android:text="Коллекция"
+            android:textColor="@color/secondary_text_color" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

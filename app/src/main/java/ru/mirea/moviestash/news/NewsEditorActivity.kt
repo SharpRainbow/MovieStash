@@ -27,9 +27,8 @@ import ru.mirea.moviestash.entites.News
 import ru.mirea.moviestash.network.ImgurResponse
 import ru.mirea.moviestash.network.WebClient
 import java.io.File
-import java.net.ConnectException
+import java.io.IOException
 import java.net.URL
-import java.net.UnknownHostException
 
 class NewsEditorActivity : AppCompatActivity() {
 
@@ -99,9 +98,8 @@ class NewsEditorActivity : AppCompatActivity() {
                                 URL(link).openConnection().getInputStream()
                             )
                         }
-                    } catch (e: UnknownHostException) {
-                        Log.d("DEBUG", e.stackTraceToString())
-                    } catch (e: ConnectException) {
+                    } catch (e: IOException) {
+                        Log.e("ERROR", e.stackTraceToString())
                         Toast.makeText(
                             this@NewsEditorActivity,
                             "Не удалось получить изображения!",

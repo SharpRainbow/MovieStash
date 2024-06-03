@@ -2,10 +2,11 @@ package ru.mirea.moviestash
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -14,7 +15,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.delay
-
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.databinding.ActivityMainBinding
 import ru.mirea.moviestash.news.NewsEditorActivity
@@ -32,10 +32,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         bindViews()
         bindListeners()
         val login = sharedPref.getString("LOGIN", "")
@@ -89,14 +89,12 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                         is Result.Success<Boolean> -> if (result.data) binding.addButton.visibility =
                             View.VISIBLE
 
-                        is Result.Error -> Toast.makeText(
-                            this@MainActivity, result.exception.message, Toast.LENGTH_SHORT
-                        ).show()
+                        is Result.Error -> Log.e("ERROR", result.exception.message.toString())
                     }
                 }
             }
-            binding.appBarLayout.visibility =
-                if ((destination as? FragmentNavigator.Destination)?.className == AccountHolderFragment::class.java.name) View.INVISIBLE
+            binding.mainToolbar.visibility =
+                if ((destination as? FragmentNavigator.Destination)?.className == AccountHolderFragment::class.java.name) View.GONE
                 else View.VISIBLE
         }
         binding.bottomNavigation.setupWithNavController(navController)
@@ -150,9 +148,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             getCurrentFragment()?.let { activeFragment ->
                 val res = when (activeFragment) {
                     is ChildFragment -> {
-                        while (!activeFragment.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) delay(
-                            10
-                        )
+                        while (!activeFragment.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                            delay(10)
+                        }
                         val child = (activeFragment as ChildFragment)
                         if (initialize && child.isInitialized()) true
                         else {
@@ -161,9 +159,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                         }
                     }
 
-                    else -> {
-                        true
-                    }
+                    else -> true
                 }
                 if (!res) showError()
                 else hideError()
