@@ -1,47 +1,48 @@
-package ru.mirea.moviestash;
+package ru.mirea.moviestash
 
-import java.sql.Date;
-import java.sql.Time;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
+import java.sql.Date
+import java.sql.Time
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-public class Utils {
-
-    public static String dateToString(Date date) {
-        if (date == null) return "";
-        return new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date);
+object Utils {
+    fun dateToString(date: Date?): String {
+        if (date == null) return ""
+        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
     }
 
-    public static String timeToString(Time time) {
-        return new SimpleDateFormat("HH ч mm мин", Locale.getDefault()).format(time);
+    fun timeToString(time: Time): String {
+        return SimpleDateFormat("HH ч mm мин", Locale.getDefault()).format(time)
     }
 
-    public static String formatMoney(long money) {
-        return new DecimalFormat("###,###").format(money) + " $";
+    fun formatMoney(money: Long): String {
+        return DecimalFormat("###,###").format(money) + " $"
     }
 
-    public static String getLiveDates(Date b, Date d) {
+    fun getLiveDates(b: Date?, d: Date?): String? {
         if (b == null && d == null) {
-            return null;
-        } else if (b == null) return String.format("Дата смерти: %s", dateToString(d));
-        else if (d == null) return String.format("Дата рождения: %s", dateToString(b));
-        else return String.format("Годы жизни:\n%s - %s", dateToString(b), dateToString(d));
-
+            return null
+        } else if (b == null) return String.format("Дата смерти: %s", dateToString(d))
+        else if (d == null) return String.format("Дата рождения: %s", dateToString(b))
+        else return String.format("Годы жизни:\n%s - %s", dateToString(b), dateToString(d))
     }
 
-    public static String opinionCodeToString(int code) {
-        String op = "Нейтральный отзыв";
-        switch (code) {
-            case 1:
-                op = "Оставил негативный отзыв";
-                break;
-            case 2:
-                op = "Оставил нейтральный отзыв";
-                break;
-            case 3:
-                op = "Оставил позитивный отзыв";
+    fun getLiveDates(a: String, b: String): String {
+        return if (b.isEmpty()) {
+            String.format("Дата рождения: %s", a)
+        } else {
+            String.format("Годы жизни:\n%s - %s", a, b)
         }
-        return op;
+    }
+
+    fun opinionCodeToString(code: Int): String {
+        var op = "Нейтральный отзыв"
+        when (code) {
+            1 -> op = "Оставил негативный отзыв"
+            2 -> op = "Оставил нейтральный отзыв"
+            3 -> op = "Оставил позитивный отзыв"
+        }
+        return op
     }
 }

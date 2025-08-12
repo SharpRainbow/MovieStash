@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".MovieStashApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,48 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MovieStash"
         android:windowSoftInputMode="adjustResize"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".news.NewsEditorActivity"
-            android:exported="false" />
-        <activity
-            android:name=".user_management.BannedUsersActivity"
-            android:exported="false" />
-        <activity
-            android:name=".reviews.ReviewListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".reviews.ReviewEditorActivity"
-            android:exported="false" />
-        <activity
-            android:name=".reviews.ReviewActivity"
-            android:exported="false" />
-        <activity
-            android:name=".collections.UserCollectionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".user_management.RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".celebrities.PersonList"
-            android:exported="false" />
-        <activity
-            android:name=".news.NewsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".collections.CollectionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".celebrities.PersonActivity"
-            android:exported="false" />
-        <activity
-            android:name=".content.ContentActivity"
-            android:exported="false" />
-        <activity
-            android:name=".search.SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:theme="@style/Theme.MovieStash.Starting"
             android:exported="true">
             <intent-filter>

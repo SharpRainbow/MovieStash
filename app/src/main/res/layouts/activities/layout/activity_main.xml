@@ -5,65 +5,52 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".presentation.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background"
+        android:background="@color/md_theme_background"
         android:visibility="visible">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/mainToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll">
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <TextView
                 android:id="@+id/searchTrigger"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="30dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/background_round"
-                android:drawableStart="@drawable/ic_baseline_search_24"
-                android:drawableTint="?attr/colorControlNormal"
                 android:drawablePadding="18dp"
                 android:elevation="5dp"
                 android:padding="15dp"
-                android:text="Поиск фильмов"
-                android:textColor="@color/secondary_color"
-                android:textSize="16sp" />
+                android:text="@string/search"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/ic_baseline_search_24"
+                app:drawableTint="?attr/colorControlNormal" />
 
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/refresher"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <!--<androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false" />-->
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_container"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/bottom_nav" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        android:clipToPadding="false"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/bottom_nav"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -78,12 +65,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/bottom_navigation_background"
         android:elevation="8dp"
-        app:itemIconTint="@drawable/bottom_navigation_color_selector"
-        app:itemTextColor="@color/icon_color"
         app:labelVisibilityMode="selected"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_items" />
 
     <TextView
@@ -92,8 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center_vertical"
-        android:text="Ошибка соединения"
-        android:textColor="@color/text_color"
+        android:text="@string/error_connection"
         android:textSize="20sp"
         android:visibility="gone" />
 
@@ -112,8 +93,8 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="80dp"
-        android:backgroundTint="@color/fab_color"
         android:clickable="true"
+        android:contentDescription="@string/add_news"
         android:visibility="gone"
         app:srcCompat="@android:drawable/ic_input_add" />
 

@@ -3,36 +3,224 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_nav"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/fragment_home">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="ru.mirea.moviestash.HomeFragment"
+        android:id="@+id/fragment_home"
+        android:name="ru.mirea.moviestash.presentation.home.HomeFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_home"/>
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_fragment_home_to_fragment_collection_content"
+            app:destination="@id/fragment_collection_content" />
+        <action
+            android:id="@+id/action_fragment_home_to_contentFragment"
+            app:destination="@id/fragment_content" />
+        <action
+            android:id="@+id/action_fragment_home_to_fragment_news"
+            app:destination="@id/fragment_news" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_collection"
-        android:name="ru.mirea.moviestash.collections.CollectionFragment"
+        android:id="@+id/fragment_collection"
+        android:name="ru.mirea.moviestash.presentation.collections.CollectionFragment"
         android:label="Collections"
-        tools:layout="@layout/fragment_collection"/>
+        tools:layout="@layout/fragment_collection">
+        <action
+            android:id="@+id/action_fragment_collection_to_fragment_collection_content"
+            app:destination="@id/fragment_collection_content" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_news"
-        android:name="ru.mirea.moviestash.news.NewsFragment"
-        android:label="News"
-        tools:layout="@layout/fragment_news"/>
+        android:id="@+id/fragment_news_list"
+        android:name="ru.mirea.moviestash.presentation.news_list.NewsListFragment"
+        android:label="NewsList"
+        tools:layout="@layout/fragment_news_list" >
+        <action
+            android:id="@+id/action_fragment_news_list_to_fragment_news"
+            app:destination="@id/fragment_news" />
+        <action
+            android:id="@+id/action_fragment_news_list_to_fragment_news_editor"
+            app:destination="@id/fragment_news_editor" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_login"
-        android:name="ru.mirea.moviestash.user_management.LogInFragment"
-        android:label="Account"
-        tools:layout="@layout/fragment_login"/>
-
+        android:id="@+id/fragment_account_holder"
+        android:name="ru.mirea.moviestash.presentation.account.AccountHolderFragment"
+        android:label="AccountHolder"
+        tools:layout="@layout/fragment_account">
+        <action
+            android:id="@+id/action_fragment_account_holder_to_fragment_banned_users"
+            app:destination="@id/fragment_banned_users" />
+        <action
+            android:id="@+id/action_fragment_account_holder_to_fragment_user_collections"
+            app:destination="@id/fragment_user_collections" />
+        <action
+            android:id="@+id/action_fragment_account_holder_to_fragment_register"
+            app:destination="@id/fragment_register" />
+    </fragment>
     <fragment
-        android:id="@+id/navigation_account"
-        android:name="ru.mirea.moviestash.user_management.AccountHolderFragment"
-        android:label="Account"
-        tools:layout="@layout/fragment_account"/>
+        android:id="@+id/fragment_banned_users"
+        android:name="ru.mirea.moviestash.presentation.banned_users.BannedUsersFragment"
+        android:label="fragment_banned_users"
+        tools:layout="@layout/fragment_banned_users" />
+    <fragment
+        android:id="@+id/fragment_collection_content"
+        android:name="ru.mirea.moviestash.presentation.collection_content.CollectionContentFragment"
+        android:label="fragment_collection_content"
+        tools:layout="@layout/fragment_collection_content" >
+        <argument
+            android:name="collectionId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="userId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_fragment_collection_content_to_contentFragment"
+            app:destination="@id/fragment_content" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_user_collections"
+        android:name="ru.mirea.moviestash.presentation.user_collections.UserCollectionsFragment"
+        android:label="fragment_user_collections"
+        tools:layout="@layout/fragment_user_collections" >
+        <action
+            android:id="@+id/action_fragment_user_collections_to_fragment_collection_content"
+            app:destination="@id/fragment_collection_content" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_search"
+        android:name="ru.mirea.moviestash.presentation.search.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_fragment_search_to_fragment_celebrity"
+            app:destination="@id/fragment_celebrity" />
+        <action
+            android:id="@+id/action_fragment_search_to_contentFragment"
+            app:destination="@id/fragment_content" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_celebrity"
+        android:name="ru.mirea.moviestash.presentation.celebrity.CelebrityFragment"
+        android:label="fragment_celebrity"
+        tools:layout="@layout/fragment_celebrity" >
+        <argument
+            android:name="celebrityId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_fragment_celebrity_to_fragment_content"
+            app:destination="@id/fragment_content" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_content"
+        android:name="ru.mirea.moviestash.presentation.content.ContentFragment"
+        android:label="fragment_content"
+        tools:layout="@layout/fragment_content" >
+        <argument
+            android:name="contentId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_fragment_content_to_fragment_celebrity_list"
+            app:destination="@id/fragment_celebrity_list" />
+        <action
+            android:id="@+id/action_fragment_content_to_fragment_celebrity"
+            app:destination="@id/fragment_celebrity" />
+        <action
+            android:id="@+id/action_fragment_content_to_fragment_review_list"
+            app:destination="@id/fragment_review_list" />
+        <action
+            android:id="@+id/action_fragment_content_to_fragment_review_editor"
+            app:destination="@id/fragment_review_editor" />
+        <action
+            android:id="@+id/action_fragment_content_to_fragment_review"
+            app:destination="@id/fragment_review" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_celebrity_list"
+        android:name="ru.mirea.moviestash.presentation.celebrity_list.CelebrityListFragment"
+        android:label="fragment_celebrity_list"
+        tools:layout="@layout/fragment_celebrity_list" >
+        <argument
+            android:name="contentId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="isActors"
+            app:argType="boolean"
+            android:defaultValue="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_news"
+        android:name="ru.mirea.moviestash.presentation.news.NewsFragment"
+        android:label="fragment_news"
+        tools:layout="@layout/fragment_news" >
+        <argument
+            android:name="newsId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_fragment_news_to_fragment_news_editor"
+            app:destination="@id/fragment_news_editor" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_news_editor"
+        android:name="ru.mirea.moviestash.presentation.news_editor.NewsEditorFragment"
+        android:label="fragment_news_editor"
+        tools:layout="@layout/fragment_news_editor" >
+        <argument
+            android:name="newsId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_register"
+        android:name="ru.mirea.moviestash.presentation.registration.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" />
+    <fragment
+        android:id="@+id/fragment_review_list"
+        android:name="ru.mirea.moviestash.presentation.review_list.ReviewListFragment"
+        android:label="fragment_review_list"
+        tools:layout="@layout/fragment_review_list" >
+        <argument
+            android:name="contentId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_fragment_review_list_to_fragment_review"
+            app:destination="@id/fragment_review" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_review_editor"
+        android:name="ru.mirea.moviestash.presentation.review_editor.ReviewEditorFragment"
+        android:label="fragment_review_editor"
+        tools:layout="@layout/fragment_review_editor" >
+        <argument
+            android:name="reviewId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="contentId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_review"
+        android:name="ru.mirea.moviestash.presentation.review.ReviewFragment"
+        android:label="fragment_review"
+        tools:layout="@layout/fragment_review" >
+        <argument
+            android:name="reviewId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_fragment_review_to_fragment_review_editor"
+            app:destination="@id/fragment_review_editor" />
+    </fragment>
 
 </navigation>

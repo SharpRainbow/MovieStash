@@ -15,9 +15,8 @@ import org.hamcrest.Matchers.allOf
 
 import org.junit.Test
 import org.junit.runner.RunWith
+import ru.mirea.moviestash.presentation.MainActivity
 
-import ru.mirea.moviestash.collections.UserCollectionActivity
-import ru.mirea.moviestash.search.SearchActivity
 import java.util.concurrent.TimeUnit
 
 /**
@@ -57,11 +56,11 @@ class MvstshInstrumentedTest {
                 }
             onView(withId(R.id.addToUserCol)).perform(ViewActions.click())
             val collectionName = "Test Collection 12345"
-            onView(withId(R.id.colNameEd)).perform(ViewActions.typeText(collectionName), ViewActions.closeSoftKeyboard())
-            onView(withId(R.id.addBtn)).perform(ViewActions.click())
+            onView(withId(R.id.editTextCollectionName)).perform(ViewActions.typeText(collectionName), ViewActions.closeSoftKeyboard())
+            onView(withId(R.id.buttonAdd)).perform(ViewActions.click())
             onView(allOf(withId(R.id.colName), withText(collectionName))).check(matches(isDisplayed()))
             onView(allOf(withId(R.id.colName), withText(collectionName))).perform(ViewActions.longClick())
-            onView(withId(R.id.deleteUsrColBtn)).perform(ViewActions.click())
+            onView(withId(R.id.buttonDeleteCollection)).perform(ViewActions.click())
             TimeUnit.SECONDS.sleep(1)
             onView(allOf(withId(R.id.colName), withText(collectionName))).check(doesNotExist())
         }
