@@ -99,7 +99,6 @@ class CelebrityRepositoryImpl(
                 Result.Success(celebrity.toEntity())
             )
         } catch (e: Exception) {
-            e.printStackTrace()
             _celebrityFlow.emit(Result.Error(e))
             return
         }

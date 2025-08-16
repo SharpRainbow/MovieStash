@@ -17,9 +17,11 @@ import ru.mirea.moviestash.data.api.dto.AddReviewDto
 import ru.mirea.moviestash.data.api.dto.AddUserStarDto
 import ru.mirea.moviestash.data.api.dto.BanRequestDto
 import ru.mirea.moviestash.data.api.dto.BannedUserDto
+import ru.mirea.moviestash.data.api.dto.CelebrityBaseDto
 import ru.mirea.moviestash.data.api.dto.CelebrityDto
 import ru.mirea.moviestash.data.api.dto.CelebrityInContentDto
 import ru.mirea.moviestash.data.api.dto.CollectionDto
+import ru.mirea.moviestash.data.api.dto.ContentBaseDto
 import ru.mirea.moviestash.data.api.dto.ContentDto
 import ru.mirea.moviestash.data.api.dto.CreateCollectionDto
 import ru.mirea.moviestash.data.api.dto.CredentialsDto
@@ -41,7 +43,7 @@ interface MovieStashApi {
         @Query("page") page: Int,
         @Query("limit") limit: Int,
         @Query("name") name: String = ""
-    ): List<CelebrityDto>
+    ): List<CelebrityBaseDto>
 
     @GET("celebrities/{id}")
     suspend fun getCelebrityById(
@@ -53,7 +55,7 @@ interface MovieStashApi {
         @Path("id") celebrityId: Int,
         @Query("page") page: Int? = null,
         @Query("limit") limit: Int? = null,
-    ): List<ContentDto>
+    ): List<ContentBaseDto>
 
     @GET("collections")
     suspend fun getPublicCollections(
@@ -99,7 +101,7 @@ interface MovieStashApi {
         @Path("id") collectionId: Int,
         @Query("page") page: Int,
         @Query("limit") limit: Int
-    ): List<ContentDto>
+    ): List<ContentBaseDto>
 
     @POST("collections/personal/{id}/contents")
     suspend fun addContentToPersonalCollection(
@@ -137,7 +139,7 @@ interface MovieStashApi {
         @Path("id") collectionId: Int,
         @Query("page") page: Int,
         @Query("limit") limit: Int
-    ): List<ContentDto>
+    ): List<ContentBaseDto>
 
     @GET("contents")
     suspend fun getContents(
@@ -145,13 +147,13 @@ interface MovieStashApi {
         @Query("limit") limit: Int,
         @Query("name") name: String? = null,
         @Query("genre") genre: Int = -1,
-    ): List<ContentDto>
+    ): List<ContentBaseDto>
 
     @GET("contents/best")
     suspend fun getBestContents(
         @Query("page") page: Int,
         @Query("limit") limit: Int,
-    ): List<ContentDto>
+    ): List<ContentBaseDto>
 
     @GET("contents/{id}")
     suspend fun getContentById(

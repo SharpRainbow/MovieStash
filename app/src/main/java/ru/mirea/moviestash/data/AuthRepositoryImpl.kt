@@ -129,7 +129,6 @@ class AuthRepositoryImpl(
             ))
             payload.getLong("exp") > System.currentTimeMillis() / 1000
         } catch (e: Exception) {
-            e.printStackTrace()
             false
         }
     }

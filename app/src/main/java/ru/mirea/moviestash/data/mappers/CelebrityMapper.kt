@@ -1,17 +1,18 @@
 package ru.mirea.moviestash.data.mappers
 
+import ru.mirea.moviestash.data.api.dto.CelebrityBaseDto
 import ru.mirea.moviestash.data.api.dto.CelebrityDto
 import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
 import ru.mirea.moviestash.domain.entities.CelebrityEntity
 
-fun CelebrityDto.toEntityBase() = CelebrityEntityBase(
+fun CelebrityBaseDto.toEntityBase() = CelebrityEntityBase(
     id = id,
     name = name,
     image = image,
-    birthDate = birthDate.orEmpty()
+    birthDate = date.orEmpty()
 )
 
-fun List<CelebrityDto>.toListEntityBase(): List<CelebrityEntityBase> {
+fun List<CelebrityBaseDto>.toListEntityBase(): List<CelebrityEntityBase> {
     return map { it.toEntityBase() }
 }
 

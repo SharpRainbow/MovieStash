@@ -1,14 +1,14 @@
 package ru.mirea.moviestash.presentation.review_editor
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +20,6 @@ import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentReviewEditorBinding
 import ru.mirea.moviestash.domain.entities.OpinionEntity
 import ru.mirea.moviestash.domain.entities.ReviewEntity
-import kotlin.getValue
 
 class ReviewEditorFragment : Fragment() {
 
@@ -65,6 +64,7 @@ class ReviewEditorFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 if (arguments.reviewId > 0) {
+                    Log.d("ReviewEditorFragment", "Loading review with ID: ${arguments.reviewId}")
                     viewModel.loadReview(arguments.reviewId)
                 }
                 viewModel.state.collect { state ->

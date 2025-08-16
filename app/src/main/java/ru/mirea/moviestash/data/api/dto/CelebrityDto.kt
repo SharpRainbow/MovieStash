@@ -9,7 +9,7 @@ data class CelebrityDto(
     val name: String,
     @SerializedName("image")
     val image: String,
-    @SerializedName("birthday", alternate = ["date"])
+    @SerializedName("birthday")
     val birthDate: String?,
     @SerializedName("death")
     val death: String?,

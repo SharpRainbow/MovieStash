@@ -245,9 +245,7 @@ class ContentFragment : Fragment() {
 
     private fun navigateToReviewEditorFragment() {
         findNavController().navigate(
-            ContentFragmentDirections.actionFragmentContentToFragmentReviewEditor(
-                arguments.contentId
-            )
+            R.id.action_fragment_content_to_fragment_review_editor
         )
     }
 

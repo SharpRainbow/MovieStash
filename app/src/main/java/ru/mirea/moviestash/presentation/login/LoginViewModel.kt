@@ -97,7 +97,6 @@ class LoginViewModel(
                     )
                 )
             } catch (e: Exception) {
-                e.printStackTrace()
                 _state.emit(
                     LoginState.Error(
                         "Login failed: ${e.message}"

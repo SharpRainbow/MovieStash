@@ -1,16 +1,17 @@
 package ru.mirea.moviestash.data.mappers
 
+import ru.mirea.moviestash.data.api.dto.ContentBaseDto
 import ru.mirea.moviestash.data.api.dto.ContentDto
 import ru.mirea.moviestash.domain.entities.ContentEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 
-fun ContentDto.toEntityBase(): ContentEntityBase {
+fun ContentBaseDto.toEntityBase(): ContentEntityBase {
     return ContentEntityBase(
         id = id,
         name = name,
         image = image,
         rating = rating,
-        releaseDate = releaseDate.orEmpty(),
+        releaseDate = date.orEmpty(),
     )
 }
 
@@ -32,6 +33,6 @@ fun ContentDto.toEntity(): ContentEntity {
     )
 }
 
-fun List<ContentDto>.toListEntityBase(): List<ContentEntityBase> {
+fun List<ContentBaseDto>.toListEntityBase(): List<ContentEntityBase> {
     return map { it.toEntityBase() }
 }

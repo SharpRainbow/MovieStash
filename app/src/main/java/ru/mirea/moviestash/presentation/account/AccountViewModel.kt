@@ -49,7 +49,6 @@ class AccountViewModel(
                     isModeratorUseCase()
                 )
             } catch (e: Exception) {
-                e.printStackTrace()
                 _state.value = AccountState.Error
             }
         }
