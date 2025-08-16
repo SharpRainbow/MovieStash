@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -78,7 +79,19 @@ class NewsEditorFragment : Fragment() {
                         }
 
                         is NewsEditorState.Error -> {
-                            showToast(getString(R.string.error_connection))
+                            if (state.dataError) {
+                                showToast(getString(R.string.error_connection))
+                            }
+                            binding.textInputLayoutNewsTitle.error =
+                                if (state.errorInputTitle)
+                                    getString(R.string.news_title_not_empty)
+                                else
+                                    null
+                            binding.editTextNewsDescription.error =
+                                if (state.errorInputContent)
+                                    getString(R.string.news_text_not_empty)
+                                else
+                                    null
                         }
 
                         NewsEditorState.Initial -> {}
@@ -118,7 +131,7 @@ class NewsEditorFragment : Fragment() {
                 ActivityResultContracts.PickVisualMedia.ImageOnly)
             )
         }
-        binding.saveNewsBtn.setOnClickListener {
+        binding.buttonSaveNews.setOnClickListener {
             if (arguments.newsId != -1) {
                 viewModel.updateNews(
                     arguments.newsId,
@@ -134,6 +147,16 @@ class NewsEditorFragment : Fragment() {
                 )
             }
         }
+        binding.editTextNewsTitle.addTextChangedListener(
+            onTextChanged = { _, _, _, _ ->
+                viewModel.resetErrorInputTitle()
+            }
+        )
+        binding.editTextNewsDescription.addTextChangedListener(
+            onTextChanged = { _, _, _, _ ->
+                viewModel.resetErrorInputContent()
+            }
+        )
     }
 
     private fun showToast(message: String) {

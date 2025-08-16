@@ -73,4 +73,11 @@
     <string name="collection_name_not_empty">Название коллекции не может быть пустым</string>
     <string name="rate_content">Поставьте оценку</string>
     <string name="select_collection">Выберите коллекцию</string>
+    <string name="saved_credentials">Сохраненные учетные записи</string>
+    <string name="select">Выбрать</string>
+    <string name="enter">Вход</string>
+    <string name="button_register">Регистрация</string>
+    <string name="autocomplete">Автозаполнение</string>
+    <string name="news_title_not_empty">Заголовок не может быть пустым</string>
+    <string name="news_text_not_empty">Текст новости не может быть пустым</string>
 </resources>

@@ -9,19 +9,19 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/md_theme_background"
         android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbarNewsEditor"
+            android:id="@+id/toolbar_news_editor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputNews"
+            android:id="@+id/text_input_layout_news_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -32,7 +32,7 @@
             app:boxCornerRadiusTopStart="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextNewsTitle"
+                android:id="@+id/edit_text_news_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/header"
@@ -40,7 +40,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardNews"
+            android:id="@+id/card_view_image_news"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -49,7 +49,7 @@
             app:cardCornerRadius="10dp">
 
             <ImageView
-                android:id="@+id/imageViewNews"
+                android:id="@+id/image_view_news"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
@@ -60,7 +60,7 @@
         </androidx.cardview.widget.CardView>
 
         <EditText
-            android:id="@+id/editTextNewsDescription"
+            android:id="@+id/edit_text_news_description"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="20dp"
@@ -71,18 +71,18 @@
             android:elevation="5dp"
             android:ems="10"
             android:gravity="start|top"
-            android:hint="Описание"
+            android:hint="@string/description"
             android:inputType="text|textCapSentences|textMultiLine"
             android:minHeight="200dp"
             android:padding="20dp"
             android:scrollbars="vertical" />
 
         <Button
-            android:id="@+id/saveNewsBtn"
+            android:id="@+id/button_save_news"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Сохранить" />
+            android:text="@string/save" />
 
     </LinearLayout>
 </ScrollView>

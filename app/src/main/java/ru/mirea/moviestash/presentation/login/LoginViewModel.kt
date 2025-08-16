@@ -1,7 +1,6 @@
 package ru.mirea.moviestash.presentation.login
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +13,6 @@ import kotlinx.coroutines.launch
 import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.data.AuthRepositoryImpl
 import ru.mirea.moviestash.data.CredentialsRepositoryImpl
-import ru.mirea.moviestash.data.UserRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CredentialsEntity
 import ru.mirea.moviestash.domain.usecases.credentials.GetCredentialByLoginUseCase
@@ -70,14 +68,15 @@ class LoginViewModel(
     }
 
     fun login(
-        username: String?,
+        login: String?,
         password: String?
     ) {
         viewModelScope.launch {
-            if (username.isNullOrBlank() || password.isNullOrBlank()) {
+            if (login.isNullOrBlank() || password.isNullOrBlank()) {
                 _state.emit(
                     LoginState.Error(
-                        "Username and password cannot be empty"
+                        errorInputLogin = login.isNullOrBlank(),
+                        errorInputPassword = password.isNullOrBlank()
                     )
                 )
                 return@launch
@@ -85,13 +84,13 @@ class LoginViewModel(
             _state.emit(LoginState.Loading)
             try {
                 loginUseCase(
-                    username,
+                    login,
                     password
                 )
-                val credentials = getCredentialByLoginUseCase(username)
+                val credentials = getCredentialByLoginUseCase(login)
                 _state.emit(
                     LoginState.Success(
-                        login = username,
+                        login = login,
                         password = password,
                         isSaved = credentials != null && credentials.password == password
                     )
@@ -99,7 +98,7 @@ class LoginViewModel(
             } catch (e: Exception) {
                 _state.emit(
                     LoginState.Error(
-                        "Login failed: ${e.message}"
+                        dataError = true
                     )
                 )
                 return@launch
@@ -124,6 +123,26 @@ class LoginViewModel(
             removeCredentialUseCase(login)
         }
     }
+
+    fun resetErrorInputLogin() {
+        _state.update { state ->
+            if (state is LoginState.Error) {
+                state.copy(errorInputLogin = false)
+            } else {
+                state
+            }
+        }
+    }
+
+    fun resetErrorInputPassword() {
+        _state.update { state ->
+            if (state is LoginState.Error) {
+                state.copy(errorInputPassword = false)
+            } else {
+                state
+            }
+        }
+    }
 }
 
 sealed interface LoginState {
@@ -136,5 +155,9 @@ sealed interface LoginState {
         val password: String,
         val isSaved: Boolean = false
     ) : LoginState
-    data class Error(val message: String) : LoginState
+    data class Error(
+        val dataError: Boolean = false,
+        val errorInputLogin: Boolean = false,
+        val errorInputPassword: Boolean = false,
+    ) : LoginState
 }

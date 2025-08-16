@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.data.NewsRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
@@ -64,8 +65,10 @@ class NewsEditorViewModel(
                     )
                 }
                 is Result.Error -> {
-                    _state.value = NewsEditorState.Error(
-                        newsResult.exception.message ?: "Unknown error"
+                    _state.emit(
+                        NewsEditorState.Error(
+                            dataError = true
+                        )
                     )
                 }
                 Result.Empty -> {}
@@ -82,7 +85,12 @@ class NewsEditorViewModel(
     fun addNews(title: String?, content: String?, image: Uri?) {
         viewModelScope.launch {
             if (title.isNullOrBlank() || content.isNullOrBlank()) {
-                _state.emit(NewsEditorState.Error("Title and content cannot be empty"))
+                _state.emit(
+                    NewsEditorState.Error(
+                        errorInputTitle = title.isNullOrBlank(),
+                        errorInputContent = content.isNullOrBlank()
+                    )
+                )
                 return@launch
             }
             try {
@@ -94,7 +102,11 @@ class NewsEditorViewModel(
                 )
                 _state.emit(NewsEditorState.Finished)
             } catch (e: Exception) {
-                _state.emit(NewsEditorState.Error(e.message ?: "Unknown error"))
+                _state.emit(
+                    NewsEditorState.Error(
+                        dataError = true
+                    )
+                )
             }
         }
     }
@@ -102,7 +114,12 @@ class NewsEditorViewModel(
     fun updateNews(newsId: Int, title: String?, content: String?, image: Uri?) {
         viewModelScope.launch {
             if (title.isNullOrBlank() || content.isNullOrBlank()) {
-                _state.emit(NewsEditorState.Error("Title and content cannot be empty"))
+                _state.emit(
+                    NewsEditorState.Error(
+                        errorInputTitle = title.isNullOrBlank(),
+                        errorInputContent = content.isNullOrBlank()
+                    )
+                )
                 return@launch
             }
             try {
@@ -113,10 +130,13 @@ class NewsEditorViewModel(
                     image?.let { getFileNameFromUri(it) },
                     image?.let { getFileDataFromUri(it) },
                 )
-                Log.d("NewsEditorActivity", "Updated news with ID: $newsId")
                 _state.emit(NewsEditorState.Finished)
             } catch (e: Exception) {
-                _state.emit(NewsEditorState.Error(e.message ?: "Unknown error"))
+                _state.emit(
+                    NewsEditorState.Error(
+                        dataError = true
+                    )
+                )
             }
         }
     }
@@ -153,11 +173,35 @@ class NewsEditorViewModel(
         }
     }
 
+    fun resetErrorInputTitle() {
+        _state.update { state ->
+            if (state is NewsEditorState.Error) {
+                state.copy(errorInputTitle = false)
+            } else {
+                state
+            }
+        }
+    }
+
+    fun resetErrorInputContent() {
+        _state.update { state ->
+            if (state is NewsEditorState.Error) {
+                state.copy(errorInputContent = false)
+            } else {
+                state
+            }
+        }
+    }
+
 }
 
 sealed interface NewsEditorState {
     data object Initial : NewsEditorState
     data class Success(val news: NewsEntity) : NewsEditorState
     data object Finished : NewsEditorState
-    data class Error(val message: String) : NewsEditorState
+    data class Error(
+        val dataError: Boolean = false,
+        val errorInputTitle: Boolean = false,
+        val errorInputContent: Boolean = false,
+    ) : NewsEditorState
 }

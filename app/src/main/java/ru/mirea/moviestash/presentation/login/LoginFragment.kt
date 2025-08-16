@@ -25,6 +25,7 @@ import ru.mirea.moviestash.databinding.FragmentLoginBinding
 import ru.mirea.moviestash.domain.entities.CredentialsEntity
 import ru.mirea.moviestash.presentation.account.AccountFragment
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.widget.addTextChangedListener
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -48,18 +49,25 @@ class LoginFragment : Fragment() {
     }
 
     private fun bindListeners() {
-        binding.enterButton.setOnClickListener {
+        binding.buttonEnter.setOnClickListener {
             viewModel.login(
-                binding.loginEdMain.text?.toString(),
-                binding.passEdMain.text?.toString()
+                binding.editTextLogin.text?.toString(),
+                binding.editTextPassword.text?.toString()
             )
         }
-        binding.registerButton.setOnClickListener {
+        binding.buttonRegister.setOnClickListener {
             navigateToRegisterFragment()
         }
-        binding.autocompleteButton.setOnClickListener {
-
-        }
+        binding.editTextLogin.addTextChangedListener(
+            onTextChanged = { _, _, _, _ ->
+                viewModel.resetErrorInputLogin()
+            }
+        )
+        binding.editTextPassword.addTextChangedListener(
+            onTextChanged = { _, _, _, _ ->
+                viewModel.resetErrorInputPassword()
+            }
+        )
     }
 
     private fun showSaveSnack() {
@@ -82,20 +90,31 @@ class LoginFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect { state ->
+                    changeUiState(state !is LoginState.Loading)
                     when (state) {
                         is LoginState.Initial -> {
                             showCredentials(state.credentials)
                         }
-                        is LoginState.Loading -> {
-
-                        }
+                        is LoginState.Loading -> {}
                         is LoginState.Success -> {
                             if (!state.isSaved)
                                 showSaveSnack()
                             navigateToAccount()
                         }
                         is LoginState.Error -> {
-                            showToast(state.message)
+                            if (state.dataError) {
+                                showToast(getString(R.string.error_connection))
+                            }
+                            binding.textInputLayoutLogin.error =
+                                if (state.errorInputLogin)
+                                    getString(R.string.login_not_empty)
+                                else
+                                    null
+                            binding.textInputLayoutPassword.error =
+                                if (state.errorInputPassword)
+                                    getString(R.string.password_not_empty)
+                                else
+                                    null
                         }
                     }
                 }
@@ -105,10 +124,10 @@ class LoginFragment : Fragment() {
 
     private fun showCredentials(credentials: List<CredentialsEntity>) {
         if (credentials.isEmpty()) {
-            binding.autocompleteButton.visibility = View.GONE
+            binding.buttonAutocomplete.visibility = View.GONE
         } else {
-            binding.autocompleteButton.visibility = View.VISIBLE
-            binding.autocompleteButton.setOnClickListener {
+            binding.buttonAutocomplete.visibility = View.VISIBLE
+            binding.buttonAutocomplete.setOnClickListener {
                 showAutoCompleteDialog(credentials)
             }
         }
@@ -116,7 +135,7 @@ class LoginFragment : Fragment() {
 
     private fun showAutoCompleteDialog(credentials: List<CredentialsEntity>) {
         val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle("Сохраненные учетные записи")
+        builder.setTitle(getString(R.string.saved_credentials))
         var checkedItem = -1
         builder.setSingleChoiceItems(
             credentials.map { it.login }.toTypedArray(),
@@ -124,20 +143,26 @@ class LoginFragment : Fragment() {
         ) { _, which ->
             checkedItem = which
         }
-        builder.setPositiveButton("Выбрать") { dialog, _ ->
+        builder.setPositiveButton(getString(R.string.select)) { dialog, _ ->
             if (checkedItem != -1) {
                 val selectedCredentials = credentials[checkedItem]
-                binding.loginEdMain.setText(selectedCredentials.login)
-                binding.passEdMain.setText(selectedCredentials.password)
+                binding.editTextLogin.setText(selectedCredentials.login)
+                binding.editTextPassword.setText(selectedCredentials.password)
             }
         }
-        builder.setNegativeButton("Удалить") { dialog, _ ->
+        builder.setNegativeButton(getString(R.string.delete)) { dialog, _ ->
             if (checkedItem != -1) {
                 val selectedCredentials = credentials[checkedItem]
                 viewModel.removeCredential(selectedCredentials.login)
             }
         }
         builder.show()
+    }
+
+    private fun changeUiState(enabled: Boolean) {
+        binding.buttonEnter.isEnabled = enabled
+        binding.buttonRegister.isEnabled = enabled
+        binding.buttonAutocomplete.isEnabled = enabled
     }
 
     private fun showToast(message: String) {
