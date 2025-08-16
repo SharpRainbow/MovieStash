@@ -38,7 +38,7 @@ class AccountFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.getUserData()
                 viewModel.state.collect { state ->
@@ -94,7 +94,7 @@ class AccountFragment : Fragment() {
             navigateToBannedUsersFragment()
         }
         binding.buttonChangeUserData.setOnClickListener {
-
+            navigateToChangeUserDataFragment()
         }
     }
 
@@ -117,6 +117,14 @@ class AccountFragment : Fragment() {
             R.id.fragment_container
         ).navigate(
             R.id.action_fragment_account_holder_to_fragment_user_collections
+        )
+    }
+
+    private fun navigateToChangeUserDataFragment() {
+        requireActivity().findNavController(
+            R.id.fragment_container
+        ).navigate(
+            R.id.action_fragment_account_holder_to_fragment_update_user_data
         )
     }
 

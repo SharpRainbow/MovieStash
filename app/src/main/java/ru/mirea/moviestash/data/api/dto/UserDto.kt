@@ -21,7 +21,9 @@ data class UserDto(
 
 data class UpdateUserDto(
     @SerializedName("nickname")
-    val nickname: String,
+    val nickname: String?,
     @SerializedName("email")
-    val email: String,
+    val email: String?,
+    @SerializedName("password")
+    val password: String?
 )

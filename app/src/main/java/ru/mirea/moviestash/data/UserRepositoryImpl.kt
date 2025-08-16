@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.api.dto.BanRequestDto
+import ru.mirea.moviestash.data.api.dto.UpdateUserDto
+import ru.mirea.moviestash.data.api.dto.UserDto
 import ru.mirea.moviestash.data.mappers.toEntity
 import ru.mirea.moviestash.data.mappers.toEntityList
 import ru.mirea.moviestash.domain.UserRepository
@@ -24,6 +26,22 @@ class UserRepositoryImpl(
 
     override suspend fun getUserData(token: String): UserEntity {
         return movieStashApi.getCurrentUserData(token).toEntity()
+    }
+
+    override suspend fun updateUserData(
+        token: String,
+        nickname: String?,
+        email: String?,
+        password: String?
+    ) {
+        movieStashApi.updateUserData(
+            token,
+            UpdateUserDto(
+                nickname = nickname,
+                email = email,
+                password = password
+            )
+        )
     }
 
     override suspend fun getBannedUsers(token: String, page: Int, limit: Int) {

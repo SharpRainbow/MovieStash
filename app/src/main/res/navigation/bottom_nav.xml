@@ -58,6 +58,9 @@
         <action
             android:id="@+id/action_fragment_account_holder_to_fragment_register"
             app:destination="@id/fragment_register" />
+        <action
+            android:id="@+id/action_fragment_account_holder_to_fragment_update_user_data"
+            app:destination="@id/fragment_update_user_data" />
     </fragment>
     <fragment
         android:id="@+id/fragment_banned_users"
@@ -222,5 +225,10 @@
             android:id="@+id/action_fragment_review_to_fragment_review_editor"
             app:destination="@id/fragment_review_editor" />
     </fragment>
+    <fragment
+        android:id="@+id/fragment_update_user_data"
+        android:name="ru.mirea.moviestash.presentation.user_data.UpdateUserDataFragment"
+        android:label="fragment_update_user_data"
+        tools:layout="@layout/fragment_update_user_data" />
 
 </navigation>

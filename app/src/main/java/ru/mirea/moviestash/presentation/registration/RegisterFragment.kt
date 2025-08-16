@@ -71,7 +71,7 @@ class RegisterFragment : Fragment() {
                                     null
                             binding.textInputLayoutNickname.error =
                                 if (state.errorInputNickname)
-                                    getString(R.string.nickname_тще_empty)
+                                    getString(R.string.nickname_not_empty)
                                 else
                                     null
                             binding.textInputLayoutEmail.error =

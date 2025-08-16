@@ -57,7 +57,7 @@
     <string name="login">Логин</string>
     <string name="registration_successful">Пользователь успешно зарегистрирован!</string>
     <string name="email_not_empty">Email не может быть пустым</string>
-    <string name="nickname_тще_empty">Никнейм не может быть пустым</string>
+    <string name="nickname_not_empty">Никнейм не может быть пустым</string>
     <string name="password_not_empty">Пароль не может быть пустым</string>
     <string name="login_not_empty">Логин не может быть пустым</string>
     <string name="banned_reason_label">Заблокирован %1$s по причине: %2$s</string>
