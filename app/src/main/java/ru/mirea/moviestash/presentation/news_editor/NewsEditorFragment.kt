@@ -63,7 +63,7 @@ class NewsEditorFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 if (arguments.newsId != -1) {
                     viewModel.getNewsById(arguments.newsId)

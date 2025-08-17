@@ -12,13 +12,15 @@ import ru.mirea.moviestash.databinding.FragmentAccountHolderBinding
 
 class AccountHolderFragment : Fragment() {
 
-    private lateinit var binding: FragmentAccountHolderBinding
+    private var _binding: FragmentAccountHolderBinding? = null
+    private val binding
+        get() = _binding!!
     private val viewModel: AccountHolderViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAccountHolderBinding.inflate(
+        _binding = FragmentAccountHolderBinding.inflate(
             layoutInflater,
             container,
             false
@@ -31,6 +33,11 @@ class AccountHolderFragment : Fragment() {
         if (viewModel.isLoggedIn()) {
             navigateToAccountFragment()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun navigateToAccountFragment() {

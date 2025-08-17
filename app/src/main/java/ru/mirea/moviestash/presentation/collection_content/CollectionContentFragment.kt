@@ -88,7 +88,7 @@ class CollectionContentFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.getCollectionInfo()
                 viewModel.getCollectionContents()

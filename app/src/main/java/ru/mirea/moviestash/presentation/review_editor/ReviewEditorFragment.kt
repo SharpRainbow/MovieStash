@@ -61,7 +61,7 @@ class ReviewEditorFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 if (arguments.reviewId > 0) {
                     viewModel.loadReview(arguments.reviewId)

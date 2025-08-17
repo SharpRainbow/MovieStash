@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.ItemUserBinding
-import ru.mirea.moviestash.databinding.ItemUserColBinding
 import ru.mirea.moviestash.domain.entities.BannedUserEntity
 
 class BannedUserAdapter

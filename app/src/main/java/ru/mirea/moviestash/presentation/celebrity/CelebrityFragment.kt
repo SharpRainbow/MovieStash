@@ -84,7 +84,7 @@ class CelebrityFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.loadCelebrity()
             viewModel.loadContent()
             repeatOnLifecycle(Lifecycle.State.RESUMED) {

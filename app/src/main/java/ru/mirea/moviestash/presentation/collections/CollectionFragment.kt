@@ -22,7 +22,9 @@ import ru.mirea.moviestash.domain.entities.CollectionEntity
 
 class CollectionFragment : Fragment() {
 
-    private lateinit var binding: FragmentCollectionBinding
+    private var _binding: FragmentCollectionBinding? = null
+    private val binding: FragmentCollectionBinding
+        get() = _binding!!
     private val collectionsAdapter: CollectionAdapter by lazy {
         CollectionAdapter().apply {
             onCollectionClick = { collection ->
@@ -38,7 +40,11 @@ class CollectionFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCollectionBinding.inflate(inflater, container, false)
+        _binding = FragmentCollectionBinding.inflate(
+            inflater,
+            container,
+            false
+        )
         return binding.root
     }
 
@@ -47,6 +53,11 @@ class CollectionFragment : Fragment() {
         bindViews()
         bindListeners()
         observeViewModel()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun observeViewModel() {

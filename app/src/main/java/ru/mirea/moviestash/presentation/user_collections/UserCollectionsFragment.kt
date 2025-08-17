@@ -102,7 +102,7 @@ class UserCollectionsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.getCollections()
                 viewModel.state.collect { state ->

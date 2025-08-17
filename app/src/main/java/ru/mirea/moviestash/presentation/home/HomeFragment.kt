@@ -26,7 +26,9 @@ import ru.mirea.moviestash.presentation.news.NewsAdapter
 
 class HomeFragment : Fragment() {
 
-    private lateinit var binding: FragmentHomeBinding
+    private var _binding: FragmentHomeBinding? = null
+    private val binding
+        get() = _binding!!
     private val viewModel: HomeViewModel by viewModels()
     private val contentAdapter by lazy {
         ContentAdapter().apply {
@@ -54,7 +56,11 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(
+            inflater,
+            container,
+            false
+        )
         return binding.root
     }
 
@@ -63,6 +69,11 @@ class HomeFragment : Fragment() {
         setupViews()
         bindListeners()
         observeViewModel()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupViews() {
