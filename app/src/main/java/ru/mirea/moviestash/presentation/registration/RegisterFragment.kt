@@ -95,6 +95,18 @@ class RegisterFragment : Fragment() {
     }
 
     private fun bindListeners() {
+        binding.toolbarRegister.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(
+                resources.getColor(
+                    R.color.md_theme_onSurface,
+                    requireActivity().theme
+                )
+            )
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+        }
         binding.buttonRegisterUser.setOnClickListener {
             viewModel.register(
                 login = binding.editTextLogin.text?.toString(),

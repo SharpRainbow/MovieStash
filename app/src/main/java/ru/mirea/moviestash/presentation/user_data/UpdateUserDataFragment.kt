@@ -46,6 +46,18 @@ class UpdateUserDataFragment : Fragment() {
     }
 
     private fun bindListeners() {
+        binding.toolbarUpdateUserData.apply {
+            setNavigationIcon(R.drawable.arrow_back)
+            navigationIcon?.setTint(
+                resources.getColor(
+                    R.color.md_theme_onSurface,
+                    requireActivity().theme
+                )
+            )
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+        }
         binding.buttonUpdateUserData.setOnClickListener {
             viewModel.updateUserData(
                 binding.editTextNickname.text?.toString(),
