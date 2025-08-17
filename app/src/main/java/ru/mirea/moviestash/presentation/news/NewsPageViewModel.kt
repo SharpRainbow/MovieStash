@@ -53,7 +53,6 @@ class NewsPageViewModel(
     init {
         getNews()
         observeNewsUseCase().onEach { newsResult ->
-            Log.d("NewsPage", "newsResult: $newsResult")
             when (newsResult) {
                 is Result.Success -> {
                     val news = newsResult.data

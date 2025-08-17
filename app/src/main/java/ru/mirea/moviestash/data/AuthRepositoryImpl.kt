@@ -71,7 +71,6 @@ class AuthRepositoryImpl(
     override suspend fun getValidToken(): String {
         val token = getToken()
         if (isTokenValid(token)) {
-            Log.d("AuthRepository", "Token is valid: $token")
             return token
         } else {
             val login = getLogin()

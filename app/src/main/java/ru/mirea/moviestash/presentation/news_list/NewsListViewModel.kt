@@ -14,8 +14,8 @@ import ru.mirea.moviestash.data.AuthRepositoryImpl
 import ru.mirea.moviestash.data.NewsRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.NewsEntity
-import ru.mirea.moviestash.domain.usecases.news.ObserveNewsListUseCase
 import ru.mirea.moviestash.domain.usecases.news.GetNewsListUseCase
+import ru.mirea.moviestash.domain.usecases.news.ObserveNewsListUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsModeratorUseCase
 
 class NewsListViewModel(
@@ -49,7 +49,7 @@ class NewsListViewModel(
     init {
         getNewsList()
         observeNewsListUseCase().onEach { newsListResult ->
-            when(newsListResult) {
+            when (newsListResult) {
                 Result.Empty -> {}
                 is Result.Error -> {
                     _state.update { state ->
@@ -58,6 +58,7 @@ class NewsListViewModel(
                         )
                     }
                 }
+
                 is Result.Success<List<NewsEntity>> -> {
                     _state.update { state ->
                         state.copy(

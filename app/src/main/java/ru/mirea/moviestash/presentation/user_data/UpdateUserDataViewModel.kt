@@ -1,17 +1,22 @@
 package ru.mirea.moviestash.presentation.user_data
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.AuthRepositoryImpl
 import ru.mirea.moviestash.data.UserRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.UserEntity
 import ru.mirea.moviestash.domain.usecases.user.GetUserDataUseCase
+import ru.mirea.moviestash.domain.usecases.user.ObserveUserDataUseCase
 import ru.mirea.moviestash.domain.usecases.user.UpdateUserDataUseCase
 
 class UpdateUserDataViewModel(
@@ -30,6 +35,9 @@ class UpdateUserDataViewModel(
         application,
         ApiProvider.movieStashApi,
     )
+    private val observeUserDataUseCase = ObserveUserDataUseCase(
+        userRepository
+    )
     private val getUserDataUseCase = GetUserDataUseCase(
         userRepository,
         authRepository
@@ -41,6 +49,25 @@ class UpdateUserDataViewModel(
 
     init {
         getUserData()
+        observeUserDataUseCase().onEach { userDataResult ->
+            when(userDataResult) {
+                Result.Empty -> {}
+                is Result.Error -> {
+                    _state.update {
+                        UpdateUserDataScreenState.Error(
+                            dataError = true
+                        )
+                    }
+                }
+                is Result.Success<UserEntity> -> {
+                    _state.update {
+                        UpdateUserDataScreenState.Editing(
+                            userData = userDataResult.data
+                        )
+                    }
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun updateUserData(
@@ -96,19 +123,9 @@ class UpdateUserDataViewModel(
         }
     }
 
-    private fun getUserData() {
+    fun getUserData() {
         viewModelScope.launch {
-            _state.update { UpdateUserDataScreenState.Loading }
-            try {
-                val userData = getUserDataUseCase()
-                _state.update { UpdateUserDataScreenState.Editing(userData) }
-            } catch (e: Exception) {
-                _state.update {
-                    UpdateUserDataScreenState.Error(
-                        dataError = true,
-                    )
-                }
-            }
+            getUserDataUseCase()
         }
     }
 }

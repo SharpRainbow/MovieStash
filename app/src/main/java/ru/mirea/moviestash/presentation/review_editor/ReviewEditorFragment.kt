@@ -64,7 +64,6 @@ class ReviewEditorFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 if (arguments.reviewId > 0) {
-                    Log.d("ReviewEditorFragment", "Loading review with ID: ${arguments.reviewId}")
                     viewModel.loadReview(arguments.reviewId)
                 }
                 viewModel.state.collect { state ->

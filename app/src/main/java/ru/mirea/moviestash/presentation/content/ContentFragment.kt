@@ -121,26 +121,36 @@ class ContentFragment : Fragment() {
         Glide.with(requireContext())
             .load(content.image)
             .into(binding.imageViewContent)
-        binding.textViewContentName.text = content.name
-        binding.textViewMvstshRating.text = content.rating.toString()
-        binding.textViewKpRating.text = content.ratingKinopoisk.toString()
-        binding.textViewImdbRating.text = content.ratingImdb.toString()
-        binding.textViewGenres.text = content.genres
-        binding.textViewDescription.text = content.description
-        binding.textViewCountries.text = content.countries
-        binding.textViewReleaseDate.text = content.releaseDate
-        binding.textViewDuration.text = content.duration
-        binding.textViewBudget.text = content.budget.toString()
-        binding.textViewBoxOffice.text = content.boxOffice.toString()
+        with(binding) {
+            textViewContentName.text = content.name
+            textViewMvstshRating.text = content.rating.toString()
+            textViewKinopoiskRating.text = content.ratingKinopoisk.toString()
+            textViewImdbRating.text = content.ratingImdb.toString()
+            textViewGenres.text = content.genres
+            textViewDescription.text = content.description
+            textViewCountries.text = content.countries
+            textViewReleaseDate.text = content.releaseDate
+            textViewDuration.text = content.duration
+            textViewBudget.text = content.budget.toString()
+            textViewBoxOffice.text = content.boxOffice.toString()
+        }
     }
 
     private fun bindViews() {
-        binding.castRecycler.layoutManager = LinearLayoutManager(context)
-        binding.castRecycler.adapter = castAdapter
-        binding.crewRecycler.layoutManager = LinearLayoutManager(context)
-        binding.crewRecycler.adapter = crewAdapter
-        binding.reviewRecycler.layoutManager = LinearLayoutManager(context)
-        binding.reviewRecycler.adapter = reviewAdapter
+        with(binding) {
+            recyclerViewCast.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = castAdapter
+            }
+            recyclerViewCrew.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = crewAdapter
+            }
+            recyclerViewReview.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = reviewAdapter
+            }
+        }
     }
 
     private fun showToast(message: String) {
@@ -148,35 +158,37 @@ class ContentFragment : Fragment() {
     }
 
     private fun bindListeners() {
-        binding.contToolbar.apply {
-            setNavigationIcon(R.drawable.arrow_back)
-            navigationIcon?.setTint(
-                resources.getColor(
-                    R.color.md_theme_onSurface,
-                    requireActivity().theme
+        with(binding) {
+            toolbarContent.apply {
+                setNavigationIcon(R.drawable.arrow_back)
+                navigationIcon?.setTint(
+                    resources.getColor(
+                        R.color.md_theme_onSurface,
+                        requireActivity().theme
+                    )
                 )
-            )
-            setNavigationOnClickListener {
-                findNavController().popBackStack()
+                setNavigationOnClickListener {
+                    findNavController().popBackStack()
+                }
             }
-        }
-        binding.rateBtn.setOnClickListener {
-            showRateDialog()
-        }
-        binding.moreActors.setOnClickListener {
-            navigateToContentListFragment(true)
-        }
-        binding.moreCreators.setOnClickListener {
-            navigateToContentListFragment(false)
-        }
-        binding.addToListBtn.setOnClickListener {
-            viewModel.getUserCollections()
-        }
-        binding.addReviewBtn.setOnClickListener {
-            navigateToReviewEditorFragment()
-        }
-        binding.moreReviews.setOnClickListener {
-            navigateToReviewListFragment()
+            buttonRate.setOnClickListener {
+                showRateDialog()
+            }
+            buttonMoreCast.setOnClickListener {
+                navigateToContentListFragment(true)
+            }
+            buttonMoreCrew.setOnClickListener {
+                navigateToContentListFragment(false)
+            }
+            buttonAddToList.setOnClickListener {
+                viewModel.getUserCollections()
+            }
+            buttonAddReview.setOnClickListener {
+                navigateToReviewEditorFragment()
+            }
+            buttonMoreReviews.setOnClickListener {
+                navigateToReviewListFragment()
+            }
         }
     }
 

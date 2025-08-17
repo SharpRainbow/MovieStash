@@ -23,9 +23,20 @@ class UserRepositoryImpl(
     )
     override val userListFlow: Flow<Result<List<BannedUserEntity>>>
         get() = _userListFlow.asStateFlow()
+    private val _userDataFlow = MutableStateFlow<Result<UserEntity>>(Result.Empty)
+    override val userDataFlow: Flow<Result<UserEntity>>
+        get() = _userDataFlow.asStateFlow()
 
-    override suspend fun getUserData(token: String): UserEntity {
-        return movieStashApi.getCurrentUserData(token).toEntity()
+    override suspend fun getUserData(token: String) {
+        try {
+            _userDataFlow.emit(
+                Result.Success(
+                    movieStashApi.getCurrentUserData(token).toEntity()
+                )
+            )
+        } catch (e: Exception) {
+            _userDataFlow.emit(Result.Error(e))
+        }
     }
 
     override suspend fun updateUserData(
@@ -42,6 +53,7 @@ class UserRepositoryImpl(
                 password = password
             )
         )
+        getUserData(token)
     }
 
     override suspend fun getBannedUsers(token: String, page: Int, limit: Int) {

@@ -9,9 +9,9 @@ interface UserRepository {
 
     val userListFlow: Flow<Result<List<BannedUserEntity>>>
 
-    // TODO: Add a flow to get the current user data
+    val userDataFlow: Flow<Result<UserEntity>>
 
-    suspend fun getUserData(token: String): UserEntity
+    suspend fun getUserData(token: String)
 
     suspend fun updateUserData(
         token: String,

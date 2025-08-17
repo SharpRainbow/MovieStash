@@ -30,25 +30,17 @@ class AccountHolderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if (viewModel.isLoggedIn()) {
             navigateToAccountFragment()
-        } else {
-            navigateToLoginFragment()
         }
-    }
-
-    private fun navigateToLoginFragment() {
-        val innerNavController = childFragmentManager
-            .findFragmentById(R.id.fragmentContainerViewAccount)?.findNavController()
-        innerNavController?.navigate(
-            R.id.fragment_login
-        )
     }
 
     private fun navigateToAccountFragment() {
         val innerNavController = childFragmentManager
             .findFragmentById(R.id.fragmentContainerViewAccount)?.findNavController()
-        innerNavController?.navigate(
-            R.id.fragment_account
-        )
+        if (innerNavController?.currentDestination?.id == R.id.fragment_login) {
+            innerNavController.navigate(
+                R.id.action_fragment_login_to_fragment_account
+            )
+        }
     }
 
 }

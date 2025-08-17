@@ -1,6 +1,5 @@
 package ru.mirea.moviestash.presentation.account
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
@@ -17,17 +17,22 @@ import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentAccountBinding
 import ru.mirea.moviestash.domain.entities.UserEntity
-import ru.mirea.moviestash.presentation.login.LoginFragment
 
 class AccountFragment : Fragment() {
 
-    private lateinit var binding: FragmentAccountBinding
+    private var _binding: FragmentAccountBinding? = null
+    private val binding
+        get() = _binding!!
     private val viewModel: AccountViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAccountBinding.inflate(inflater, container, false)
+        _binding = FragmentAccountBinding.inflate(
+            inflater,
+            container,
+            false
+        )
         return binding.root
     }
 
@@ -37,10 +42,14 @@ class AccountFragment : Fragment() {
         observeViewModel()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.getUserData()
                 viewModel.state.collect { state ->
                     when(state) {
                         is AccountState.Loading -> {

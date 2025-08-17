@@ -17,7 +17,6 @@ class GenreRepositoryImpl(
 
     override suspend fun getPresentGenres(): Result<List<GenreEntity>> {
         return try {
-            Log.d("GenreRepositoryImpl", "Fetching present genres")
             val result = movieStashApi.getPresentGenres()
             Result.Success(result.toListEntity())
         } catch (e: Exception) {

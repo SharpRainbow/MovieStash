@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/acount_holder_nav"
+    android:id="@+id/account_holder_nav"
     app:startDestination="@id/fragment_login">
     <fragment
         android:id="@+id/fragment_account"
@@ -10,7 +10,9 @@
         android:label="Account" >
         <action
             android:id="@+id/action_fragment_account_to_fragment_login"
-            app:destination="@id/fragment_login" />
+            app:destination="@id/fragment_login"
+            app:popUpTo="@id/fragment_account"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/fragment_login"
@@ -19,6 +21,9 @@
         tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_fragment_login_to_fragment_account"
-            app:destination="@id/fragment_account" />
+            app:destination="@id/fragment_account"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/fragment_login"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

@@ -8,7 +8,7 @@
     tools:context=".presentation.content.ContentFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/contToolbar"
+        android:id="@+id/toolbar_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -26,7 +27,7 @@
             android:orientation="vertical">
 
             <ProgressBar
-                android:id="@+id/progressBarContent"
+                android:id="@+id/progress_bar_content"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -34,14 +35,14 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/imageViewContent"
+                android:id="@+id/image_view_content"
                 android:layout_width="match_parent"
                 android:layout_height="245dp"
                 android:padding="10dp"
                 app:srcCompat="@drawable/plchldr" />
 
             <TextView
-                android:id="@+id/textViewGenres"
+                android:id="@+id/text_view_genres"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -49,7 +50,7 @@
                 tools:text="Genres" />
 
             <TextView
-                android:id="@+id/textViewContentName"
+                android:id="@+id/text_view_content_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -59,14 +60,14 @@
                 tools:text="Name" />
 
             <LinearLayout
-                android:id="@+id/linearLayoutContentUserActions"
+                android:id="@+id/linear_layout_content_user_actions"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:visibility="gone">
 
                 <Button
-                    android:id="@+id/addToListBtn"
+                    android:id="@+id/button_add_to_list"
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -77,7 +78,7 @@
                     app:iconGravity="top" />
 
                 <Button
-                    android:id="@+id/rateBtn"
+                    android:id="@+id/button_rate"
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -95,7 +96,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textViewKpRating"
+                    android:id="@+id/text_view_kinopoisk_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -105,7 +106,7 @@
                     app:drawableBottomCompat="@drawable/kp" />
 
                 <TextView
-                    android:id="@+id/textViewImdbRating"
+                    android:id="@+id/text_view_imdb_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -115,7 +116,7 @@
                     app:drawableBottomCompat="@drawable/imdb" />
 
                 <TextView
-                    android:id="@+id/textViewMvstshRating"
+                    android:id="@+id/text_view_mvstsh_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -125,7 +126,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/textViewDescriptionLabel"
+                android:id="@+id/text_view_description_label"
                 style="@style/TextViewHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -134,7 +135,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textViewDescription"
+                android:id="@+id/text_view_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="12dp"
@@ -142,7 +143,7 @@
                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." />
 
             <TextView
-                android:id="@+id/textViewActorsLabel"
+                android:id="@+id/text_view_actors_label"
                 style="@style/TextViewHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -152,7 +153,7 @@
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/castRecycler"
+                android:id="@+id/recycler_view_cast"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
@@ -162,14 +163,14 @@
                 tools:listitem="@layout/item_person" />
 
             <Button
-                android:id="@+id/moreActors"
+                android:id="@+id/button_more_cast"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/more" />
 
             <TextView
-                android:id="@+id/textViewCrewLabel"
+                android:id="@+id/text_view_crew_label"
                 style="@style/TextViewHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -178,7 +179,7 @@
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/crewRecycler"
+                android:id="@+id/recycler_view_crew"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
@@ -188,78 +189,78 @@
                 tools:listitem="@layout/item_person" />
 
             <Button
-                android:id="@+id/moreCreators"
+                android:id="@+id/button_more_crew"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/more" />
 
             <TextView
-                android:id="@+id/textViewInfoLabel"
+                android:id="@+id/text_view_info_label"
                 style="@style/TextViewHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/info" />
 
             <TextView
-                android:id="@+id/textViewCountries"
+                android:id="@+id/text_view_countries"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/country"
                 android:drawablePadding="8dp"
-                android:drawableTint="?attr/colorControlNormal"
                 android:gravity="center_vertical"
                 android:padding="8dp"
+                app:drawableStartCompat="@drawable/country"
+                app:drawableTint="?attr/colorControlNormal"
                 tools:text="Country:" />
 
             <TextView
-                android:id="@+id/textViewReleaseDate"
+                android:id="@+id/text_view_release_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/release_date"
                 android:drawablePadding="8dp"
-                android:drawableTint="?attr/colorControlNormal"
                 android:gravity="center_vertical"
-                android:padding="8dp" />
+                android:padding="8dp"
+                app:drawableStartCompat="@drawable/release_date"
+                app:drawableTint="?attr/colorControlNormal" />
 
             <TextView
-                android:id="@+id/textViewDuration"
+                android:id="@+id/text_view_duration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/time_len"
                 android:drawablePadding="8dp"
-                android:drawableTint="?attr/colorControlNormal"
                 android:gravity="center_vertical"
-                android:padding="8dp" />
+                android:padding="8dp"
+                app:drawableStartCompat="@drawable/time_len"
+                app:drawableTint="?attr/colorControlNormal" />
 
             <TextView
-                android:id="@+id/textViewBudget"
+                android:id="@+id/text_view_budget"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/budget"
                 android:drawablePadding="8dp"
-                android:drawableTint="?attr/colorControlNormal"
                 android:gravity="center_vertical"
-                android:padding="8dp" />
+                android:padding="8dp"
+                app:drawableStartCompat="@drawable/budget"
+                app:drawableTint="?attr/colorControlNormal" />
 
             <TextView
-                android:id="@+id/textViewBoxOffice"
+                android:id="@+id/text_view_box_office"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/box_office"
                 android:drawablePadding="8dp"
-                android:drawableTint="?attr/colorControlNormal"
-                android:padding="8dp" />
+                android:padding="8dp"
+                app:drawableStartCompat="@drawable/box_office"
+                app:drawableTint="?attr/colorControlNormal" />
 
             <TextView
-                android:id="@+id/textViewReviewLabel"
+                android:id="@+id/text_view_review_label"
                 style="@style/TextViewHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/reviews" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reviewRecycler"
+                android:id="@+id/recycler_view_review"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
@@ -272,7 +273,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/moreReviews"
+                    android:id="@+id/button_more_reviews"
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -280,7 +281,7 @@
                     android:text="@string/more" />
 
                 <Button
-                    android:id="@+id/addReviewBtn"
+                    android:id="@+id/button_add_review"
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
