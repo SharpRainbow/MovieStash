@@ -38,7 +38,4 @@ interface ContentRepository {
         query: String
     ): Flow<PagingData<ContentEntityBase>>
 
-    companion object {
-        const val NETWORK_PAGE_SIZE = 10
-    }
 }

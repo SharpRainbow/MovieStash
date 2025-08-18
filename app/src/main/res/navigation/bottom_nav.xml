@@ -156,6 +156,9 @@
             android:name="isActors"
             app:argType="boolean"
             android:defaultValue="true" />
+        <action
+            android:id="@+id/action_fragment_celebrity_list_to_fragment_celebrity"
+            app:destination="@id/fragment_celebrity" />
     </fragment>
     <fragment
         android:id="@+id/fragment_news"

@@ -159,8 +159,14 @@
                 android:nestedScrollingEnabled="false"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
+                android:visibility="gone"
                 tools:itemCount="5"
                 tools:listitem="@layout/item_person" />
+
+            <ListView
+                android:id="@+id/list_view_cast"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <Button
                 android:id="@+id/button_more_cast"

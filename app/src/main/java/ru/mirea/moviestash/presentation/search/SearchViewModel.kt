@@ -18,6 +18,7 @@ import ru.mirea.moviestash.data.ContentRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
+import ru.mirea.moviestash.domain.usecases.celebrity.SearchCelebrityUseCase
 
 class SearchViewModel : ViewModel() {
 
@@ -32,6 +33,9 @@ class SearchViewModel : ViewModel() {
     )
     private val celebrityRepository = CelebrityRepositoryImpl(
         ApiProvider.movieStashApi
+    )
+    private val searchCelebrityUseCase = SearchCelebrityUseCase(
+        celebrityRepository
     )
 
     init {
@@ -49,8 +53,8 @@ class SearchViewModel : ViewModel() {
                         )
                     } else {
                         state.copy(
-                            pagedCelebrityList = celebrityRepository
-                                .getCelebritySearchResultFlow(input)
+                            pagedCelebrityList =
+                                searchCelebrityUseCase(input)
                                 .cachedIn(viewModelScope),
                             pagedContentList = contentRepository
                                 .getContentSearchResultFlow(input)

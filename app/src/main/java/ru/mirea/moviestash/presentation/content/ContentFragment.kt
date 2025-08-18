@@ -1,12 +1,11 @@
 package ru.mirea.moviestash.presentation.content
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,9 +21,7 @@ import ru.mirea.moviestash.databinding.DialogRatingBinding
 import ru.mirea.moviestash.databinding.FragmentContentBinding
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntity
-import ru.mirea.moviestash.presentation.celebrity.CelebrityAdapter
 import ru.mirea.moviestash.presentation.review.ReviewAdapter
-import kotlin.getValue
 
 class ContentFragment : Fragment() {
 

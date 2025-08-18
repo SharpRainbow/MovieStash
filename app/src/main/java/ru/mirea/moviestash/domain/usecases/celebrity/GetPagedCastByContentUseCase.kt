@@ -2,9 +2,10 @@ package ru.mirea.moviestash.domain.usecases.celebrity
 
 import ru.mirea.moviestash.domain.CelebrityRepository
 
-class ObserveCelebrityListUseCase(
+class GetPagedCastByContentUseCase(
     private val repository: CelebrityRepository
 ) {
 
-    operator fun invoke() = repository.celebrityListFlow
+    operator fun invoke(contentId: Int)
+        = repository.getCelebrityByContentIdFlow(contentId, true)
 }

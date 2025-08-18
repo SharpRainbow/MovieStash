@@ -113,6 +113,7 @@
         android:layout_margin="14dp"
         android:elevation="6dp"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

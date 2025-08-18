@@ -26,4 +26,7 @@ object ApiProvider {
     val movieStashApi: MovieStashApi by lazy {
         retrofit.create(MovieStashApi::class.java)
     }
+
+    const val FIRST_PAGE_INDEX = 1
+    const val NETWORK_PAGE_SIZE = 10
 }

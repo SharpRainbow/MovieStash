@@ -20,6 +20,7 @@ import ru.mirea.moviestash.data.ReviewRepositoryImpl
 import ru.mirea.moviestash.data.UserStarRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.data.api.dto.CelebrityInContentDto
+import ru.mirea.moviestash.domain.entities.CelebrityInContentEntity
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntity
 import ru.mirea.moviestash.domain.entities.ReviewEntity
@@ -405,8 +406,8 @@ data class ContentScreenState(
     val isLoading: Boolean = false,
     val error: Throwable? = null,
     val content: ContentEntity? = null,
-    val castList: List<CelebrityInContentDto> = emptyList(),
-    val crewList: List<CelebrityInContentDto> = emptyList(),
+    val castList: List<CelebrityInContentEntity> = emptyList(),
+    val crewList: List<CelebrityInContentEntity> = emptyList(),
     val reviews: List<ReviewEntity> = emptyList(),
     val isLoggedIn: Boolean = false,
     val userStar: UserStarEntity? = null,

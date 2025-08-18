@@ -136,7 +136,7 @@ class ContentRepositoryImpl(
     override fun getContentSearchResultFlow(query: String): Flow<PagingData<ContentEntityBase>> {
         return Pager(
             config = androidx.paging.PagingConfig(
-                pageSize = ContentRepository.NETWORK_PAGE_SIZE,
+                pageSize = ApiProvider.NETWORK_PAGE_SIZE,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {

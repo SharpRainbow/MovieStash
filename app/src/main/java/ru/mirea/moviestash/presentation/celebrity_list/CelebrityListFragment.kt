@@ -10,19 +10,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentCelebrityListBinding
-import ru.mirea.moviestash.presentation.celebrity.CelebrityAdapter
 
 class CelebrityListFragment : Fragment() {
 
     private var _binding: FragmentCelebrityListBinding? = null
     private val binding: FragmentCelebrityListBinding
         get() = _binding!!
-    private val arguments by navArgs< CelebrityListFragmentArgs>()
+    private val arguments by navArgs<CelebrityListFragmentArgs>()
     private val viewModel: PersonListViewModel by viewModels {
         PersonListViewModel.provideFactory(
             arguments.contentId,
@@ -30,9 +33,9 @@ class CelebrityListFragment : Fragment() {
         )
     }
     private val celebrityAdapter by lazy {
-        CelebrityAdapter().apply {
-            onReachEndListener = {
-                viewModel.loadCelebrityList()
+        CelebrityPagingAdapter().apply {
+            onCelebrityClick = { celebrity ->
+                navigateToCelebrityFragment(celebrity.id)
             }
         }
     }
@@ -62,12 +65,21 @@ class CelebrityListFragment : Fragment() {
     }
 
     private fun bindViews() {
-        binding.personListRv.layoutManager = LinearLayoutManager(context)
-        binding.personListRv.adapter = celebrityAdapter
+        with(binding) {
+            if (arguments.isActors) {
+                textViewCelebrityType.text = getString(R.string.actors)
+            } else {
+                textViewCelebrityType.text = getString(R.string.crew)
+            }
+            recyclerViewCelebrityList.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = celebrityAdapter
+            }
+        }
     }
 
     private fun bindListeners() {
-        binding.personListToolbar.apply {
+        binding.toolbarCelebrityList.apply {
             setNavigationIcon(R.drawable.arrow_back)
             navigationIcon?.setTint(
                 resources.getColor(
@@ -83,21 +95,27 @@ class CelebrityListFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.loadCelebrityList()
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { state ->
-                    if (state.isLoading) {
-                        binding.progressBarPersonList.visibility = View.VISIBLE
-                    } else {
-                        binding.progressBarPersonList.visibility = View.GONE
-                        if (state.error == null) {
-                            celebrityAdapter.submitList(
-                                state.celebrityList
-                            )
+                celebrityAdapter.loadStateFlow.onEach { state ->
+                    binding.progressBarCelebrityList.visibility =
+                        if (state.append is LoadState.Loading) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
                         }
-                    }
+                }.launchIn(this)
+                viewModel.celebrityFlow.collect { celebrityData ->
+                    celebrityAdapter.submitData(celebrityData)
                 }
             }
         }
+    }
+
+    private fun navigateToCelebrityFragment(celebrityId: Int) {
+        findNavController().navigate(
+            CelebrityListFragmentDirections.actionFragmentCelebrityListToFragmentCelebrity(
+                celebrityId
+            )
+        )
     }
 }

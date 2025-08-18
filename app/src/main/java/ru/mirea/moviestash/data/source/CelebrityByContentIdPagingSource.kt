@@ -4,37 +4,46 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.data.api.MovieStashApi
-import ru.mirea.moviestash.data.mappers.toListEntityBase
-import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
+import ru.mirea.moviestash.data.mappers.toListEntity
+import ru.mirea.moviestash.domain.entities.CelebrityInContentEntity
 
-class CelebritySearchPagingSource(
+class CelebrityByContentIdPagingSource(
     private val apiService: MovieStashApi,
-    private val query: String
-): PagingSource<Int, CelebrityEntityBase>() {
+    private val contentId: Int,
+    private val actors: Boolean
+): PagingSource<Int, CelebrityInContentEntity>() {
 
-    override fun getRefreshKey(state: PagingState<Int, CelebrityEntityBase>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, CelebrityInContentEntity>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
-
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CelebrityEntityBase> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CelebrityInContentEntity> {
         val position = params.key ?: ApiProvider.FIRST_PAGE_INDEX
         return try {
-            val celebrityList = apiService.getCelebrities(
-                page = position,
-                limit = params.loadSize,
-                name = query
-            )
+            val celebrityList =
+                if (actors) {
+                    apiService.getCastByContentId(
+                        page = position,
+                        limit = params.loadSize,
+                        contentId = contentId
+                    )
+                } else {
+                    apiService.getCrewByContentId(
+                        page = position,
+                        limit = params.loadSize,
+                        contentId = contentId
+                    )
+                }
             val nextKey = if (celebrityList.isEmpty()) {
                 null
             } else {
                 position + (params.loadSize / ApiProvider.NETWORK_PAGE_SIZE)
             }
             LoadResult.Page(
-                data = celebrityList.toListEntityBase(),
+                data = celebrityList.toListEntity(),
                 prevKey = if (position == ApiProvider.FIRST_PAGE_INDEX) null else position - 1,
                 nextKey = nextKey
             )
@@ -42,5 +51,4 @@ class CelebritySearchPagingSource(
             return LoadResult.Error(exception)
         }
     }
-
 }
