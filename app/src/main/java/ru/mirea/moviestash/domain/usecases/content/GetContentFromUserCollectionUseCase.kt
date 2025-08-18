@@ -10,13 +10,9 @@ class GetContentFromUserCollectionUseCase(
 ) {
 
     suspend operator fun invoke(
-        collectionId: Int,
-        page: Int,
-        limit: Int
-    ) = contentRepository.getContentFromUserCollection(
+        collectionId: Int
+    ) = contentRepository.getContentFromUserCollectionFlow(
         authRepository.getValidToken(),
-        collectionId,
-        page,
-        limit
+        collectionId
     )
 }

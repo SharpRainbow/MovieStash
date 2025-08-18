@@ -6,7 +6,5 @@ class GetContentUseCase(
     private val repository: ContentRepository
 ) {
 
-    suspend operator fun invoke(contentId: Int) {
-        repository.getContentById(contentId)
-    }
+    suspend operator fun invoke(contentId: Int) = repository.getContentById(contentId)
 }

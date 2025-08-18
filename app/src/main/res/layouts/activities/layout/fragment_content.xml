@@ -159,7 +159,6 @@
                 android:nestedScrollingEnabled="false"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:visibility="gone"
                 tools:itemCount="5"
                 tools:listitem="@layout/item_person" />
 

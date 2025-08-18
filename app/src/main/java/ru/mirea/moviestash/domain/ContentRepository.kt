@@ -8,31 +8,26 @@ import ru.mirea.moviestash.domain.entities.ContentEntityBase
 
 interface ContentRepository {
 
-    val contentFlow: Flow<Result<ContentEntity>>
+    suspend fun getContentById(id: Int): ContentEntity
 
-    val contentListFlow: Flow<Result<List<ContentEntityBase>>>
+    suspend fun getMainPageContent(): List<ContentEntityBase>
 
-    suspend fun getContentById(id: Int)
+    fun getTopRatedContentFlow(): Flow<PagingData<ContentEntityBase>>
 
-    suspend fun searchContent(name: String, page: Int, limit: Int)
+    fun getContentByCelebrityFlow(celebrityId: Int): Flow<PagingData<ContentEntityBase>>
 
-    suspend fun getMainPageContent()
+    fun getContentFromPublicCollectionFlow(
+        collectionId: Int
+    ): Flow<PagingData<ContentEntityBase>>
 
-    suspend fun getTopRatedContent(page: Int, limit: Int)
+    fun getContentFromUserCollectionFlow(
+        token: String,
+        collectionId: Int
+    ): Flow<PagingData<ContentEntityBase>>
 
-    suspend fun getContentByCelebrity(celebrityId: Int, page: Int, limit: Int)
-
-    suspend fun getContentFromPublicCollection(
-        collectionId: Int, page: Int, limit: Int
-    )
-
-    suspend fun getContentFromUserCollection(
-        token: String, collectionId: Int, page: Int, limit: Int
-    )
-
-    suspend fun getContentByGenre(
-        genreId: Int, page: Int, limit: Int
-    )
+    fun getContentByGenreFlow(
+        genreId: Int
+    ): Flow<PagingData<ContentEntityBase>>
 
     fun getContentSearchResultFlow(
         query: String

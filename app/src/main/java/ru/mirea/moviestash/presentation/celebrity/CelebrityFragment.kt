@@ -13,11 +13,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Utils
 import ru.mirea.moviestash.databinding.FragmentCelebrityBinding
 import ru.mirea.moviestash.presentation.content.ContentAdapter
+import ru.mirea.moviestash.presentation.content.ContentPagedAdapter
 
 class CelebrityFragment : Fragment() {
 
@@ -31,7 +34,7 @@ class CelebrityFragment : Fragment() {
         )
     }
     private val contentAdapter by lazy {
-        ContentAdapter().apply {
+        ContentPagedAdapter().apply {
             onContentClick = { content ->
                 navigateToContentFragment(content.id)
             }
@@ -85,8 +88,6 @@ class CelebrityFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.loadCelebrity()
-            viewModel.loadContent()
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect { state ->
                     if (state.isLoading) {
@@ -112,8 +113,10 @@ class CelebrityFragment : Fragment() {
                                 )
                                 binding.textViewPersonCareer.text = celebrity.career
                             }
-                            contentAdapter.submitList(state.contentList)
                         }
+                        state.contentList?.onEach { contentData ->
+                            contentAdapter.submitData(contentData)
+                        }?.launchIn(this)
                     }
                 }
             }

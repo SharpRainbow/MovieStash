@@ -10,22 +10,13 @@ import ru.mirea.moviestash.domain.entities.CelebrityInContentEntity
 
 interface CelebrityRepository {
 
-    val celebrityListFlow: Flow<Result<List<CelebrityEntityBase>>>
-
-    val castListFlow: Flow<Result<List<CelebrityInContentEntity>>>
-
-    val crewListFlow: Flow<Result<List<CelebrityInContentEntity>>>
-
-    val celebrityFlow: Flow<Result<CelebrityEntity>>
-
-    suspend fun getCelebrityByContentId(
+    suspend fun getFirstNCelebrityByContentId(
         contentId: Int,
-        page: Int,
         limit: Int,
         actors: Boolean = true
-    )
+    ): List<CelebrityInContentEntity>
 
-    suspend fun getCelebrityById(celebrityId: Int)
+    suspend fun getCelebrityById(celebrityId: Int): CelebrityEntity
 
     fun getCelebritySearchResultFlow(
         query: String

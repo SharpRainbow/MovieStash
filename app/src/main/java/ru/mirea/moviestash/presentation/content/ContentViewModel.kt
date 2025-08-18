@@ -29,9 +29,6 @@ import ru.mirea.moviestash.domain.usecases.celebrity.GetCastByContentUseCase
 import ru.mirea.moviestash.domain.usecases.content.GetContentUseCase
 import ru.mirea.moviestash.domain.usecases.celebrity.GetCrewByContentUseCase
 import ru.mirea.moviestash.domain.usecases.review.GetReviewsUseCase
-import ru.mirea.moviestash.domain.usecases.celebrity.ObserveCastListUseCase
-import ru.mirea.moviestash.domain.usecases.content.ObserveContentUseCase
-import ru.mirea.moviestash.domain.usecases.celebrity.ObserveCrewListUseCase
 import ru.mirea.moviestash.domain.usecases.collection.AddContentToCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.GetUserCollectionsUseCase
 import ru.mirea.moviestash.domain.usecases.collection.ObserveCollectionsListUseCase
@@ -65,15 +62,6 @@ class ContentViewModel(
     )
     private val collectionRepository = CollectionRepositoryImpl(
         ApiProvider.movieStashApi
-    )
-    private val observeContentUseCase = ObserveContentUseCase(
-        contentRepository
-    )
-    private val observeCastListUseCase = ObserveCastListUseCase(
-        celebrityRepository
-    )
-    private val observeCrewListUseCase = ObserveCrewListUseCase(
-        celebrityRepository
     )
     private val observeReviewsUseCase = ObserveReviewsUseCase(
         reviewRepository
@@ -156,66 +144,6 @@ class ContentViewModel(
                 Result.Empty -> {}
             }
         }.launchIn(viewModelScope)
-        observeContentUseCase().onEach { contentResult ->
-            when (contentResult) {
-                is Result.Success -> {
-                    _state.update { state ->
-                        state.copy(
-                            content = contentResult.data
-                        )
-                    }
-                }
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = contentResult.exception
-                        )
-                    }
-                }
-                Result.Empty -> {}
-            }
-        }.launchIn(viewModelScope)
-        observeCrewListUseCase().onEach { crewResult ->
-            when (crewResult) {
-                is Result.Success -> {
-                    _state.update { state ->
-                        state.copy(
-                            crewList = crewResult.data
-                        )
-                    }
-                }
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = crewResult.exception
-                        )
-                    }
-                }
-                Result.Empty -> {}
-            }
-        }.launchIn(viewModelScope)
-        observeCastListUseCase().onEach { castResult ->
-            when (castResult) {
-                is Result.Success -> {
-                    _state.update { state ->
-                        state.copy(
-                            castList = castResult.data
-                        )
-                    }
-                }
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = castResult.exception
-                        )
-                    }
-                }
-                Result.Empty -> {}
-            }
-        }.launchIn(viewModelScope)
         observeReviewsUseCase().onEach { reviewsResult ->
             when (reviewsResult) {
                 is Result.Success -> {
@@ -258,29 +186,74 @@ class ContentViewModel(
         }.launchIn(viewModelScope)
     }
 
-    fun getContent() {
+    private fun getContent() {
         viewModelScope.launch {
-            getContentUseCase(contentId)
+            _state.update { state ->
+                state.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
+            try {
+                _state.update { state ->
+                    state.copy(
+                        content = getContentUseCase(contentId)
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
+                }
+            }
+            _state.update { state ->
+                state.copy(
+                    isLoading = false
+                )
+            }
         }
     }
 
-    fun getCast() {
+    private fun getCast() {
         viewModelScope.launch {
-            getCastListUseCase(
-                contentId,
-                FIRST_PAGE,
-                5
-            )
+            try {
+                _state.update { state ->
+                    state.copy(
+                        castList = getCastListUseCase(
+                            contentId,
+                            PREVIEW_ITEMS_COUNT
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
+                }
+            }
         }
     }
 
-    fun getCrew() {
+    private fun getCrew() {
         viewModelScope.launch {
-            getCrewListUseCase(
-                contentId,
-                FIRST_PAGE,
-                5
-            )
+            try {
+                _state.update { state ->
+                    state.copy(
+                        crewList = getCrewListUseCase(
+                            contentId,
+                            PREVIEW_ITEMS_COUNT
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
+                }
+            }
         }
     }
 
@@ -389,6 +362,7 @@ class ContentViewModel(
 
     companion object {
 
+        private const val PREVIEW_ITEMS_COUNT = 5
         private const val FIRST_PAGE = 1
         private const val LIMIT = -1
 

@@ -5,9 +5,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.filter
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,7 +33,6 @@ import ru.mirea.moviestash.domain.usecases.genre.GetGenreByIdUseCase
 import ru.mirea.moviestash.domain.usecases.collection.GetPublicCollectionInfoUseCase
 import ru.mirea.moviestash.domain.usecases.collection.GetUserCollectionInfoUseCase
 import ru.mirea.moviestash.domain.usecases.collection.ObserveCollectionInfoUseCase
-import ru.mirea.moviestash.domain.usecases.content.ObserveContentsUseCase
 import ru.mirea.moviestash.domain.usecases.user.GetUserIdUseCase
 
 class CollectionContentViewModel(
@@ -54,9 +58,6 @@ class CollectionContentViewModel(
     )
     private val collectionRepository = CollectionRepositoryImpl(
         ApiProvider.movieStashApi
-    )
-    private val observeContentListUseCase = ObserveContentsUseCase(
-        contentRepository
     )
     private val observeCollectionInfoUseCase = ObserveCollectionInfoUseCase(
         collectionRepository
@@ -88,8 +89,6 @@ class CollectionContentViewModel(
         collectionRepository,
         authRepository
     )
-    private var page = FIRST_PAGE
-    private val limit = 20
 
     init {
         observeCollectionInfoUseCase().onEach { collectionInfoResult ->
@@ -109,25 +108,6 @@ class CollectionContentViewModel(
                             isAuthor = userId == getUserIdUseCase()
                         )
                     }
-                }
-            }
-        }.launchIn(viewModelScope)
-        observeContentListUseCase().onEach { contentListResult ->
-            when(contentListResult) {
-                Result.Empty -> {}
-                is Result.Error -> {
-
-                }
-                is Result.Success<List<ContentEntityBase>> -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = null,
-                            collections = state.collections + contentListResult.data
-                        )
-                    }
-                    if (contentListResult.data.isNotEmpty())
-                        page++
                 }
             }
         }.launchIn(viewModelScope)
@@ -170,23 +150,29 @@ class CollectionContentViewModel(
     fun getCollectionContents() {
         viewModelScope.launch {
             if (userId == -1) {
-                getContentByGenreUseCase(
-                    collectionId,
-                    page,
-                    limit
-                )
+                _state.update { state ->
+                    state.copy(
+                        collections = getContentByGenreUseCase(
+                            collectionId
+                        )
+                    )
+                }
             } else if (userId != 0 && getUserIdUseCase() == userId) {
-                getContentFromUserCollectionUseCase(
-                    collectionId,
-                    page,
-                    limit
-                )
+                _state.update { state ->
+                    state.copy(
+                        collections = getContentFromUserCollectionUseCase(
+                            collectionId
+                        )
+                    )
+                }
             } else {
-                getContentFromPublicCollectionUseCase(
-                    collectionId,
-                    page,
-                    limit
-                )
+                _state.update { state ->
+                    state.copy(
+                        collections = getContentFromPublicCollectionUseCase(
+                            collectionId
+                        )
+                    )
+                }
             }
         }
     }
@@ -200,8 +186,10 @@ class CollectionContentViewModel(
                 )
                 _state.update { state ->
                     state.copy(
-                        collections = state.collections.filterNot {
-                            it.id == contentId
+                        collections = state.collections?.map { pagingData ->
+                            pagingData.filter { content ->
+                                content.id != contentId
+                            }
                         }
                     )
                 }
@@ -239,6 +227,6 @@ data class CollectionScreenState(
     val isLoading: Boolean = false,
     val error: Throwable? = null,
     val collectionInfo: CollectionEntity? = null,
-    val collections: List<ContentEntityBase> = emptyList(),
+    val collections: Flow<PagingData<ContentEntityBase>>? = null,
     val isAuthor: Boolean = false
 )

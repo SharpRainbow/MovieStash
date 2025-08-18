@@ -6,9 +6,7 @@ class GetContentByGenreUseCase(
     private val repository: ContentRepository
 ) {
 
-    suspend operator fun invoke(
-        genreId: Int,
-        page: Int,
-        limit: Int
-    ) = repository.getContentByGenre(genreId, page, limit)
+    operator fun invoke(
+        genreId: Int
+    ) = repository.getContentByGenreFlow(genreId)
 }

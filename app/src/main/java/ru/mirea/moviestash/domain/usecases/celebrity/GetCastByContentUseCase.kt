@@ -6,14 +6,10 @@ class GetCastByContentUseCase(
     private val repository: CelebrityRepository
 ) {
 
-    suspend operator fun invoke(contentId: Int,
-                                page: Int,
-                                limit: Int) {
-        repository.getCelebrityByContentId(
+    suspend operator fun invoke(contentId: Int, limit: Int) =
+        repository.getFirstNCelebrityByContentId(
             contentId,
-            page,
             limit,
             actors = true
         )
-    }
 }

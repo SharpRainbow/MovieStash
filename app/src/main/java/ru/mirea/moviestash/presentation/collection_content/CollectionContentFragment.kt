@@ -15,12 +15,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentCollectionContentBinding
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.presentation.content.ContentAdapter
+import ru.mirea.moviestash.presentation.content.ContentPagedAdapter
 import kotlin.getValue
 
 
@@ -38,7 +41,7 @@ class CollectionContentFragment : Fragment() {
         )
     }
     private val collectionContentAdapter by lazy {
-        ContentAdapter().apply {
+        ContentPagedAdapter().apply {
             onContentClick = { content ->
                 navigateToContentFragment(
                     content.id
@@ -97,12 +100,14 @@ class CollectionContentFragment : Fragment() {
                         // TODO: Show loading indicator
                     } else {
                         if (state.error == null) {
-                            collectionContentAdapter.submitList(
-                                state.collections
-                            )
                             state.collectionInfo?.let {
                                 showCollectionInfo(it)
                             }
+                        }
+                        state.collections?.let { collectionPagedList ->
+                            collectionPagedList.onEach {
+                                collectionContentAdapter.submitData(it)
+                            }.launchIn(this)
                         }
                     }
                 }

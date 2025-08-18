@@ -23,7 +23,6 @@ import ru.mirea.moviestash.domain.usecases.news.GetLatestNewsUseCase
 import ru.mirea.moviestash.domain.usecases.content.GetMainPageContentUseCase
 import ru.mirea.moviestash.domain.usecases.genre.GetPresentGenresUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsLoggedInUseCase
-import ru.mirea.moviestash.domain.usecases.content.ObserveMainPageContentUseCase
 import ru.mirea.moviestash.domain.usecases.news.ObserveNewsListUseCase
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -46,9 +45,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         application,
         ApiProvider.movieStashApi,
     )
-    private val observeMainPageContentUseCase = ObserveMainPageContentUseCase(
-        contentRepository
-    )
     private val getMainPageContentUseCase = GetMainPageContentUseCase(
         contentRepository
     )
@@ -67,31 +63,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         reloadPage()
-        observeMainPageContentUseCase()
-            .onEach { result ->
-                when (result) {
-
-                    is Result.Error -> {
-                        _state.value = _state.value.copy(
-                            error = result.exception
-                        )
-                    }
-
-                    Result.Empty -> {
-
-                    }
-
-                    is Result.Success<List<ContentEntityBase>> -> {
-                        _state.update { state ->
-                            state.copy(
-                                error = null,
-                                contents = result.data
-                            )
-                        }
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
         observeLatestNewsUseCase()
             .onEach { result ->
                 when (result) {
@@ -141,14 +112,27 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getMainPageContent() {
+    private fun getMainPageContent() {
         viewModelScope.launch {
             _state.update { state ->
                 state.copy(
-                    isLoading = true
+                    isLoading = true,
+                    error = null
                 )
             }
-            getMainPageContentUseCase()
+            try {
+                _state.update { state ->
+                    state.copy(
+                        contents = getMainPageContentUseCase()
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
+                }
+            }
             _state.update { state ->
                 state.copy(
                     isLoading = false
@@ -157,7 +141,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getLatestNews() {
+    private fun getLatestNews() {
         viewModelScope.launch {
             _state.update { state ->
                 state.copy(

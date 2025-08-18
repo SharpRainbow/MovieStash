@@ -6,13 +6,9 @@ class GetContentFromPublicCollectionUseCase(
     private val repository: ContentRepository
 ) {
 
-    suspend operator fun invoke(
-        collectionId: Int,
-        page: Int,
-        limit: Int
-    ) = repository.getContentFromPublicCollection(
-        collectionId,
-        page,
-        limit
+    operator fun invoke(
+        collectionId: Int
+    ) = repository.getContentFromPublicCollectionFlow(
+        collectionId
     )
 }

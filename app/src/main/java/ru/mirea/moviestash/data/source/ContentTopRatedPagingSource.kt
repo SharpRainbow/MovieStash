@@ -7,10 +7,9 @@ import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.mappers.toListEntityBase
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 
-class ContentSearchPagingSource(
-    private val apiService: MovieStashApi,
-    private val query: String
-): PagingSource<Int, ContentEntityBase>() {
+class ContentTopRatedPagingSource(
+    private val apiService: MovieStashApi
+) : PagingSource<Int, ContentEntityBase>() {
 
     override fun getRefreshKey(state: PagingState<Int, ContentEntityBase>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -22,16 +21,16 @@ class ContentSearchPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ContentEntityBase> {
         val position = params.key ?: ApiProvider.FIRST_PAGE_INDEX
         return try {
-            val contentList = apiService.getContents(
-                page = position,
-                limit = params.loadSize,
-                name = query
+            val contentList = apiService.getBestContents(
+                position,
+                params.loadSize
             )
-            val nextKey = if (contentList.isEmpty()) {
-                null
-            } else {
-                position + (params.loadSize / ApiProvider.NETWORK_PAGE_SIZE)
-            }
+            val nextKey =
+                if (contentList.isEmpty()) {
+                    null
+                } else {
+                    position + (params.loadSize / ApiProvider.NETWORK_PAGE_SIZE)
+                }
             LoadResult.Page(
                 data = contentList.toListEntityBase(),
                 prevKey = if (position == ApiProvider.FIRST_PAGE_INDEX) null else position - 1,
@@ -41,5 +40,6 @@ class ContentSearchPagingSource(
             LoadResult.Error(exception)
         }
     }
+
 
 }
