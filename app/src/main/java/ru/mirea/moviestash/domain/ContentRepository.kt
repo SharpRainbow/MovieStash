@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.domain
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.domain.entities.ContentEntity
@@ -32,4 +33,12 @@ interface ContentRepository {
     suspend fun getContentByGenre(
         genreId: Int, page: Int, limit: Int
     )
+
+    fun getContentSearchResultFlow(
+        query: String
+    ): Flow<PagingData<ContentEntityBase>>
+
+    companion object {
+        const val NETWORK_PAGE_SIZE = 10
+    }
 }

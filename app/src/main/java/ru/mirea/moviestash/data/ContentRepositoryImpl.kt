@@ -1,12 +1,16 @@
 package ru.mirea.moviestash.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.mirea.moviestash.Result
+import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.mappers.toEntity
 import ru.mirea.moviestash.data.mappers.toListEntityBase
+import ru.mirea.moviestash.data.source.ContentSearchPagingSource
 import ru.mirea.moviestash.domain.ContentRepository
 import ru.mirea.moviestash.domain.entities.ContentEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
@@ -127,5 +131,20 @@ class ContentRepositoryImpl(
         } catch (e: Exception) {
             _contentListFlow.emit(Result.Error(e))
         }
+    }
+
+    override fun getContentSearchResultFlow(query: String): Flow<PagingData<ContentEntityBase>> {
+        return Pager(
+            config = androidx.paging.PagingConfig(
+                pageSize = ContentRepository.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                ContentSearchPagingSource(
+                    movieStashApi,
+                    query
+                )
+            }
+        ).flow
     }
 }

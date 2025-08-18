@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.domain
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.api.dto.CelebrityInContentDto
@@ -30,4 +31,12 @@ interface CelebrityRepository {
     )
 
     suspend fun getCelebrityById(celebrityId: Int)
+
+    fun getCelebritySearchResultFlow(
+        query: String
+    ): Flow<PagingData<CelebrityEntityBase>>
+
+    companion object {
+        const val NETWORK_PAGE_SIZE = 10
+    }
 }

@@ -80,4 +80,5 @@
     <string name="autocomplete">Автозаполнение</string>
     <string name="news_title_not_empty">Заголовок не может быть пустым</string>
     <string name="news_text_not_empty">Текст новости не может быть пустым</string>
+    <string name="search_hint">Поиск фильмов</string>
 </resources>

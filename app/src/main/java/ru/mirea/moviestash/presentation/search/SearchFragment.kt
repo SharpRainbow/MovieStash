@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -13,8 +14,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentSearchBinding
@@ -25,23 +32,17 @@ class SearchFragment : Fragment() {
     private val binding
         get() = _binding!!
     private val viewModel: SearchViewModel by viewModels()
-    private val contentAdapter: SearchMovieAdapter by lazy {
-        SearchMovieAdapter().apply {
-            onListEndReached = {
-                viewModel.loadMore()
-            }
-            onContentClick = { content ->
-                navigateToContentFragment(content.id)
+    private val celebrityPagingAdapter: SearchPagingCelebrityAdapter by lazy {
+        SearchPagingCelebrityAdapter().apply {
+            onCelebrityClick = { celebrity ->
+                navigateToCelebrityFragment(celebrity.id)
             }
         }
     }
-    private val celebrityAdapter: SearchCelebrityAdapter by lazy {
-        SearchCelebrityAdapter().apply {
-            onListEndReached = {
-                viewModel.loadMore()
-            }
-            onCelebrityClick = { celebrity ->
-                navigateToCelebrityFragment(celebrity.id)
+    private val contentPagingAdapter: SearchPagingContentAdapter by lazy {
+        SearchPagingContentAdapter().apply {
+            onContentClick = { content ->
+                navigateToContentFragment(content.id)
             }
         }
     }
@@ -72,22 +73,40 @@ class SearchFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { state ->
-                    if (state.isLoading) {
-                        hideNotFound()
-                        showProgress()
-                    } else {
-                        hideProgress()
-                        selectCorrectTab(state.currentTab)
-                        if (state.currentTab == SearchTab.CONTENT) {
-                            contentAdapter.submitList(state.contentList)
-                            if (state.contentList.isEmpty())
-                                showNotFound()
+                merge(
+                    celebrityPagingAdapter.loadStateFlow,
+                    contentPagingAdapter.loadStateFlow
+                ).onEach { state ->
+                    binding.progressBarSearch.visibility =
+                        if (state.source.append is LoadState.Loading) {
+                            View.VISIBLE
                         } else {
-                            celebrityAdapter.submitList(state.celebrityList)
-                            if (state.celebrityList.isEmpty())
-                                showNotFound()
+                            View.GONE
                         }
+                    if (state.source.append is LoadState.Error) {
+                        showToast(getString(R.string.loading_error))
+                    }
+                }.launchIn(this)
+                viewModel.state.collect { state ->
+                    selectCorrectTab(state.currentTab)
+                    if (state.currentTab == SearchTab.CONTENT) {
+                        state.pagedContentList?.let { pagedContentFlow ->
+                            launch {
+                                pagedContentFlow.collectLatest { pagingContentData ->
+                                    contentPagingAdapter.submitData(pagingContentData)
+                                }
+                            }
+                        } ?: contentPagingAdapter.submitData(PagingData.empty())
+                    } else {
+                        state.pagedCelebrityList?.let { pagedCelebrityFlow ->
+                            launch {
+                                pagedCelebrityFlow.collectLatest { pagingCelebrityData ->
+                                    celebrityPagingAdapter.submitData(
+                                        pagingCelebrityData
+                                    )
+                                }
+                            }
+                        } ?: celebrityPagingAdapter.submitData(PagingData.empty())
                     }
                 }
             }
@@ -96,102 +115,91 @@ class SearchFragment : Fragment() {
 
     private fun selectCorrectTab(currentTab: SearchTab) {
         val tabIndex = currentTab.tabId
-        if (binding.tabs.selectedTabPosition != tabIndex) {
-            binding.tabs.getTabAt(tabIndex)?.select()
+        if (binding.tabLayoutSearch.selectedTabPosition != tabIndex) {
+            binding.tabLayoutSearch.getTabAt(tabIndex)?.select()
         }
 
         val expectedAdapter =
             if (currentTab == SearchTab.CONTENT)
-                contentAdapter
+                contentPagingAdapter
             else
-                celebrityAdapter
+                celebrityPagingAdapter
         if (binding.recyclerViewSearch.adapter != expectedAdapter) {
             binding.recyclerViewSearch.adapter = expectedAdapter
         }
     }
 
     private fun bindListeners() {
-        binding.customToolbar.apply {
-            setNavigationIcon(R.drawable.arrow_back)
-            navigationIcon?.setTint(
-                resources.getColor(
-                    R.color.md_theme_onSurface,
-                    requireActivity().theme
-                )
-            )
-            setNavigationOnClickListener {
-                findNavController().popBackStack()
-            }
-        }
-        binding.contentSearcher.addTextChangedListener(
-            afterTextChanged = {
-                viewModel.search(binding.contentSearcher.text?.toString())
-            }
-        )
-        binding.contentSearcher.apply {
-            postDelayed({
-                isFocusableInTouchMode = true
-                requestFocus()
-                val keyboard = ContextCompat.getSystemService<InputMethodManager>(
-                    context,
-                    InputMethodManager::class.java
-                )
-                keyboard?.showSoftInput(this, 0)
-            }, 200)
-        }
-        binding.recyclerViewSearch.layoutManager = LinearLayoutManager(context)
-        binding.tabs.apply {
-            addTab(
-                newTab()
-                    .setId(SearchTab.CONTENT.tabId)
-                    .setText(
-                        getString(R.string.search_content)
+        with(binding) {
+            toolbarSearch.apply {
+                setNavigationIcon(R.drawable.arrow_back)
+                navigationIcon?.setTint(
+                    resources.getColor(
+                        R.color.md_theme_onSurface,
+                        requireActivity().theme
                     )
-            )
-            addTab(
-                newTab()
-                    .setId(SearchTab.CELEBRITY.tabId)
-                    .setText(
-                        getString(R.string.search_celebrity)
-                    )
-            )
-        }
-        binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.let { selectedTab ->
-                    if (selectedTab.id == SearchTab.CONTENT.tabId) {
-                        viewModel.changeTab(SearchTab.CONTENT)
-                    } else {
-                        viewModel.changeTab(SearchTab.CELEBRITY)
-                    }
-                    viewModel.search(binding.contentSearcher.text?.toString())
+                )
+                setNavigationOnClickListener {
+                    findNavController().popBackStack()
                 }
             }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-
+            editTextSearchQuery.apply {
+                postDelayed({
+                    isFocusableInTouchMode = true
+                    requestFocus()
+                    val keyboard = ContextCompat.getSystemService<InputMethodManager>(
+                        context,
+                        InputMethodManager::class.java
+                    )
+                    keyboard?.showSoftInput(this, 0)
+                }, 200)
+                addTextChangedListener(
+                    afterTextChanged = {
+                        viewModel.search(binding.editTextSearchQuery.text?.toString())
+                    }
+                )
             }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-
+            recyclerViewSearch.layoutManager = LinearLayoutManager(context)
+            tabLayoutSearch.apply {
+                addTab(
+                    newTab()
+                        .setId(SearchTab.CONTENT.tabId)
+                        .setText(
+                            getString(R.string.search_content)
+                        )
+                )
+                addTab(
+                    newTab()
+                        .setId(SearchTab.CELEBRITY.tabId)
+                        .setText(
+                            getString(R.string.search_celebrity)
+                        )
+                )
             }
-        })
+            tabLayoutSearch.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    tab?.let { selectedTab ->
+                        if (selectedTab.id == SearchTab.CONTENT.tabId) {
+                            viewModel.changeTab(SearchTab.CONTENT)
+                        } else {
+                            viewModel.changeTab(SearchTab.CELEBRITY)
+                        }
+                    }
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+                }
+
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+
+                }
+            })
+        }
     }
 
-    private fun showNotFound() {
-        binding.notFoundTv.visibility = View.VISIBLE
-    }
-
-    private fun hideNotFound() {
-        binding.notFoundTv.visibility = View.GONE
-    }
-
-    private fun showProgress() {
-        binding.searchPrBar.visibility = View.VISIBLE
-    }
-
-    private fun hideProgress() {
-        binding.searchPrBar.visibility = View.INVISIBLE
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToCelebrityFragment(celebrityId: Int) {

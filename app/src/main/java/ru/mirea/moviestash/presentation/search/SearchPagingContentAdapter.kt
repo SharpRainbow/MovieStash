@@ -2,20 +2,19 @@ package ru.mirea.moviestash.presentation.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import ru.mirea.moviestash.presentation.content.ContentDiffCallback
 import ru.mirea.moviestash.databinding.ItemSearchedBinding
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
+import ru.mirea.moviestash.presentation.content.ContentDiffCallback
 
-class SearchMovieAdapter :
-    ListAdapter<ContentEntityBase, SearchMovieAdapter.SearchViewHolder>(
+class SearchPagingContentAdapter :
+    PagingDataAdapter<ContentEntityBase, SearchPagingContentAdapter.SearchViewHolder>(
         ContentDiffCallback()
     ) {
 
-        var onContentClick: ((ContentEntityBase) -> Unit)? = null
-    var onListEndReached: (() -> Unit)? = null
+    var onContentClick: ((ContentEntityBase) -> Unit)? = null
 
     class SearchViewHolder(
         val binding: ItemSearchedBinding
@@ -32,18 +31,16 @@ class SearchMovieAdapter :
     }
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
-        val content = getItem(position)
-        holder.binding.searchName.text = content.name
-        holder.binding.searchDesc.text = content.releaseDate
-        Glide
-            .with(holder.binding.searchImage)
-            .load(content.image)
-            .into(holder.binding.searchImage)
-        holder.itemView.setOnClickListener {
-            onContentClick?.invoke(content)
-        }
-        if (itemCount > 5 && position >= itemCount - 5) {
-            onListEndReached?.invoke()
+        getItem(position)?.let { content ->
+            holder.binding.searchDesc.text = content.releaseDate
+            holder.binding.searchName.text = content.name
+            Glide
+                .with(holder.binding.searchImage)
+                .load(content.image)
+                .into(holder.binding.searchImage)
+            holder.itemView.setOnClickListener {
+                onContentClick?.invoke(content)
+            }
         }
     }
 

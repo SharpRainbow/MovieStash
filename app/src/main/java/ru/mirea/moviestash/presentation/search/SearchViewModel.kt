@@ -2,6 +2,9 @@ package ru.mirea.moviestash.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -10,16 +13,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.CelebrityRepositoryImpl
 import ru.mirea.moviestash.data.ContentRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
-import ru.mirea.moviestash.domain.usecases.content.ObserveContentsUseCase
-import ru.mirea.moviestash.domain.usecases.celebrity.ObserveCelebrityListUseCase
-import ru.mirea.moviestash.domain.usecases.celebrity.SearchCelebrityUseCase
-import ru.mirea.moviestash.domain.usecases.content.SearchContentUseCase
 
 class SearchViewModel : ViewModel() {
 
@@ -35,21 +33,6 @@ class SearchViewModel : ViewModel() {
     private val celebrityRepository = CelebrityRepositoryImpl(
         ApiProvider.movieStashApi
     )
-    private val observeContentListUseCase = ObserveContentsUseCase(
-        contentRepository
-    )
-    private val observeCelebrityListUseCase = ObserveCelebrityListUseCase(
-        celebrityRepository
-    )
-    private val getContentListUseCase = SearchContentUseCase(
-        contentRepository
-    )
-    private val getCelebrityUseCase = SearchCelebrityUseCase(
-        celebrityRepository
-    )
-    private var celebrityPage = FIRST_PAGE
-    private var contentPage = FIRST_PAGE
-    private val limit = 10
 
     init {
         searchFlow
@@ -58,71 +41,25 @@ class SearchViewModel : ViewModel() {
                 it.trim()
             }
             .onEach { input ->
-                if (input != state.value.searchQuery) {
-                    resetSearch()
-                    _state.update { state ->
+                _state.update { state ->
+                    if (input.isBlank()) {
                         state.copy(
-                            searchQuery = input,
-                            contentList = emptyList(),
-                            celebrityList = emptyList(),
+                            pagedCelebrityList = null,
+                            pagedContentList = null
                         )
-                    }
-                }
-                loadMore()
-            }
-            .launchIn(viewModelScope)
-        observeContentListUseCase().onEach { contentListResult ->
-            when (contentListResult) {
-                Result.Empty -> {}
-                is Result.Error -> {
-                    _state.update { state ->
+                    } else {
                         state.copy(
-                            isLoading = false,
-                            error = contentListResult.exception
+                            pagedCelebrityList = celebrityRepository
+                                .getCelebritySearchResultFlow(input)
+                                .cachedIn(viewModelScope),
+                            pagedContentList = contentRepository
+                                .getContentSearchResultFlow(input)
+                                .cachedIn(viewModelScope)
                         )
-                    }
-                }
-
-                is Result.Success<List<ContentEntityBase>> -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = null,
-                            contentList = state.contentList + contentListResult.data
-                        )
-                    }
-                    if (contentListResult.data.isNotEmpty()) {
-                        contentPage++
                     }
                 }
             }
-        }.launchIn(viewModelScope)
-        observeCelebrityListUseCase().onEach { celebrityListResult ->
-            when (celebrityListResult) {
-                Result.Empty -> {}
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = celebrityListResult.exception
-                        )
-                    }
-                }
-
-                is Result.Success<List<CelebrityEntityBase>> -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = null,
-                            celebrityList = state.celebrityList + celebrityListResult.data
-                        )
-                    }
-                    if (celebrityListResult.data.isNotEmpty()) {
-                        celebrityPage++
-                    }
-                }
-            }
-        }.launchIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
     fun search(input: String?) {
@@ -133,60 +70,20 @@ class SearchViewModel : ViewModel() {
         }
     }
 
-    fun loadMore() {
-        val query = state.value.searchQuery
-        val isContentTab = state.value.currentTab == SearchTab.CONTENT
-        if (query.isBlank() || state.value.isLoading)
-            return
-        _state.update {
-            it.copy(isLoading = true)
-        }
-        viewModelScope.launch {
-            if (isContentTab) {
-                getContentListUseCase(
-                    query,
-                    contentPage,
-                    limit
-                )
-            } else {
-                getCelebrityUseCase(
-                    query,
-                    celebrityPage,
-                    limit
-                )
-            }
-            _state.update {
-                it.copy(isLoading = false)
-            }
-        }
-    }
-
     fun changeTab(searchTab: SearchTab) {
         _state.update { state ->
             state.copy(
                 currentTab = searchTab,
             )
         }
-        loadMore()
     }
 
-    private fun resetSearch() {
-        celebrityPage = FIRST_PAGE
-        contentPage = FIRST_PAGE
-    }
-
-    companion object {
-        private const val FIRST_PAGE = 1
-    }
 }
 
 data class SearchScreenState(
-    val isLoading: Boolean = false,
-    val error: Throwable? = null,
     val currentTab: SearchTab = SearchTab.CONTENT,
-    val searchQuery: String = "",
-    val celebrityList: List<CelebrityEntityBase> = emptyList(),
-    val contentList: List<ContentEntityBase> = emptyList()
+    val pagedCelebrityList: Flow<PagingData<CelebrityEntityBase>>? = null,
+    val pagedContentList: Flow<PagingData<ContentEntityBase>>? = null,
 )
 
 enum class SearchTab(val tabId: Int) {

@@ -14,14 +14,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
-import ru.mirea.moviestash.presentation.collections.CollectionAdapter
-import ru.mirea.moviestash.presentation.content.ContentAdapter
 import ru.mirea.moviestash.databinding.FragmentHomeBinding
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.domain.entities.GenreEntity
 import ru.mirea.moviestash.domain.entities.NewsEntity
-import ru.mirea.moviestash.presentation.collection_content.CollectionContentFragmentDirections
+import ru.mirea.moviestash.presentation.collections.CollectionAdapter
+import ru.mirea.moviestash.presentation.content.ContentAdapter
 import ru.mirea.moviestash.presentation.news.NewsAdapter
 
 class HomeFragment : Fragment() {

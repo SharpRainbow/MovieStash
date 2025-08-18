@@ -1,5 +1,8 @@
 package ru.mirea.moviestash.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -8,6 +11,7 @@ import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.api.dto.CelebrityInContentDto
 import ru.mirea.moviestash.data.mappers.toEntity
 import ru.mirea.moviestash.data.mappers.toListEntityBase
+import ru.mirea.moviestash.data.source.CelebritySearchPagingSource
 import ru.mirea.moviestash.domain.CelebrityRepository
 import ru.mirea.moviestash.domain.entities.CelebrityEntity
 import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
@@ -102,5 +106,20 @@ class CelebrityRepositoryImpl(
             _celebrityFlow.emit(Result.Error(e))
             return
         }
+    }
+
+    override fun getCelebritySearchResultFlow(query: String): Flow<PagingData<CelebrityEntityBase>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = CelebrityRepository.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                CelebritySearchPagingSource(
+                    movieStashApi,
+                    query
+                )
+            }
+        ).flow
     }
 }
