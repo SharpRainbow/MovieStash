@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -93,24 +95,23 @@ class CollectionContentFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.getCollectionInfo()
-                viewModel.getCollectionContents()
-                viewModel.state.collect { state ->
-                    if (state.isLoading) {
-                        // TODO: Show loading indicator
+                viewModel.state.onEach { state ->
+                    if (state.error == null) {
+                        state.collectionInfo?.let {
+                            showCollectionInfo(it)
+                        }
                     } else {
-                        if (state.error == null) {
-                            state.collectionInfo?.let {
-                                showCollectionInfo(it)
-                            }
-                        }
-                        state.collections?.let { collectionPagedList ->
-                            collectionPagedList.onEach {
-                                collectionContentAdapter.submitData(it)
-                            }.launchIn(this)
-                        }
+                        showToast(getString(R.string.loading_error))
                     }
-                }
+                }.launchIn(this)
+                viewModel.collectionContentFlow.onEach {
+                    collectionContentAdapter.submitData(it)
+                }.launchIn(this)
+                collectionContentAdapter.loadStateFlow.onEach { state ->
+                    if (state.hasError) {
+                        showToast(getString(R.string.loading_error))
+                    }
+                }.launchIn(this)
             }
         }
     }
@@ -147,6 +148,10 @@ class CollectionContentFragment : Fragment() {
         }
         popup.gravity = Gravity.END
         popup.show()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToContentFragment(contentId: Int) {

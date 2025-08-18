@@ -57,7 +57,7 @@ class NewsFragment : Fragment() {
     }
 
     private fun bindListeners() {
-        binding.newsToolbar.apply {
+        binding.toolbarNews.apply {
             setNavigationIcon(R.drawable.arrow_back)
             navigationIcon?.setTint(
                 resources.getColor(
@@ -69,10 +69,10 @@ class NewsFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
-        binding.deleteNews.setOnClickListener {
+        binding.floatinActionButtonsDeleteNews.setOnClickListener {
             viewModel.deleteNews()
         }
-        binding.editNews.setOnClickListener {
+        binding.floatinActionButtonsEditNews.setOnClickListener {
             navigateToNewsEditorFragment(arguments.newsId)
         }
     }
@@ -82,9 +82,10 @@ class NewsFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.getNews()
                 viewModel.state.collect { state ->
+                    binding.progressBarNews.visibility = View.INVISIBLE
                     when (state) {
                         is NewsPageState.Loading -> {
-                            //TODO: Show loading indicator if needed
+                            binding.progressBarNews.visibility = View.VISIBLE
                         }
                         is NewsPageState.Error -> {
                             showToast(getString(R.string.loading_error))
@@ -92,9 +93,9 @@ class NewsFragment : Fragment() {
                         is NewsPageState.Success -> {
                             displayNews(state.news)
                             if (state.isModerator) {
-                                binding.moderatorGroup.visibility = View.VISIBLE
+                                binding.linearLayoutModeratorActions.visibility = View.VISIBLE
                             } else {
-                                binding.moderatorGroup.visibility = View.GONE
+                                binding.linearLayoutModeratorActions.visibility = View.GONE
                             }
                         }
 

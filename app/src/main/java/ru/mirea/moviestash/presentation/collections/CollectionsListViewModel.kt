@@ -3,20 +3,19 @@ package ru.mirea.moviestash.presentation.collections
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.AuthRepositoryImpl
 import ru.mirea.moviestash.data.CollectionRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
-import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.usecases.collection.GetPublicCollectionsUseCase
 import ru.mirea.moviestash.domain.usecases.collection.HideCollectionUseCase
-import ru.mirea.moviestash.domain.usecases.collection.ObserveCollectionsListUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsModeratorUseCase
 
 class CollectionsListViewModel(
@@ -30,9 +29,6 @@ class CollectionsListViewModel(
 
     private val collectionsRepository = CollectionRepositoryImpl(
         ApiProvider.movieStashApi
-    )
-    private val observeCollectionsListUseCase = ObserveCollectionsListUseCase(
-        collectionsRepository
     )
     private val getPublicCollectionsUseCase = GetPublicCollectionsUseCase(
         collectionsRepository
@@ -48,50 +44,21 @@ class CollectionsListViewModel(
         collectionsRepository,
         authRepository
     )
-    private var page = FIRST_PAGE
-    private val limit = 20
-
-    init {
-        getCollections()
-        observeCollectionsListUseCase().onEach { collectionsListResult ->
-            when(collectionsListResult) {
-                Result.Empty -> {}
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = collectionsListResult.exception
-                        )
-                    }
-                }
-                is Result.Success<List<CollectionEntity>> -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            collections = state.collections + collectionsListResult.data
-                        )
-                    }
-                    if (collectionsListResult.data.isNotEmpty()) {
-                        page++
-                    }
-                }
+    private val refreshCollectionsFlow = MutableSharedFlow<Unit>(1)
+    val collectionsFlow =
+        refreshCollectionsFlow
+            .onStart {
+                emit(Unit)
             }
-        }.launchIn(viewModelScope)
-    }
-
-    fun getCollections() {
-        viewModelScope.launch {
-            getPublicCollectionsUseCase(
-                page, limit
-            )
-        }
-    }
+            .flatMapLatest {
+                getPublicCollectionsUseCase()
+            }.cachedIn(viewModelScope)
 
     fun hideCollection(collectionId: Int) {
         viewModelScope.launch {
             try {
                 hideCollectionUseCase(collectionId)
-                getCollections()
+                refreshCollections()
             } catch (e: Exception) {
                 _state.update { state ->
                     state.copy(
@@ -110,24 +77,15 @@ class CollectionsListViewModel(
         }
     }
 
-    fun resetPage() {
-        page = FIRST_PAGE
-        _state.update {
-            it.copy(
-                collections = emptyList(),
-            )
+    fun refreshCollections() {
+        viewModelScope.launch {
+            refreshCollectionsFlow.emit(Unit)
         }
-    }
-
-    companion object {
-        private const val FIRST_PAGE = 1
     }
 
 }
 
 data class CollectionsListScreenState(
-    val isLoading: Boolean = false,
     val isModerator: Boolean = false,
-    val error: Exception? = null,
-    val collections: List<CollectionEntity> = emptyList()
+    val error: Exception? = null
 )

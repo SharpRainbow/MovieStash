@@ -3,21 +3,15 @@ package ru.mirea.moviestash.presentation.celebrity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.CelebrityRepositoryImpl
 import ru.mirea.moviestash.data.ContentRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CelebrityEntity
-import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.domain.usecases.celebrity.GetCelebrityByIdUseCase
 import ru.mirea.moviestash.domain.usecases.content.GetContentByCelebrityUseCase
 
@@ -42,41 +36,28 @@ class CelebrityViewModel(
         contentRepository
     )
 
+    val celebrityContentFlow =
+        getContentByCelebrityUseCase(celebrityId).cachedIn(viewModelScope)
+
     init {
         loadCelebrity()
-        loadContent()
     }
 
     fun loadCelebrity() {
-        _state.update {
-            it.copy(
-                isLoading = true
-            )
-        }
         viewModelScope.launch {
             try {
                 _state.update { state ->
                     state.copy(
-                        isLoading = false,
                         celebrity = getCelebrityUseCase(celebrityId)
                     )
                 }
             } catch (e: Exception) {
                 _state.update { state ->
                     state.copy(
-                        isLoading = false,
                         error = e
                     )
                 }
             }
-        }
-    }
-
-    fun loadContent() {
-        _state.update { state ->
-            state.copy(
-                contentList = getContentByCelebrityUseCase(celebrityId).cachedIn(viewModelScope)
-            )
         }
     }
 
@@ -95,8 +76,6 @@ class CelebrityViewModel(
 }
 
 data class CelebrityScreenState(
-    val isLoading: Boolean = false,
     val error: Throwable? = null,
-    val celebrity: CelebrityEntity? = null,
-    val contentList: Flow<PagingData<ContentEntityBase>>? = null
+    val celebrity: CelebrityEntity? = null
 )

@@ -1,15 +1,27 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package ru.mirea.moviestash.presentation.user_collections
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.AuthRepositoryImpl
 import ru.mirea.moviestash.data.CollectionRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
@@ -18,8 +30,6 @@ import ru.mirea.moviestash.domain.usecases.collection.AddCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.DeleteCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.GetUserCollectionInfoUseCase
 import ru.mirea.moviestash.domain.usecases.collection.GetUserCollectionsUseCase
-import ru.mirea.moviestash.domain.usecases.collection.ObserveCollectionInfoUseCase
-import ru.mirea.moviestash.domain.usecases.collection.ObserveCollectionsListUseCase
 import ru.mirea.moviestash.domain.usecases.collection.PublishCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.UpdateCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsModeratorUseCase
@@ -39,12 +49,6 @@ class UserCollectionsViewModel(
     )
     private val collectionsRepository = CollectionRepositoryImpl(
         ApiProvider.movieStashApi
-    )
-    private val observeCollectionUseCase = ObserveCollectionInfoUseCase(
-        collectionsRepository
-    )
-    private val observeCollectionsListUseCase = ObserveCollectionsListUseCase(
-        collectionsRepository
     )
     private val getUserCollectionsUseCase = GetUserCollectionsUseCase(
         collectionsRepository,
@@ -73,67 +77,16 @@ class UserCollectionsViewModel(
     private val isModeratorUseCase = IsModeratorUseCase(
         authRepository
     )
-    private var page = FIRST_PAGE
-    private val limit = 20
+    private val refreshCollectionsFlow = MutableSharedFlow<Unit>(1)
+    val collectionFlow: Flow<PagingData<CollectionEntity>> =
+        refreshCollectionsFlow
+            .onStart { emit(Unit) }
+            .flatMapLatest {
+                getUserCollectionsUseCase()
+            }.cachedIn(viewModelScope)
 
     init {
         isModerator()
-        observeCollectionsListUseCase().onEach { collectionsListResult ->
-            when(collectionsListResult) {
-                Result.Empty -> {}
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = collectionsListResult.exception
-                        )
-                    }
-                }
-                is Result.Success<List<CollectionEntity>> -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = null,
-                            collections = state.collections + collectionsListResult.data
-                        )
-                    }
-                    if (collectionsListResult.data.isNotEmpty()) {
-                        page++
-                    }
-                }
-            }
-        }.launchIn(viewModelScope)
-        observeCollectionUseCase().onEach { collectionResult ->
-            when(collectionResult) {
-                Result.Empty -> {}
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            modifiedCollection = null,
-                            error = collectionResult.exception
-                        )
-                    }
-                }
-                is Result.Success<CollectionEntity> -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            modifiedCollection = collectionResult.data,
-                            error = null
-                        )
-                    }
-                }
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun getCollections() {
-        viewModelScope.launch {
-            getUserCollectionsUseCase(
-                page, limit
-            )
-        }
     }
 
     fun addCollection(name: String?, description: String?) {
@@ -154,15 +107,18 @@ class UserCollectionsViewModel(
             }
             try {
                 addCollectionUseCase(name, description)
-                resetState()
-                getCollections()
+                refreshCollectionsFlow.emit(Unit)
             } catch (e: Exception) {
                 _state.update { state ->
                     state.copy(
-                        isLoading = false,
                         error = e
                     )
                 }
+            }
+            _state.update { state ->
+                state.copy(
+                    isLoading = false
+                )
             }
         }
     }
@@ -177,7 +133,19 @@ class UserCollectionsViewModel(
 
     fun getCollectionInfo(collectionId: Int) {
         viewModelScope.launch {
-            getUserCollectionInfoUseCase(collectionId)
+            try {
+                _state.update { state ->
+                    state.copy(
+                        modifiedCollection = getUserCollectionInfoUseCase(collectionId)
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
+                }
+            }
         }
     }
 
@@ -185,9 +153,7 @@ class UserCollectionsViewModel(
         viewModelScope.launch {
             try {
                 deleteCollectionUseCase(collectionId)
-                updateCollections { collections ->
-                    collections.filter { it.id != collectionId }
-                }
+                refreshCollections()
             } catch (e: Exception) {
                 _state.update { state ->
                     state.copy(
@@ -214,18 +180,7 @@ class UserCollectionsViewModel(
         viewModelScope.launch {
             try {
                 updateCollectionUseCase(collectionId, name, description)
-                updateCollections { collections ->
-                    collections.map { collection ->
-                        if (collection.id == collectionId) {
-                            collection.copy(
-                                name = name,
-                                description = description.orEmpty()
-                            )
-                        } else {
-                            collection
-                        }
-                    }
-                }
+                refreshCollections()
             } catch (e: Exception) {
                 _state.update { state ->
                     state.copy(
@@ -243,9 +198,7 @@ class UserCollectionsViewModel(
         viewModelScope.launch {
             try {
                 publicCollectionsUseCase(collectionId)
-                updateCollections { collections ->
-                    collections.filter { it.id != collectionId }
-                }
+                refreshCollections()
             } catch (e: Exception) {
                 _state.update { state ->
                     state.copy(
@@ -257,35 +210,18 @@ class UserCollectionsViewModel(
         }
     }
 
+    fun refreshCollections() {
+        viewModelScope.launch {
+            refreshCollectionsFlow.emit(Unit)
+        }
+    }
+
     private fun isModerator() {
         _state.update { state ->
             state.copy(
                 isModerator = isModeratorUseCase()
             )
         }
-    }
-
-    private inline fun updateCollections(
-        transformation: (List<CollectionEntity>) -> List<CollectionEntity>
-    ) {
-        _state.update { state ->
-            state.copy(
-                collections = transformation(state.collections)
-            )
-        }
-    }
-
-    private fun resetState() {
-        page = FIRST_PAGE
-        _state.update { state ->
-            state.copy(
-                collections = emptyList(),
-            )
-        }
-    }
-
-    companion object {
-        private const val FIRST_PAGE = 1
     }
 
 }
@@ -295,7 +231,6 @@ data class UserCollectionsScreenState(
     val isLoading: Boolean = false,
     val error: Exception? = null,
     val errorInputName: Boolean = false,
-    val collections: List<CollectionEntity> = emptyList(),
     val modifiedCollection: CollectionEntity? = null,
     val dataSaved: Boolean = false
 )

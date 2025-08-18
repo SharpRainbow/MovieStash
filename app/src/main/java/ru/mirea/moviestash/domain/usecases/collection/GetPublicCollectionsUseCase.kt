@@ -6,8 +6,5 @@ class GetPublicCollectionsUseCase(
     private val repository: CollectionRepository
 ) {
 
-    suspend operator fun invoke(
-        page: Int,
-        limit: Int
-    ) = repository.getEditorCollections(page, limit)
+    operator fun invoke() = repository.getEditorCollectionsFlow()
 }

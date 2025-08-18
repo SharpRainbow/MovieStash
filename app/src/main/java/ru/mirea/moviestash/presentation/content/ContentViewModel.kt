@@ -5,8 +5,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -19,19 +26,17 @@ import ru.mirea.moviestash.data.ContentRepositoryImpl
 import ru.mirea.moviestash.data.ReviewRepositoryImpl
 import ru.mirea.moviestash.data.UserStarRepositoryImpl
 import ru.mirea.moviestash.data.api.ApiProvider
-import ru.mirea.moviestash.data.api.dto.CelebrityInContentDto
 import ru.mirea.moviestash.domain.entities.CelebrityInContentEntity
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntity
 import ru.mirea.moviestash.domain.entities.ReviewEntity
 import ru.mirea.moviestash.domain.entities.UserStarEntity
 import ru.mirea.moviestash.domain.usecases.celebrity.GetCastByContentUseCase
-import ru.mirea.moviestash.domain.usecases.content.GetContentUseCase
 import ru.mirea.moviestash.domain.usecases.celebrity.GetCrewByContentUseCase
-import ru.mirea.moviestash.domain.usecases.review.GetReviewsUseCase
 import ru.mirea.moviestash.domain.usecases.collection.AddContentToCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.GetUserCollectionsUseCase
-import ru.mirea.moviestash.domain.usecases.collection.ObserveCollectionsListUseCase
+import ru.mirea.moviestash.domain.usecases.content.GetContentUseCase
+import ru.mirea.moviestash.domain.usecases.review.GetReviewsUseCase
 import ru.mirea.moviestash.domain.usecases.review.ObserveReviewsUseCase
 import ru.mirea.moviestash.domain.usecases.stars.GetRatingUseCase
 import ru.mirea.moviestash.domain.usecases.stars.ObserveRatingUseCase
@@ -93,9 +98,6 @@ class ContentViewModel(
         userStarRepository,
         authRepository
     )
-    private val observeCollectionsUseCase = ObserveCollectionsListUseCase(
-        collectionRepository
-    )
     private val getUserCollectionsUseCase = GetUserCollectionsUseCase(
         collectionRepository,
         authRepository
@@ -107,12 +109,18 @@ class ContentViewModel(
     private val isLoggedInUseCase = IsLoggedInUseCase(
         authRepository
     )
-    private var collectionPage = FIRST_PAGE
 
     private val _state = MutableStateFlow<ContentScreenState>(
         ContentScreenState()
     )
     val state = _state.asStateFlow()
+
+    private val refreshCollectionFlow = MutableSharedFlow<Unit>(1)
+    val userCollections: Flow<PagingData<CollectionEntity>> =
+        refreshCollectionFlow
+            .flatMapLatest {
+                getUserCollectionsUseCase()
+            }.cachedIn(viewModelScope)
 
     init {
         isLoggedIn()
@@ -129,6 +137,7 @@ class ContentViewModel(
                         )
                     }
                 }
+
                 is Result.Error -> {
                     _state.update { state ->
                         if (state.isLoggedIn) {
@@ -141,6 +150,7 @@ class ContentViewModel(
                         }
                     }
                 }
+
                 Result.Empty -> {}
             }
         }.launchIn(viewModelScope)
@@ -153,6 +163,7 @@ class ContentViewModel(
                         )
                     }
                 }
+
                 is Result.Error -> {
                     _state.update { state ->
                         state.copy(
@@ -161,26 +172,7 @@ class ContentViewModel(
                         )
                     }
                 }
-                Result.Empty -> {}
-            }
-        }.launchIn(viewModelScope)
-        observeCollectionsUseCase().onEach { collectionResult ->
-            when (collectionResult) {
-                is Result.Success -> {
-                    _state.update { state ->
-                        state.copy(
-                            userCollections = state.userCollections + collectionResult.data
-                        )
-                    }
-                }
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = collectionResult.exception
-                        )
-                    }
-                }
+
                 Result.Empty -> {}
             }
         }.launchIn(viewModelScope)
@@ -309,32 +301,6 @@ class ContentViewModel(
         }
     }
 
-    fun getUserCollections() {
-        viewModelScope.launch {
-            try {
-                getUserCollectionsUseCase(
-                    collectionPage,
-                    LIMIT
-                )
-            } catch (e: Exception) {
-                _state.update { state ->
-                    state.copy(
-                        error = e
-                    )
-                }
-            }
-        }
-    }
-
-    fun resetCollectionPage() {
-        collectionPage = FIRST_PAGE
-        _state.update { state ->
-            state.copy(
-                userCollections = emptyList()
-            )
-        }
-    }
-
     fun addToCollection(collectionId: Int) {
         viewModelScope.launch {
             try {
@@ -352,6 +318,12 @@ class ContentViewModel(
         }
     }
 
+    fun refreshCollections() {
+        viewModelScope.launch {
+            refreshCollectionFlow.emit(Unit)
+        }
+    }
+
     private fun isLoggedIn() {
         _state.update { state ->
             state.copy(
@@ -364,7 +336,6 @@ class ContentViewModel(
 
         private const val PREVIEW_ITEMS_COUNT = 5
         private const val FIRST_PAGE = 1
-        private const val LIMIT = -1
 
         fun provideFactory(contentId: Int, application: Application) =
             object : ViewModelProvider.Factory {
@@ -384,6 +355,5 @@ data class ContentScreenState(
     val crewList: List<CelebrityInContentEntity> = emptyList(),
     val reviews: List<ReviewEntity> = emptyList(),
     val isLoggedIn: Boolean = false,
-    val userStar: UserStarEntity? = null,
-    val userCollections: List<CollectionEntity> = emptyList(),
+    val userStar: UserStarEntity? = null
 )

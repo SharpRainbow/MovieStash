@@ -91,22 +91,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getPresentGenres() {
         viewModelScope.launch {
-            when(val genreResult = getPresentGenresUseCase()) {
-                is Result.Error -> {
-                    _state.value = _state.value.copy(
-                        error = genreResult.exception
+            try {
+                val genreResult = getPresentGenresUseCase()
+                _state.update { state ->
+                    state.copy(
+                        error = null,
+                        collections = genreResult
                     )
                 }
-                is Result.Success<List<GenreEntity>> -> {
-                    _state.update { state ->
-                        state.copy(
-                            error = null,
-                            collections = genreResult.data
-                        )
-                    }
-                }
-                Result.Empty -> {
-
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
                 }
             }
         }

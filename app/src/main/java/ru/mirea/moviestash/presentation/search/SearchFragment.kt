@@ -78,37 +78,24 @@ class SearchFragment : Fragment() {
                     contentPagingAdapter.loadStateFlow
                 ).onEach { state ->
                     binding.progressBarSearch.visibility =
-                        if (state.source.append is LoadState.Loading) {
+                        if (state.refresh is LoadState.Loading) {
                             View.VISIBLE
                         } else {
                             View.GONE
                         }
-                    if (state.source.append is LoadState.Error) {
+                    if (state.hasError) {
                         showToast(getString(R.string.loading_error))
                     }
                 }.launchIn(this)
-                viewModel.state.collect { state ->
+                viewModel.state.onEach { state ->
                     selectCorrectTab(state.currentTab)
-                    if (state.currentTab == SearchTab.CONTENT) {
-                        state.pagedContentList?.let { pagedContentFlow ->
-                            launch {
-                                pagedContentFlow.collectLatest { pagingContentData ->
-                                    contentPagingAdapter.submitData(pagingContentData)
-                                }
-                            }
-                        } ?: contentPagingAdapter.submitData(PagingData.empty())
-                    } else {
-                        state.pagedCelebrityList?.let { pagedCelebrityFlow ->
-                            launch {
-                                pagedCelebrityFlow.collectLatest { pagingCelebrityData ->
-                                    celebrityPagingAdapter.submitData(
-                                        pagingCelebrityData
-                                    )
-                                }
-                            }
-                        } ?: celebrityPagingAdapter.submitData(PagingData.empty())
-                    }
-                }
+                }.launchIn(this)
+                viewModel.pagedContentList.onEach {
+                    contentPagingAdapter.submitData(it)
+                }.launchIn(this)
+                viewModel.pagedCelebrityList.onEach {
+                    celebrityPagingAdapter.submitData(it)
+                }.launchIn(this)
             }
         }
     }

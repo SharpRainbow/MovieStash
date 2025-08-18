@@ -1,59 +1,21 @@
 package ru.mirea.moviestash.data
 
-import kotlinx.coroutines.channels.BufferOverflow
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import ru.mirea.moviestash.Result
+import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.api.dto.CreateCollectionDto
 import ru.mirea.moviestash.data.mappers.toEntity
-import ru.mirea.moviestash.data.mappers.toListEntity
+import ru.mirea.moviestash.data.source.CollectionByEditorPagingSource
+import ru.mirea.moviestash.data.source.CollectionByUserPagingSource
 import ru.mirea.moviestash.domain.CollectionRepository
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 
 class CollectionRepositoryImpl(
     private val movieStashApi: MovieStashApi
 ) : CollectionRepository {
-
-    private val _collectionsListFlow = MutableSharedFlow<Result<List<CollectionEntity>>>(
-        1, 0, BufferOverflow.DROP_OLDEST
-    )
-    override val collectionsListFlow: Flow<Result<List<CollectionEntity>>>
-        get() = _collectionsListFlow.asSharedFlow()
-    private val _collectionFlow = MutableSharedFlow<Result<CollectionEntity>>(
-        1, 0, BufferOverflow.DROP_OLDEST
-    )
-    override val collectionFlow: Flow<Result<CollectionEntity>>
-        get() = _collectionFlow.asSharedFlow()
-
-    override suspend fun getEditorCollections(page: Int, limit: Int) {
-        try {
-            val collections = movieStashApi.getPublicCollections(page, limit)
-            _collectionsListFlow.emit(Result.Success(collections.toListEntity()))
-        } catch (e: Exception) {
-            _collectionsListFlow.emit(Result.Error(e))
-        }
-    }
-
-    override suspend fun getUserCollections(
-        token: String,
-        page: Int,
-        limit: Int
-    ) {
-        try {
-            val collections = movieStashApi.getPersonalCollections(
-                token,
-                page,
-                limit
-            )
-            _collectionsListFlow.emit(Result.Success(collections.toListEntity()))
-        } catch (e: Exception) {
-            _collectionsListFlow.emit(Result.Error(e))
-        }
-    }
 
     override suspend fun deleteUserCollection(token: String, collectionId: Int) {
         movieStashApi.deletePersonalCollection(token, collectionId)
@@ -117,36 +79,43 @@ class CollectionRepositoryImpl(
         )
     }
 
-    override suspend fun getPublicCollectionInfo(collectionId: Int) {
-        try {
-            _collectionFlow.emit(
-                Result.Success(
-                    movieStashApi.getPublicCollectionInfoById(
-                        collectionId
-                    ).toEntity()
-                )
-            )
-        } catch (e: Exception) {
-            _collectionFlow.emit(
-                Result.Error(e)
-            )
-        }
+    override suspend fun getPublicCollectionInfo(collectionId: Int): CollectionEntity {
+        return movieStashApi.getPublicCollectionInfoById(collectionId).toEntity()
     }
 
-    override suspend fun getUserCollectionInfo(token: String, collectionId: Int) {
-        try {
-            _collectionFlow.emit(
-                Result.Success(
-                    movieStashApi.getPersonalCollectionById(
-                        token,
-                        collectionId
-                    ).toEntity()
+    override suspend fun getUserCollectionInfo(
+        token: String,
+        collectionId: Int
+    ): CollectionEntity {
+        return movieStashApi.getPersonalCollectionById(token, collectionId).toEntity()
+    }
+
+    override fun getEditorCollectionsFlow(): Flow<PagingData<CollectionEntity>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = ApiProvider.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                CollectionByEditorPagingSource(
+                    movieStashApi
                 )
-            )
-        } catch (e: Exception) {
-            _collectionFlow.emit(
-                Result.Error(e)
-            )
-        }
+            }
+        ).flow
+    }
+
+    override fun getUserCollectionsFlow(token: String): Flow<PagingData<CollectionEntity>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = ApiProvider.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                CollectionByUserPagingSource(
+                    movieStashApi,
+                    token
+                )
+            }
+        ).flow
     }
 }

@@ -15,6 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentCollectionBinding
@@ -25,8 +29,8 @@ class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null
     private val binding: FragmentCollectionBinding
         get() = _binding!!
-    private val collectionsAdapter: CollectionAdapter by lazy {
-        CollectionAdapter().apply {
+    private val collectionsAdapter: CollectionPagedAdapter by lazy {
+        CollectionPagedAdapter().apply {
             onCollectionClick = { collection ->
                 navigateToContentCollectionFragment(
                     collection.id,
@@ -64,20 +68,19 @@ class CollectionFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.isModerator()
-                viewModel.state.collect { state ->
-                    if (state.isLoading) {
-                        binding.swipeRefreshLayoutCollections.isRefreshing = true
-                    } else {
-                        binding.swipeRefreshLayoutCollections.isRefreshing = false
-                        if (state.error == null) {
-                            collectionsAdapter.submitList(
-                                state.collections
-                            )
-                        } else {
-                            showToast(getString(R.string.loading_error))
-                        }
+                viewModel.state.onEach { state ->
+                    if (state.error != null) {
+                        showToast(getString(R.string.loading_error))
                     }
-                }
+                }.launchIn(this)
+                viewModel.collectionsFlow.onEach { pagedCollections ->
+                    collectionsAdapter.submitData(pagedCollections)
+                }.launchIn(this)
+                collectionsAdapter.loadStateFlow.onEach { state ->
+                    if (state.hasError) {
+                        showToast(getString(R.string.loading_error))
+                    }
+                }.launchIn(this)
             }
         }
     }
@@ -107,12 +110,7 @@ class CollectionFragment : Fragment() {
     }
 
     private fun bindViews() {
-        val metrics = resources.displayMetrics
-        val columnsCount = metrics.widthPixels / TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            COLUMN_WIDTH,
-            metrics
-        ).toInt()
+        val columnsCount = calculateColumnsCount()
         binding.colRcVw.apply {
             layoutManager = GridLayoutManager(context, maxOf(2, columnsCount))
             adapter = collectionsAdapter.apply {
@@ -127,8 +125,7 @@ class CollectionFragment : Fragment() {
 
     private fun bindListeners() {
         binding.swipeRefreshLayoutCollections.setOnRefreshListener {
-            viewModel.resetPage()
-            viewModel.getCollections()
+            collectionsAdapter.refresh()
         }
     }
 
@@ -147,6 +144,15 @@ class CollectionFragment : Fragment() {
                 userId
             )
         )
+    }
+
+    private fun calculateColumnsCount(): Int {
+        val metrics = resources.displayMetrics
+        return metrics.widthPixels / TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            COLUMN_WIDTH,
+            metrics
+        ).toInt()
     }
 
     companion object {

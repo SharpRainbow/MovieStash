@@ -98,15 +98,15 @@ class CelebrityListFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 celebrityAdapter.loadStateFlow.onEach { state ->
                     binding.progressBarCelebrityList.visibility =
-                        if (state.append is LoadState.Loading) {
+                        if (state.refresh is LoadState.Loading) {
                             View.VISIBLE
                         } else {
                             View.GONE
                         }
                 }.launchIn(this)
-                viewModel.celebrityFlow.collect { celebrityData ->
+                viewModel.celebrityFlow.onEach { celebrityData ->
                     celebrityAdapter.submitData(celebrityData)
-                }
+                }.launchIn(this)
             }
         }
     }

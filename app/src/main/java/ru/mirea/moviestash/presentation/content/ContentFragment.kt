@@ -13,11 +13,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
+import ru.mirea.moviestash.databinding.DialogAddListBinding
+import ru.mirea.moviestash.databinding.DialogCollectionsBinding
 import ru.mirea.moviestash.databinding.DialogRatingBinding
 import ru.mirea.moviestash.databinding.FragmentContentBinding
 import ru.mirea.moviestash.domain.entities.CollectionEntity
@@ -61,6 +68,9 @@ class ContentFragment : Fragment() {
             }
         }
     }
+    private val collectionContentAdapter by lazy {
+        DialogCollectionPagedAdapter()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,7 +100,7 @@ class ContentFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.getReviews()
-                viewModel.state.collect { state ->
+                viewModel.state.onEach { state ->
                     if (state.isLoading) {
                         binding.progressBarContent.visibility = View.VISIBLE
                     } else {
@@ -101,16 +111,29 @@ class ContentFragment : Fragment() {
                         state.content?.let {
                             showContent(it)
                         }
-                        if (state.isLoggedIn && state.userCollections.isNotEmpty()) {
-                            showCollectionsDialog(state.userCollections)
-                        }
                         binding.linearLayoutContentUserActions.visibility =
                             if (state.isLoggedIn) View.VISIBLE else View.GONE
                         castAdapter.submitList(state.castList)
                         crewAdapter.submitList(state.crewList)
                         reviewAdapter.submitList(state.reviews)
                     }
-                }
+                }.launchIn(this)
+                viewModel.userCollections.onEach { collectionPagedData ->
+                    collectionContentAdapter.submitData(
+                        collectionPagedData
+                    )
+                }.launchIn(this)
+                collectionContentAdapter.loadStateFlow.onEach { state ->
+                    if (state.hasError) {
+                        showToast(getString(R.string.loading_error))
+                    }
+                    binding.progressBarContent.visibility =
+                        if (state.refresh is LoadState.Loading) {
+                            View.VISIBLE
+                        } else {
+                            View.INVISIBLE
+                        }
+                }.launchIn(this)
             }
         }
     }
@@ -179,7 +202,7 @@ class ContentFragment : Fragment() {
                 navigateToContentListFragment(false)
             }
             buttonAddToList.setOnClickListener {
-                viewModel.getUserCollections()
+                showCollectionsDialog()
             }
             buttonAddReview.setOnClickListener {
                 navigateToReviewEditorFragment()
@@ -213,19 +236,27 @@ class ContentFragment : Fragment() {
         builder.show()
     }
 
-    private fun showCollectionsDialog(collections: List<CollectionEntity>) {
+    private fun showCollectionsDialog() {
         val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(getString(R.string.select_collection))
-        builder.setItems(
-            collections.map { it.name }.toTypedArray()
-        ) { dialog, which ->
-            val collection = collections[which]
-            viewModel.addToCollection(collection.id)
+        val dialogBinding = DialogCollectionsBinding.inflate(
+            LayoutInflater.from(context),
+            null,
+            false
+        )
+        builder.setView(dialogBinding.root)
+        val dialog = builder.create()
+        dialogBinding.recyclerViewDialogCollections.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = collectionContentAdapter.apply {
+                onCollectionClick = { collection ->
+                    viewModel.addToCollection(collection.id)
+                    dialog.dismiss()
+                }
+            }
         }
-        builder.setOnDismissListener {
-            viewModel.resetCollectionPage()
-        }
-        builder.show()
+        viewModel.refreshCollections()
+        dialog.show()
     }
 
     private fun navigateToContentListFragment(isActors: Boolean) {

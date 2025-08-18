@@ -8,11 +8,7 @@ class GetUserCollectionsUseCase(
     private val authRepository: AuthRepository
 ) {
 
-    suspend operator fun invoke(page: Int, limit: Int) {
-        collectionRepository.getUserCollections(
-            authRepository.getValidToken(),
-            page,
-            limit
-        )
-    }
+    suspend operator fun invoke() = collectionRepository.getUserCollectionsFlow(
+        authRepository.getValidToken()
+    )
 }

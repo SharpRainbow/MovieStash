@@ -8,9 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.mirea.moviestash.data.CelebrityRepositoryImpl
@@ -19,6 +20,7 @@ import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.domain.usecases.celebrity.SearchCelebrityUseCase
+import ru.mirea.moviestash.domain.usecases.content.SearchContentUseCase
 
 class SearchViewModel : ViewModel() {
 
@@ -37,34 +39,42 @@ class SearchViewModel : ViewModel() {
     private val searchCelebrityUseCase = SearchCelebrityUseCase(
         celebrityRepository
     )
-
-    init {
+    private val searchContentUseCase = SearchContentUseCase(
+        contentRepository
+    )
+    val pagedCelebrityList: Flow<PagingData<CelebrityEntityBase>> =
         searchFlow
+            .filter {
+                state.value.currentTab == SearchTab.CELEBRITY
+            }
             .debounce(500)
             .map {
                 it.trim()
             }
-            .onEach { input ->
-                _state.update { state ->
-                    if (input.isBlank()) {
-                        state.copy(
-                            pagedCelebrityList = null,
-                            pagedContentList = null
-                        )
-                    } else {
-                        state.copy(
-                            pagedCelebrityList =
-                                searchCelebrityUseCase(input)
-                                .cachedIn(viewModelScope),
-                            pagedContentList = contentRepository
-                                .getContentSearchResultFlow(input)
-                                .cachedIn(viewModelScope)
-                        )
-                    }
+            .flatMapLatest { input ->
+                if (input.isBlank()) {
+                    flowOf(PagingData.empty())
+                } else {
+                    searchCelebrityUseCase(input)
                 }
+            }.cachedIn(viewModelScope)
+
+    val pagedContentList: Flow<PagingData<ContentEntityBase>> =
+        searchFlow
+            .filter {
+                state.value.currentTab == SearchTab.CONTENT
             }
-            .launchIn(viewModelScope)
-    }
+            .debounce(500)
+            .map {
+                it.trim()
+            }
+            .flatMapLatest { input ->
+                if (input.isBlank()) {
+                    flowOf(PagingData.empty())
+                } else {
+                    searchContentUseCase(input)
+                }
+            }.cachedIn(viewModelScope)
 
     fun search(input: String?) {
         input?.let { searchValue ->
@@ -85,9 +95,7 @@ class SearchViewModel : ViewModel() {
 }
 
 data class SearchScreenState(
-    val currentTab: SearchTab = SearchTab.CONTENT,
-    val pagedCelebrityList: Flow<PagingData<CelebrityEntityBase>>? = null,
-    val pagedContentList: Flow<PagingData<ContentEntityBase>>? = null,
+    val currentTab: SearchTab = SearchTab.CONTENT
 )
 
 enum class SearchTab(val tabId: Int) {

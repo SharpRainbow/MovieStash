@@ -93,7 +93,7 @@ class MvstshInstrumentedTest {
             onView(withId(R.id.refresher)).perform(ViewActions.swipeDown())
             TimeUnit.SECONDS.sleep(1)
             onView(allOf(withId(R.id.newsText), withText(header))).perform(ViewActions.click())
-            onView(withId(R.id.deleteNews)).perform(ViewActions.click())
+            onView(withId(R.id.floatin_action_buttons_delete_news)).perform(ViewActions.click())
             onView(withText("Удалить")).perform(ViewActions.click())
             onView(withId(R.id.refresher)).perform(ViewActions.swipeDown())
             TimeUnit.SECONDS.sleep(1)

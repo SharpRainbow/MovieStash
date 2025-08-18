@@ -7,41 +7,47 @@
     android:layout_height="match_parent"
     tools:context=".presentation.user_collections.UserCollectionsFragment">
 
-    <RelativeLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout_user_collections"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/userListToolbar"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent"
-            android:elevation="1dp">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Мои коллекции"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_user_list"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                android:elevation="1dp">
 
-                android:textSize="20sp"
-                android:textStyle="bold" />
-        </androidx.appcompat.widget.Toolbar>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/my_collections"
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/userColRv"
-            style="@style/RecyclerViewPadding"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/userListToolbar"
-            tools:listitem="@layout/item_user_col" />
-    </RelativeLayout>
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </androidx.appcompat.widget.Toolbar>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_user_collections"
+                style="@style/RecyclerViewPadding"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar_user_list"
+                tools:listitem="@layout/item_user_collection" />
+        </RelativeLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addToUserCol"
+        android:id="@+id/floating_action_button_add_collection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
+        android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         app:srcCompat="@android:drawable/ic_input_add" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,6 +1,7 @@
 package ru.mirea.moviestash.presentation.user_collections
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,13 +14,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.DialogAddListBinding
 import ru.mirea.moviestash.databinding.FragmentUserCollectionsBinding
 import ru.mirea.moviestash.presentation.collections.CollectionAdapter
+import ru.mirea.moviestash.presentation.collections.CollectionPagedAdapter
 import kotlin.getValue
 
 class UserCollectionsFragment : Fragment() {
@@ -29,8 +37,8 @@ class UserCollectionsFragment : Fragment() {
         get() = _binding!!
     private var dialogBinding: DialogAddListBinding? = null
     private val viewModel: UserCollectionsViewModel by viewModels()
-    private val collectionAdapter: CollectionAdapter by lazy {
-        CollectionAdapter(true).apply {
+    private val collectionAdapter: CollectionPagedAdapter by lazy {
+        CollectionPagedAdapter(true).apply {
             onCollectionClick = { collection ->
                 navigateToCollectionActivity(
                     collection.id,
@@ -65,8 +73,8 @@ class UserCollectionsFragment : Fragment() {
     }
 
     private fun bindViews() {
-        binding.userColRv.layoutManager = LinearLayoutManager(context)
-        binding.userColRv.adapter = collectionAdapter.apply {
+        binding.recyclerViewUserCollections.layoutManager = LinearLayoutManager(context)
+        binding.recyclerViewUserCollections.adapter = collectionAdapter.apply {
             onCollectionLongClick = { itemView, collection ->
                 val popup = PopupMenu(
                     itemView.context,
@@ -104,20 +112,15 @@ class UserCollectionsFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.getCollections()
-                viewModel.state.collect { state ->
-                    if (state.isLoading) {
-
-                    } else {
+                viewModel.state.onEach { state ->
+                    binding.swipeRefreshLayoutUserCollections.isRefreshing = state.isLoading
+                    if (!state.isLoading) {
                         if (state.errorInputName) {
                             showToast(
                                 getString(R.string.collection_name_not_empty)
                             )
                         }
                         if (state.error == null) {
-                            collectionAdapter.submitList(
-                                state.collections
-                            )
                             state.modifiedCollection?.let { collection ->
                                 dialogBinding?.editTextCollectionName?.setText(collection.name)
                                 dialogBinding?.editTextCollectionDescription?.setText(
@@ -130,13 +133,25 @@ class UserCollectionsFragment : Fragment() {
                             )
                         }
                     }
-                }
+                }.launchIn(this)
+                viewModel.collectionFlow.onEach {
+                    collectionAdapter.submitData(it)
+                }.launchIn(this)
+                collectionAdapter.loadStateFlow.onEach { state ->
+                    binding.swipeRefreshLayoutUserCollections.isRefreshing =
+                        state.refresh is LoadState.Loading
+                    if (state.hasError) {
+                        showToast(
+                            getString(R.string.loading_error)
+                        )
+                    }
+                }.launchIn(this)
             }
         }
     }
 
     private fun bindListeners() {
-        binding.userListToolbar.apply {
+        binding.toolbarUserList.apply {
             setNavigationIcon(R.drawable.arrow_back)
             navigationIcon?.setTint(
                 resources.getColor(
@@ -148,8 +163,11 @@ class UserCollectionsFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
-        binding.addToUserCol.setOnClickListener {
+        binding.floatingActionButtonAddCollection.setOnClickListener {
             showCollectionDialog()
+        }
+        binding.swipeRefreshLayoutUserCollections.setOnRefreshListener {
+            viewModel.refreshCollections()
         }
     }
 

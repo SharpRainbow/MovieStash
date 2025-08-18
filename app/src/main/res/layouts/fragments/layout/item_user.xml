@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/userColName"
+            android:id="@+id/text_view_collection_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -22,7 +22,7 @@
             android:layout_marginBottom="5dp" />
 
         <TextView
-            android:id="@+id/userColDesc"
+            android:id="@+id/text_view_collection_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"

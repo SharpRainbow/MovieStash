@@ -6,8 +6,8 @@ import ru.mirea.moviestash.domain.entities.GenreEntity
 
 interface GenreRepository {
 
-    suspend fun getPresentGenres(): Result<List<GenreEntity>>
+    suspend fun getPresentGenres(): List<GenreEntity>
 
-    suspend fun getGenreById(genreId: Int): Result<GenreEntity>
+    suspend fun getGenreById(genreId: Int): GenreEntity
 
 }

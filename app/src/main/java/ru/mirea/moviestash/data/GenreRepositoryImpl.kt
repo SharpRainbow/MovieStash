@@ -15,21 +15,11 @@ class GenreRepositoryImpl(
     private val movieStashApi: MovieStashApi
 ) : GenreRepository {
 
-    override suspend fun getPresentGenres(): Result<List<GenreEntity>> {
-        return try {
-            val result = movieStashApi.getPresentGenres()
-            Result.Success(result.toListEntity())
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
+    override suspend fun getPresentGenres(): List<GenreEntity> {
+        return movieStashApi.getPresentGenres().toListEntity()
     }
 
-    override suspend fun getGenreById(genreId: Int): Result<GenreEntity> {
-        return try {
-            val result = movieStashApi.getGenreById(genreId)
-            Result.Success(result.toEntity())
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
+    override suspend fun getGenreById(genreId: Int): GenreEntity {
+        return movieStashApi.getGenreById(genreId).toEntity()
     }
 }

@@ -33,14 +33,16 @@ class BannedUserAdapter
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val bannedUser = getItem(position)
-        holder.binding.userColDesc.isSingleLine = false
-        holder.binding.userColName.text = "${bannedUser.nickname} ${bannedUser.email}"
-        holder.binding.userColDesc.text =
-            holder.itemView.context.getString(
-                R.string.banned_reason_label,
-                bannedUser.banDate,
-                bannedUser.banReason
-            )
+        with(holder.binding) {
+            textViewCollectionDescription.isSingleLine = false
+            textViewCollectionName.text = "${bannedUser.nickname} ${bannedUser.email}"
+            textViewCollectionDescription.text =
+                holder.itemView.context.getString(
+                    R.string.banned_reason_label,
+                    bannedUser.banDate,
+                    bannedUser.banReason
+                )
+        }
         holder.itemView.setOnClickListener {
             onUserClick?.invoke(holder.itemView, bannedUser)
         }

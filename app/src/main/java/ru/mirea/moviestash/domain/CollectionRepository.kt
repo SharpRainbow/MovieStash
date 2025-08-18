@@ -1,29 +1,18 @@
 package ru.mirea.moviestash.domain
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 
 interface CollectionRepository {
 
-    val collectionFlow: Flow<Result<CollectionEntity>>
+    suspend fun getPublicCollectionInfo(collectionId: Int): CollectionEntity
 
-    val collectionsListFlow: Flow<Result<List<CollectionEntity>>>
+    suspend fun getUserCollectionInfo(token: String, collectionId: Int): CollectionEntity
 
-    suspend fun getPublicCollectionInfo(collectionId: Int)
+    fun getEditorCollectionsFlow(): Flow<PagingData<CollectionEntity>>
 
-    suspend fun getUserCollectionInfo(token: String, collectionId: Int)
-
-    suspend fun getEditorCollections(
-        page: Int,
-        limit: Int
-    )
-
-    suspend fun getUserCollections(
-        token: String,
-        page: Int,
-        limit: Int
-    )
+    fun getUserCollectionsFlow(token: String): Flow<PagingData<CollectionEntity>>
 
     suspend fun deleteUserCollection(
         token: String,

@@ -1,9 +1,11 @@
 package ru.mirea.moviestash.presentation.celebrity
 
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -19,7 +21,7 @@ import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.Utils
 import ru.mirea.moviestash.databinding.FragmentCelebrityBinding
-import ru.mirea.moviestash.presentation.content.ContentAdapter
+import ru.mirea.moviestash.domain.entities.CelebrityEntity
 import ru.mirea.moviestash.presentation.content.ContentPagedAdapter
 
 class CelebrityFragment : Fragment() {
@@ -68,7 +70,7 @@ class CelebrityFragment : Fragment() {
         binding.celebFilmsRecycler.apply {
             layoutManager = GridLayoutManager(
                 context,
-                3
+                maxOf(3, calculateColumnsCount())
             )
             adapter = contentAdapter
         }
@@ -89,38 +91,63 @@ class CelebrityFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { state ->
-                    if (state.isLoading) {
-
-                    } else {
-                        if (state.error == null) {
-                            state.celebrity?.let { celebrity ->
-                                Glide.with(requireContext())
-                                    .load(celebrity.image)
-                                    .into(binding.personProfileImage)
-                                binding.textViewPersonName.text = celebrity.name
-                                binding.textViewPersonHeight.text = getString(
-                                    R.string.height,
-                                    celebrity.height.toString()
-                                )
-                                binding.textViewPersonBirthplace.text = getString(
-                                    R.string.birthplace,
-                                    celebrity.birthPlace
-                                )
-                                binding.textViewPersonLifeDates.text = Utils.getLiveDates(
-                                    celebrity.birthDate,
-                                    celebrity.death
-                                )
-                                binding.textViewPersonCareer.text = celebrity.career
-                            }
+                viewModel.state.onEach { state ->
+                    if (state.error == null) {
+                        state.celebrity?.let { celebrity ->
+                            displayCelebrity(celebrity)
                         }
-                        state.contentList?.onEach { contentData ->
-                            contentAdapter.submitData(contentData)
-                        }?.launchIn(this)
+                    } else {
+                        showToast(getString(R.string.loading_error))
                     }
-                }
+                }.launchIn(this)
+                viewModel.celebrityContentFlow.onEach {
+                    contentAdapter.submitData(it)
+                }.launchIn(this)
+                contentAdapter.loadStateFlow.onEach { state ->
+                    if (state.hasError) {
+                        showToast(getString(R.string.loading_error))
+                    }
+                }.launchIn(this)
             }
         }
+    }
+
+    private fun displayCelebrity(celebrity: CelebrityEntity) {
+        Glide.with(requireContext())
+            .load(celebrity.image)
+            .placeholder(R.drawable.placeholder)
+            .into(binding.personProfileImage)
+        binding.textViewPersonName.text = celebrity.name
+        binding.textViewPersonHeight.apply {
+            visibility = if (celebrity.height > 0) View.VISIBLE else View.GONE
+            text = getString(
+                R.string.height,
+                celebrity.height.toString()
+            )
+        }
+        binding.textViewPersonBirthplace.apply {
+            visibility = if (celebrity.birthPlace.isNotBlank()) View.VISIBLE else View.GONE
+            text = getString(
+                R.string.birthplace,
+                celebrity.birthPlace
+            )
+        }
+        binding.textViewPersonLifeDates.apply {
+            visibility =
+                if (celebrity.birthDate.isNotBlank() || celebrity.death.isNotBlank())
+                    View.VISIBLE
+                else
+                    View.GONE
+            text = Utils.getLiveDates(
+                celebrity.birthDate,
+                celebrity.death
+            )
+        }
+        binding.textViewPersonCareer.text = celebrity.career
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToContentFragment(contentId: Int) {
@@ -130,4 +157,18 @@ class CelebrityFragment : Fragment() {
             )
         )
     }
+
+    private fun calculateColumnsCount(): Int {
+        val metrics = resources.displayMetrics
+        return metrics.widthPixels / TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            COLUMN_WIDTH,
+            metrics
+        ).toInt()
+    }
+
+    companion object {
+        private const val COLUMN_WIDTH = 160f
+    }
+
 }
