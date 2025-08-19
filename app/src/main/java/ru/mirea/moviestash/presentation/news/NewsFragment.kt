@@ -69,10 +69,10 @@ class NewsFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
-        binding.floatinActionButtonsDeleteNews.setOnClickListener {
+        binding.floatingActionButtonsDeleteNews.setOnClickListener {
             viewModel.deleteNews()
         }
-        binding.floatinActionButtonsEditNews.setOnClickListener {
+        binding.floatingActionButtonsEditNews.setOnClickListener {
             navigateToNewsEditorFragment(arguments.newsId)
         }
     }

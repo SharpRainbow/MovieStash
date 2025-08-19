@@ -14,9 +14,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -80,6 +79,8 @@ class CollectionFragment : Fragment() {
                     if (state.hasError) {
                         showToast(getString(R.string.loading_error))
                     }
+                    binding.swipeRefreshLayoutCollections.isRefreshing =
+                        state.refresh is LoadState.Loading
                 }.launchIn(this)
             }
         }

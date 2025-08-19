@@ -31,8 +31,8 @@ class NewsAdapter :
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val news = getItem(position)
-        holder.binding.textViewTitle.text = news.title
-        holder.binding.textViewDate.text = news.date
+        holder.binding.textViewTitleItemNews.text = news.title
+        holder.binding.textViewDateItemNews.text = news.date
         Glide
             .with(holder.binding.imageViewNewsImage)
             .load(news.imageUrl)

@@ -1,14 +1,13 @@
 package ru.mirea.moviestash.presentation.user_collections
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,18 +16,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.DialogAddListBinding
 import ru.mirea.moviestash.databinding.FragmentUserCollectionsBinding
-import ru.mirea.moviestash.presentation.collections.CollectionAdapter
 import ru.mirea.moviestash.presentation.collections.CollectionPagedAdapter
-import kotlin.getValue
 
 class UserCollectionsFragment : Fragment() {
 
@@ -182,8 +176,8 @@ class UserCollectionsFragment : Fragment() {
             dialogBinding = it
         }
         builder.setView(localBinding.root)
-        builder.setTitle("Create Collection")
-        builder.setPositiveButton("Save") { _, _ ->
+        builder.setTitle(R.string.add_collections)
+        builder.setPositiveButton(R.string.save) { _, _ ->
             if (collectionId != -1) {
                 viewModel.updateCollection(
                     collectionId,
@@ -197,7 +191,7 @@ class UserCollectionsFragment : Fragment() {
                 )
             }
         }
-        builder.setNegativeButton("Cancel") { _, _ ->
+        builder.setNegativeButton(R.string.cancel) { _, _ ->
 
         }
         builder.setOnDismissListener {

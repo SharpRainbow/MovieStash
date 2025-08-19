@@ -1,36 +1,24 @@
 package ru.mirea.moviestash.presentation.login
 
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.launch
-import ru.mirea.moviestash.R
-import ru.mirea.moviestash.databinding.DialogCollectionsBinding
-import ru.mirea.moviestash.databinding.FragmentLoginBinding
-import ru.mirea.moviestash.domain.entities.CredentialsEntity
-import ru.mirea.moviestash.presentation.account.AccountFragment
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.widget.addTextChangedListener
-import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
+import ru.mirea.moviestash.R
+import ru.mirea.moviestash.databinding.FragmentLoginBinding
+import ru.mirea.moviestash.domain.entities.CredentialsEntity
 
 class LoginFragment : Fragment() {
 
@@ -84,19 +72,16 @@ class LoginFragment : Fragment() {
     }
 
     private fun showSaveSnack() {
-        val saveSnackBar =
-            Snackbar.make(
+        Snackbar
+            .make(
                 binding.root,
                 getString(R.string.save_credentials),
                 Snackbar.LENGTH_LONG
             )
-        val params = saveSnackBar.view.layoutParams as CoordinatorLayout.LayoutParams
-        params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-        saveSnackBar.view.layoutParams = params
-        saveSnackBar.setAction(getString(R.string.ok)) {
-            viewModel.saveCredentials()
-        }
-        saveSnackBar.show()
+            .setAnchorView(R.id.bottom_navigation)
+            .setAction(getString(R.string.ok)) {
+                viewModel.saveCredentials()
+            }.show()
     }
 
     private fun observeViewModel() {
@@ -108,12 +93,14 @@ class LoginFragment : Fragment() {
                         is LoginState.Initial -> {
                             showCredentials(state.credentials)
                         }
+
                         is LoginState.Loading -> {}
                         is LoginState.Success -> {
                             if (!state.isSaved)
                                 showSaveSnack()
                             navigateToAccount()
                         }
+
                         is LoginState.Error -> {
                             if (state.dataError) {
                                 showToast(getString(R.string.error_connection))

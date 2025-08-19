@@ -13,4 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-/app/src/main/java/ru/mirea/moviestash/AppConstants.kt
+/app/src/androidTest/java/ru/mirea/moviestash/TestUserData.kt

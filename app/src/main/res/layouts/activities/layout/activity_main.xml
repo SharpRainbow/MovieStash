@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".presentation.MainActivity">
+    tools:context=".presentation.MainActivity"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -49,8 +50,8 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/bottom_nav"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:navGraph="@navigation/bottom_nav" />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -90,12 +91,13 @@
         android:id="@+id/addButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="80dp"
         android:clickable="true"
         android:contentDescription="@string/add_news"
         android:visibility="gone"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:layout_anchor="@id/bottom_navigation"
+        app:layout_anchorGravity="end"
+        app:srcCompat="@drawable/ic_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -116,7 +116,7 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatin_action_buttons_edit_news"
+            android:id="@+id/floating_action_buttons_edit_news"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -124,7 +124,7 @@
             app:srcCompat="@android:drawable/ic_menu_edit" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatin_action_buttons_delete_news"
+            android:id="@+id/floating_action_buttons_delete_news"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"

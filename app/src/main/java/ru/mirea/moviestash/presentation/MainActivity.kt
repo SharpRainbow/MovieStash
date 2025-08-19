@@ -26,12 +26,13 @@ class MainActivity : AppCompatActivity(), NewsListFragment.AddButtonProvider {
         enableEdgeToEdge()
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(
-                systemInsets.left,
-                systemInsets.top,
-                systemInsets.right,
-                systemInsets.bottom
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                maxOf(systemBars.bottom, ime.bottom)
             )
             WindowInsetsCompat.CONSUMED
         }
