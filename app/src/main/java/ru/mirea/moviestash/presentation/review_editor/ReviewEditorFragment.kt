@@ -69,7 +69,7 @@ class ReviewEditorFragment : Fragment() {
                 viewModel.state.collect { state ->
                     when(state) {
                         is ReviewEditorState.Editing -> {
-                            binding.opSpinner.adapter = ArrayAdapter(
+                            binding.spinnerReviewOpinion.adapter = ArrayAdapter(
                                 requireContext(),
                                 android.R.layout.simple_spinner_item,
                                 state.opinions.map(OpinionEntity::name)
@@ -90,7 +90,7 @@ class ReviewEditorFragment : Fragment() {
                                     getString(R.string.review_title_not_empty)
                                 else
                                     null
-                            binding.editTextDescription.error =
+                            binding.editTextReviewDescription.error =
                                 if (state.errorInputText)
                                     getString(R.string.review_title_not_empty)
                                 else
@@ -113,8 +113,8 @@ class ReviewEditorFragment : Fragment() {
 
     private fun displayReview(review: ReviewEntity) {
         binding.editTextTitle.setText(review.title)
-        binding.editTextDescription.setText(review.description)
-        binding.opSpinner.setSelection(spinnerAdapter.getPosition(review.opinion))
+        binding.editTextReviewDescription.setText(review.description)
+        binding.spinnerReviewOpinion.setSelection(spinnerAdapter.getPosition(review.opinion))
     }
 
     private fun bindListeners() {
@@ -135,14 +135,14 @@ class ReviewEditorFragment : Fragment() {
                 viewModel.updateReview(
                     arguments.reviewId,
                     binding.editTextTitle.text?.toString(),
-                    binding.editTextDescription.text?.toString(),
-                    binding.opSpinner.selectedItemPosition + 1
+                    binding.editTextReviewDescription.text?.toString(),
+                    binding.spinnerReviewOpinion.selectedItemPosition + 1
                 )
             } else {
                 viewModel.addReview(
                     binding.editTextTitle.text?.toString(),
-                    binding.editTextDescription.text?.toString(),
-                    binding.opSpinner.selectedItemPosition + 1
+                    binding.editTextReviewDescription.text?.toString(),
+                    binding.spinnerReviewOpinion.selectedItemPosition + 1
                 )
             }
         }
@@ -151,7 +151,7 @@ class ReviewEditorFragment : Fragment() {
                 viewModel.resetErrorInputTitle()
             }
         )
-        binding.editTextDescription.addTextChangedListener(
+        binding.editTextReviewDescription.addTextChangedListener(
             onTextChanged = { _, _, _, _ ->
                 viewModel.resetErrorInputText()
             }

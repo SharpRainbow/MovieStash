@@ -221,13 +221,13 @@ class ContentFragment : Fragment() {
             null,
             false
         )
-        localBinding.ratingBar.apply {
+        localBinding.ratingBarContentRating.apply {
             rating = (viewModel.state.value.userStar?.rating ?: 0) / 2f
         }
         builder.setView(localBinding.root)
         builder.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
             viewModel.rateContent(
-                (localBinding.ratingBar.rating * 2).toInt()
+                (localBinding.ratingBarContentRating.rating * 2).toInt()
             )
         }
         builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
@@ -286,7 +286,9 @@ class ContentFragment : Fragment() {
 
     private fun navigateToReviewEditorFragment() {
         findNavController().navigate(
-            R.id.action_fragment_content_to_fragment_review_editor
+            ContentFragmentDirections.actionFragmentContentToFragmentReviewEditor(
+                contentId = arguments.contentId
+            )
         )
     }
 

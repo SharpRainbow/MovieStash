@@ -8,7 +8,7 @@
     tools:context=".presentation.collection_content.CollectionContentFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/colToolbar"
+        android:id="@+id/toolbar_collection_content"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
@@ -19,7 +19,7 @@
         app:layout_scrollFlags="scroll">
 
         <TextView
-            android:id="@+id/collectionName"
+            android:id="@+id/text_view_collection_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -32,7 +32,7 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCollectionItems"
+        android:id="@+id/recycler_view_collection_items"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="5dp"
@@ -41,13 +41,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/colDescription"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_collection_description"
         tools:listitem="@layout/item_content"
         tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         tools:spanCount="3"/>
 
     <TextView
-        android:id="@+id/colDescription"
+        android:id="@+id/text_view_collection_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -55,5 +55,5 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/colToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_collection_content" />
 </androidx.constraintlayout.widget.ConstraintLayout>

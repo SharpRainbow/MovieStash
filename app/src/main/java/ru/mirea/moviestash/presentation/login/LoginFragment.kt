@@ -51,6 +51,7 @@ class LoginFragment : Fragment() {
 
     private fun bindListeners() {
         binding.buttonEnter.setOnClickListener {
+            hideKeyboard()
             viewModel.login(
                 binding.editTextLogin.text?.toString(),
                 binding.editTextPassword.text?.toString()
@@ -78,7 +79,7 @@ class LoginFragment : Fragment() {
                 getString(R.string.save_credentials),
                 Snackbar.LENGTH_LONG
             )
-            .setAnchorView(R.id.bottom_navigation)
+            .setAnchorView(R.id.bottom_navigation_view_main)
             .setAction(getString(R.string.ok)) {
                 viewModel.saveCredentials()
             }.show()
@@ -163,6 +164,13 @@ class LoginFragment : Fragment() {
         binding.buttonEnter.isEnabled = enabled
         binding.buttonRegister.isEnabled = enabled
         binding.buttonAutocomplete.isEnabled = enabled
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(
+            android.content.Context.INPUT_METHOD_SERVICE
+        ) as android.view.inputmethod.InputMethodManager
+        imm.hideSoftInputFromWindow(requireView().windowToken, 0)
     }
 
     private fun showToast(message: String) {

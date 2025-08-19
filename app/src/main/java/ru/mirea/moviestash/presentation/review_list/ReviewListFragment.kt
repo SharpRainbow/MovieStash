@@ -35,6 +35,9 @@ class ReviewListFragment : Fragment() {
             onReachEnd = {
                 viewModel.loadReviews()
             }
+            onReviewClick = { review ->
+                navigateToReviewFragment(review.id)
+            }
         }
     }
 
@@ -81,8 +84,10 @@ class ReviewListFragment : Fragment() {
     }
 
     private fun bindViews() {
-        binding.reviewListRv.layoutManager = LinearLayoutManager(context)
-        binding.reviewListRv.adapter = reviewAdapter
+        binding.recyclerViewReviewList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = reviewAdapter
+        }
     }
 
     private fun bindListeners() {
@@ -98,6 +103,14 @@ class ReviewListFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
+    }
+
+    private fun navigateToReviewFragment(reviewId: Int) {
+        findNavController().navigate(
+            ReviewListFragmentDirections.actionFragmentReviewListToFragmentReview(
+                reviewId
+            )
+        )
     }
 
 }

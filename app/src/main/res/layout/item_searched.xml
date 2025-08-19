@@ -7,7 +7,7 @@
     android:padding="10dp">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/card_view_search_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="5dp"
@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/searchImage"
+            android:id="@+id/image_view_search_image"
             android:layout_width="40dp"
             android:layout_height="60dp"
             android:scaleType="centerCrop"
@@ -25,24 +25,24 @@
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/searchName"
+        android:id="@+id/text_view_search_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/searchDesc"
-        app:layout_constraintStart_toEndOf="@+id/cardView"
+        app:layout_constraintBottom_toTopOf="@+id/text_view_search_description"
+        app:layout_constraintStart_toEndOf="@+id/card_view_search_image"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/searchDesc"
+        android:id="@+id/text_view_search_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:gravity="start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/searchName"
-        app:layout_constraintTop_toBottomOf="@+id/searchName" />
+        app:layout_constraintStart_toStartOf="@+id/text_view_search_name"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_search_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

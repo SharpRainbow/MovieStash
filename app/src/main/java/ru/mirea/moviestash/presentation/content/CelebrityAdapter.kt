@@ -31,14 +31,16 @@ class CelebrityAdapter :
 
     override fun onBindViewHolder(holder: CelebrityViewHolder, position: Int) {
         val person = getItem(position)
-        holder.binding.textViewPersonName.text = person.name
-        holder.binding.textViewPersonDescription.text = person.description.ifEmpty {
-            person.role
+        with(holder.binding) {
+            textViewPersonName.text = person.name
+            textViewPersonDescription.text = person.description.ifEmpty {
+                person.role
+            }
+            Glide
+                .with(imageViewPersonImage)
+                .load(person.image)
+                .into(imageViewPersonImage)
         }
-        Glide
-            .with(holder.binding.personImage)
-            .load(person.image)
-            .into(holder.binding.personImage)
         holder.itemView.setOnClickListener {
             onCelebrityClick?.invoke(person)
         }

@@ -7,7 +7,7 @@
     tools:context=".presentation.review_list.ReviewListFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/reviewListToolbar"
+        android:id="@+id/review_list_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
@@ -23,7 +23,7 @@
 
 
     <ProgressBar
-        android:id="@+id/progressBarReviewList"
+        android:id="@+id/progress_bar_review_list"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/reviewListRv"
+        android:id="@+id/recycler_view_review_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         style="@style/RecyclerViewPadding" />

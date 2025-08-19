@@ -106,7 +106,7 @@ class ReviewFragment : Fragment() {
     }
 
     private fun bindListeners() {
-        binding.reviewToolbar.apply {
+        binding.toolbarReview.apply {
             setNavigationIcon(R.drawable.arrow_back)
             navigationIcon?.setTint(
                 resources.getColor(
@@ -138,7 +138,7 @@ class ReviewFragment : Fragment() {
     }
 
     private fun displayActionButtons(isAuthor: Boolean, isModerator: Boolean) {
-        binding.actionsGroup.visibility =
+        binding.linearLayoutUserActions.visibility =
             if (isAuthor || isModerator) View.VISIBLE else View.GONE
         binding.floatingActionButtonEdit.visibility =
             if (isAuthor) View.VISIBLE else View.GONE

@@ -35,9 +35,9 @@ class CelebrityPagingAdapter :
         getItem(position)?.let { person ->
             with(holder.binding) {
                 Glide
-                    .with(personImage)
+                    .with(imageViewPersonImage)
                     .load(person.image)
-                    .into(personImage)
+                    .into(imageViewPersonImage)
                 textViewPersonName.text = person.name
                 textViewPersonDescription.text = person.description.ifEmpty {
                     person.role

@@ -7,7 +7,7 @@
     tools:context=".presentation.celebrity.CelebrityFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/personToolbar"
+        android:id="@+id/toolbar_celebrity_screen"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
@@ -15,6 +15,7 @@
         app:layout_scrollFlags="scroll" />
 
     <ScrollView
+        android:id="@+id/scroll_view_celebrity_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -26,7 +27,7 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardViewPersonImage"
+                android:id="@+id/card_view_celebrity_image"
                 android:layout_width="120dp"
                 android:layout_height="180dp"
                 android:layout_marginStart="20dp"
@@ -36,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/personProfileImage"
+                    android:id="@+id/image_view_celebrity_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
@@ -44,71 +45,71 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/textViewPersonName"
+                android:id="@+id/text_view_celebrity_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                tools:text="Person Name"
+                tools:text="Celebrity Name"
 
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/cardViewPersonImage"
-                app:layout_constraintTop_toTopOf="@+id/cardViewPersonImage" />
+                app:layout_constraintStart_toEndOf="@+id/card_view_celebrity_image"
+                app:layout_constraintTop_toTopOf="@+id/card_view_celebrity_image" />
 
             <TextView
-                android:id="@+id/textViewPersonCareer"
+                android:id="@+id/text_view_celebrity_career"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="50dp"
                 android:gravity="start"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/textViewPersonName"
-                app:layout_constraintTop_toBottomOf="@+id/textViewPersonName"
+                app:layout_constraintStart_toStartOf="@+id/text_view_celebrity_name"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_celebrity_name"
                 tools:text="profession" />
 
             <TextView
-                android:id="@+id/textViewPersonLifeDates"
+                android:id="@+id/text_view_celebrity_life_dates"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="50dp"
                 android:gravity="start"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/textViewPersonName"
-                app:layout_constraintTop_toBottomOf="@+id/textViewPersonCareer"
+                app:layout_constraintStart_toStartOf="@+id/text_view_celebrity_name"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_celebrity_career"
                 tools:text="dates of live" />
 
             <TextView
-                android:id="@+id/textViewPersonBirthplace"
+                android:id="@+id/text_view_celebrity_birthplace"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="50dp"
                 android:gravity="start"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/textViewPersonName"
-                app:layout_constraintTop_toBottomOf="@+id/textViewPersonLifeDates"
+                app:layout_constraintStart_toStartOf="@+id/text_view_celebrity_name"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_celebrity_life_dates"
                 tools:text="place of birth" />
 
             <TextView
-                android:id="@+id/textViewPersonHeight"
+                android:id="@+id/text_view_celebrity_height"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="20dp"
                 android:gravity="start"
-                app:layout_constraintBottom_toTopOf="@+id/textViewPersonFilms"
+                app:layout_constraintBottom_toTopOf="@+id/text_view_celebrity_content"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/textViewPersonName"
-                app:layout_constraintTop_toBottomOf="@+id/textViewPersonBirthplace"
+                app:layout_constraintStart_toStartOf="@+id/text_view_celebrity_name"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_celebrity_birthplace"
                 app:layout_constraintVertical_bias="0.0"
                 tools:text="params" />
 
             <TextView
-                android:id="@+id/textViewPersonFilms"
+                android:id="@+id/text_view_celebrity_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
@@ -116,18 +117,18 @@
 
                 android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/cardViewPersonImage"
-                app:layout_constraintTop_toBottomOf="@+id/cardViewPersonImage" />
+                app:layout_constraintStart_toStartOf="@+id/card_view_celebrity_image"
+                app:layout_constraintTop_toBottomOf="@+id/card_view_celebrity_image" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/celebFilmsRecycler"
+                android:id="@+id/recycler_view_celebrity_content"
                 style="@style/RecyclerViewPadding"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewPersonFilms">
+                app:layout_constraintTop_toBottomOf="@+id/text_view_celebrity_content">
 
             </androidx.recyclerview.widget.RecyclerView>
 

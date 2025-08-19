@@ -67,14 +67,14 @@ class CelebrityFragment : Fragment() {
     }
 
     private fun bindListeners() {
-        binding.celebFilmsRecycler.apply {
+        binding.recyclerViewCelebrityContent.apply {
             layoutManager = GridLayoutManager(
                 context,
                 maxOf(3, calculateColumnsCount())
             )
             adapter = contentAdapter
         }
-        binding.personToolbar.apply {
+        binding.toolbarCelebrityScreen.apply {
             setNavigationIcon(R.drawable.arrow_back)
             navigationIcon?.setTint(
                 resources.getColor(
@@ -116,34 +116,36 @@ class CelebrityFragment : Fragment() {
         Glide.with(requireContext())
             .load(celebrity.image)
             .placeholder(R.drawable.placeholder)
-            .into(binding.personProfileImage)
-        binding.textViewPersonName.text = celebrity.name
-        binding.textViewPersonHeight.apply {
-            visibility = if (celebrity.height > 0) View.VISIBLE else View.GONE
-            text = getString(
-                R.string.height,
-                celebrity.height.toString()
-            )
+            .into(binding.imageViewCelebrityImage)
+        with(binding) {
+            textViewCelebrityName.text = celebrity.name
+            textViewCelebrityHeight.apply {
+                visibility = if (celebrity.height > 0) View.VISIBLE else View.GONE
+                text = getString(
+                    R.string.height,
+                    celebrity.height.toString()
+                )
+            }
+            textViewCelebrityBirthplace.apply {
+                visibility = if (celebrity.birthPlace.isNotBlank()) View.VISIBLE else View.GONE
+                text = getString(
+                    R.string.birthplace,
+                    celebrity.birthPlace
+                )
+            }
+            textViewCelebrityLifeDates.apply {
+                visibility =
+                    if (celebrity.birthDate.isNotBlank() || celebrity.death.isNotBlank())
+                        View.VISIBLE
+                    else
+                        View.GONE
+                text = Utils.getLiveDates(
+                    celebrity.birthDate,
+                    celebrity.death
+                )
+            }
+            textViewCelebrityCareer.text = celebrity.career
         }
-        binding.textViewPersonBirthplace.apply {
-            visibility = if (celebrity.birthPlace.isNotBlank()) View.VISIBLE else View.GONE
-            text = getString(
-                R.string.birthplace,
-                celebrity.birthPlace
-            )
-        }
-        binding.textViewPersonLifeDates.apply {
-            visibility =
-                if (celebrity.birthDate.isNotBlank() || celebrity.death.isNotBlank())
-                    View.VISIBLE
-                else
-                    View.GONE
-            text = Utils.getLiveDates(
-                celebrity.birthDate,
-                celebrity.death
-            )
-        }
-        binding.textViewPersonCareer.text = celebrity.career
     }
 
     private fun showToast(message: String) {

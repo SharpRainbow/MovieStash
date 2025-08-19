@@ -72,7 +72,7 @@ class CollectionContentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
-        binding.colToolbar.apply {
+        binding.toolbarCollectionContent.apply {
             setNavigationIcon(R.drawable.arrow_back)
             navigationIcon?.setTint(
                 resources.getColor(
@@ -117,8 +117,10 @@ class CollectionContentFragment : Fragment() {
     }
 
     private fun showCollectionInfo(collection: CollectionEntity) {
-        binding.collectionName.text = collection.name
-        binding.colDescription.text = collection.description
+        with(binding) {
+            textViewCollectionName.text = collection.name
+            textViewCollectionDescription.text = collection.description
+        }
     }
 
     private fun bindViews() {

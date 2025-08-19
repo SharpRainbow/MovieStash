@@ -9,20 +9,20 @@
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+        android:id="@+id/app_bar_layout_search_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/md_theme_background"
         android:visibility="visible">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/mainToolbar"
+            android:id="@+id/toolbar_main_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|enterAlways">
 
             <TextView
-                android:id="@+id/searchTrigger"
+                android:id="@+id/text_view_search_trigger"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -55,7 +55,7 @@
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+        android:id="@+id/bottom_navigation_view_main"
         style="@style/Widget.MaterialComponents.BottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,26 +69,8 @@
         app:labelVisibilityMode="selected"
         app:menu="@menu/bottom_items" />
 
-    <TextView
-        android:id="@+id/conError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_vertical"
-        android:text="@string/error_connection"
-        android:textSize="20sp"
-        android:visibility="gone" />
-
-    <ProgressBar
-        android:id="@+id/loader"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addButton"
+        android:id="@+id/floating_action_button_add_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
@@ -96,7 +78,7 @@
         android:clickable="true"
         android:contentDescription="@string/add_news"
         android:visibility="gone"
-        app:layout_anchor="@id/bottom_navigation"
+        app:layout_anchor="@id/bottom_navigation_view_main"
         app:layout_anchorGravity="end"
         app:srcCompat="@drawable/ic_add" />
 

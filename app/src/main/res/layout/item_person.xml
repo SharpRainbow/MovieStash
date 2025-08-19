@@ -14,7 +14,7 @@
         android:layout_height="match_parent">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
+            android:id="@+id/card_view_person_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:cardCornerRadius="4dp"
@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/personImage"
+                android:id="@+id/image_view_person_image"
                 android:layout_width="40dp"
                 android:layout_height="60dp"
                 android:scaleType="centerCrop"
@@ -32,25 +32,25 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/textViewPersonName"
+            android:id="@+id/text_view_person_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/textViewPersonDescription"
-            app:layout_constraintStart_toEndOf="@+id/cardView"
+            app:layout_constraintBottom_toTopOf="@+id/text_view_person_description"
+            app:layout_constraintStart_toEndOf="@+id/card_view_person_image"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textViewPersonDescription"
+            android:id="@+id/text_view_person_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:gravity="start"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textViewPersonName"
-            app:layout_constraintTop_toBottomOf="@+id/textViewPersonName" />
+            app:layout_constraintStart_toStartOf="@+id/text_view_person_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_person_name" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

@@ -7,14 +7,14 @@
     tools:context=".presentation.banned_users.BannedUsersFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarBannedUsers"
+        android:id="@+id/toolbar_banned_users"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
         android:elevation="1dp" />
 
     <TextView
-        android:id="@+id/textViewPlaceholder"
+        android:id="@+id/text_view_placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -23,7 +23,7 @@
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewBannedUsers"
+        android:id="@+id/recycler_view_banned_users"
         style="@style/RecyclerViewPadding"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

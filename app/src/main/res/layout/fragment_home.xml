@@ -8,7 +8,7 @@
     tools:context=".presentation.home.HomeFragment">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/homeScrollView"
+        android:id="@+id/scroll_view_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
@@ -20,7 +20,7 @@
             tools:context=".presentation.home.HomeFragment">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewContents"
+                android:id="@+id/recycler_view_contents"
                 style="@style/RecyclerViewPadding"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -28,13 +28,13 @@
                 android:foregroundGravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewPopularLabel"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_popular_label"
                 tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_content"
                 tools:orientation="horizontal" />
 
             <TextView
-                android:id="@+id/textViewPopularLabel"
+                android:id="@+id/text_view_popular_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -45,7 +45,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textViewLatestNews"
+                android:id="@+id/text_view_latest_news"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -53,10 +53,10 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerViewCollections" />
+                app:layout_constraintTop_toBottomOf="@+id/recycler_view_collections" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewNews"
+                android:id="@+id/recycler_view_news"
                 style="@style/RecyclerViewPadding"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -64,12 +64,12 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewLatestNews"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_latest_news"
                 tools:itemCount="5"
                 tools:listitem="@layout/item_news" />
 
             <TextView
-                android:id="@+id/textViewGenreLabel"
+                android:id="@+id/text_view_genre_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -77,17 +77,17 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerViewContents" />
+                app:layout_constraintTop_toBottomOf="@+id/recycler_view_contents" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewCollections"
+                android:id="@+id/recycler_view_collections"
                 style="@style/RecyclerViewPadding"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewGenreLabel"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_genre_label"
                 tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_col"
                 tools:orientation="horizontal" />

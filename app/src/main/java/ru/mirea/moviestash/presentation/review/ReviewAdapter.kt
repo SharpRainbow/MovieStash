@@ -13,7 +13,7 @@ class ReviewAdapter :
     ) {
 
     var onReviewClick: ((ReviewEntity) -> Unit)? = null
-    var onReachEnd: (() -> Unit)? = null
+    var onReachEnd: (() -> Unit)? = null // TODO: implement pagination
 
     class ReviewViewHolder(
         val binding: ItemReviewBinding

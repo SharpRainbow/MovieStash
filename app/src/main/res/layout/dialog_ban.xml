@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayoutBanReason"
+        android:id="@+id/text_input_layout_ban_reason"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editTextBanReason"
+            android:id="@+id/edit_text_ban_reason"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ban_reason" />

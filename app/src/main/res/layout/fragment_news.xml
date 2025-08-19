@@ -9,7 +9,7 @@
     android:clipChildren="false">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/appbar_review"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -59,7 +59,7 @@
                 android:visibility="invisible" />
 
             <TextView
-                android:id="@+id/textViewNewsTitle"
+                android:id="@+id/text_view_news_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -78,7 +78,7 @@
                 app:cardCornerRadius="10dp">
 
                 <ImageView
-                    android:id="@+id/imageViewNews"
+                    android:id="@+id/image_view_news"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -89,7 +89,7 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/textViewNewsDescription"
+                android:id="@+id/text_view_news_description"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
                 android:layout_marginStart="20dp"

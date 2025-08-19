@@ -356,4 +356,4 @@ data class ContentScreenState(
     val reviews: List<ReviewEntity> = emptyList(),
     val isLoggedIn: Boolean = false,
     val userStar: UserStarEntity? = null
-)
+)// TODO: Add flag to indicate if user already added review

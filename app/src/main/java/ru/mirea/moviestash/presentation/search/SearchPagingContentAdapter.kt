@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.ItemSearchedBinding
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.presentation.content.ContentDiffCallback
@@ -32,12 +33,15 @@ class SearchPagingContentAdapter :
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         getItem(position)?.let { content ->
-            holder.binding.searchDesc.text = content.releaseDate
-            holder.binding.searchName.text = content.name
-            Glide
-                .with(holder.binding.searchImage)
-                .load(content.image)
-                .into(holder.binding.searchImage)
+            with(holder.binding) {
+                textViewSearchDescription.text = content.releaseDate
+                textViewSearchName.text = content.name
+                Glide
+                    .with(imageViewSearchImage)
+                    .load(content.image)
+                    .placeholder(R.drawable.plchldr)
+                    .into(imageViewSearchImage)
+            }
             holder.itemView.setOnClickListener {
                 onContentClick?.invoke(content)
             }

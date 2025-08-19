@@ -7,7 +7,7 @@
     tools:context=".presentation.account.AccountHolderFragment">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerViewAccount"
+        android:id="@+id/fragment_container_view_account"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

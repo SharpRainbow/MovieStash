@@ -31,10 +31,11 @@ class CollectionAdapter(
 
     override fun onBindViewHolder(holder: ColViewHolder, position: Int) {
         val collection = getItem(position)
-        holder.binding.colName.text = collection.name
+        holder.binding.textViewCollectionName.text = collection.name
         if (personal) {
             holder.itemView.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-            holder.binding.colName.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+            holder.binding.textViewCollectionName.layoutParams.width =
+                ViewGroup.LayoutParams.MATCH_PARENT
         }
         holder.itemView.setOnClickListener {
             onCollectionClick?.invoke(collection)

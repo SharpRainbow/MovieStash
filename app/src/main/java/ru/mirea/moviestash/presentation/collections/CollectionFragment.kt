@@ -112,7 +112,7 @@ class CollectionFragment : Fragment() {
 
     private fun bindViews() {
         val columnsCount = calculateColumnsCount()
-        binding.colRcVw.apply {
+        binding.recyclerViewCollections.apply {
             layoutManager = GridLayoutManager(context, maxOf(2, columnsCount))
             adapter = collectionsAdapter.apply {
                 onCollectionLongClick = { itemView, collection ->

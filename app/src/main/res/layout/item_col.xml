@@ -6,7 +6,7 @@
     android:layout_margin="5dp">
 
     <LinearLayout
-        android:id="@+id/colLayout"
+        android:id="@+id/linear_layout_collection_item"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:gravity="center"
@@ -15,7 +15,7 @@
         android:visibility="visible">
 
         <TextView
-            android:id="@+id/colName"
+            android:id="@+id/text_view_collection_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

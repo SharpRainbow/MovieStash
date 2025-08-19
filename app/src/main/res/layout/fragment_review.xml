@@ -8,7 +8,7 @@
     tools:context=".presentation.review.ReviewFragment">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/appbar_review"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -19,7 +19,7 @@
             app:toolbarId="@+id/toolbar_news">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/reviewToolbar"
+                android:id="@+id/toolbar_review"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/md_theme_background"
@@ -30,32 +30,32 @@
                     android:layout_height="match_parent">
 
                     <TextView
-                        android:id="@+id/textViewUserNickname"
+                        android:id="@+id/text_view_user_nickname"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        app:layout_constraintBottom_toTopOf="@id/textViewReviewOpinion"
+                        app:layout_constraintBottom_toTopOf="@id/text_view_review_opinion"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="Имя пользователя" />
 
                     <TextView
-                        android:id="@+id/textViewReviewDate"
+                        android:id="@+id/text_view_review_date"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        app:layout_constraintBaseline_toBaselineOf="@+id/textViewReviewOpinion"
-                        app:layout_constraintStart_toEndOf="@id/textViewReviewOpinion"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/text_view_review_opinion"
+                        app:layout_constraintStart_toEndOf="@id/text_view_review_opinion"
                         tools:text="Дата обзора" />
 
                     <TextView
-                        android:id="@+id/textViewReviewOpinion"
+                        android:id="@+id/text_view_review_opinion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
 
-                        app:layout_constraintStart_toStartOf="@+id/textViewUserNickname"
-                        app:layout_constraintTop_toBottomOf="@+id/textViewUserNickname"
+                        app:layout_constraintStart_toStartOf="@+id/text_view_user_nickname"
+                        app:layout_constraintTop_toBottomOf="@+id/text_view_user_nickname"
                         tools:text="Мнение" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -65,6 +65,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view_review"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -76,24 +77,23 @@
             android:orientation="vertical">
 
             <ProgressBar
-                android:id="@+id/progressBarReview"
+                android:id="@+id/progress_bar_review"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:indeterminate="true" />
 
             <TextView
-                android:id="@+id/textViewReviewTitle"
+                android:id="@+id/text_view_review_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textViewReviewDescription"
+                android:id="@+id/text_view_review_description"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="20dp"
@@ -106,7 +106,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
-        android:id="@+id/actionsGroup"
+        android:id="@+id/linear_layout_user_actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -119,7 +119,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButtonEdit"
+            android:id="@+id/floating_action_button_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -127,7 +127,7 @@
             app:srcCompat="@android:drawable/ic_menu_edit" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButtonDelete"
+            android:id="@+id/floating_action_button_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
@@ -138,7 +138,7 @@
             android:tooltipText="Удалить" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButtonBan"
+            android:id="@+id/floating_action_button_ban"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"

@@ -35,12 +35,14 @@ class SearchPagingCelebrityAdapter :
         position: Int
     ) {
         getItem(position)?.let { celebrity ->
-            holder.binding.searchName.text = celebrity.name
-            holder.binding.searchDesc.text = celebrity.birthDate
-            Glide
-                .with(holder.binding.searchImage)
-                .load(celebrity.image)
-                .into(holder.binding.searchImage)
+            with(holder.binding) {
+                textViewSearchName.text = celebrity.name
+                textViewSearchName.text = celebrity.birthDate
+                Glide
+                    .with(imageViewSearchImage)
+                    .load(celebrity.image)
+                    .into(imageViewSearchImage)
+            }
             holder.itemView.setOnClickListener {
                 onCelebrityClick?.invoke(celebrity)
             }

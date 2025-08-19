@@ -96,7 +96,7 @@ class NewsListFragment : Fragment() {
     }
 
     private fun bindViews() {
-        binding.newsRcVw.apply {
+        binding.recyclerViewNewsList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = newsAdapter
         }

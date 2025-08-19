@@ -49,7 +49,13 @@ class HomeFragment : Fragment() {
         }
     }
     private val newsAdapter by lazy {
-        NewsAdapter()
+        NewsAdapter().apply {
+            onNewsClick = { news ->
+                navigateToNewsFragment(
+                    news.id
+                )
+            }
+        }
     }
 
     override fun onCreateView(
@@ -167,6 +173,14 @@ class HomeFragment : Fragment() {
         findNavController().navigate(
             HomeFragmentDirections.actionFragmentHomeToContentFragment(
                 contentId
+            )
+        )
+    }
+
+    private fun navigateToNewsFragment(newsId: Int) {
+        findNavController().navigate(
+            HomeFragmentDirections.actionFragmentHomeToFragmentNews(
+                newsId
             )
         )
     }

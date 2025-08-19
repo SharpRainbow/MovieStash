@@ -42,7 +42,7 @@ class AccountHolderFragment : Fragment() {
 
     private fun navigateToAccountFragment() {
         val innerNavController = childFragmentManager
-            .findFragmentById(R.id.fragmentContainerViewAccount)?.findNavController()
+            .findFragmentById(R.id.fragment_container_view_account)?.findNavController()
         if (innerNavController?.currentDestination?.id == R.id.fragment_login) {
             innerNavController.navigate(
                 R.id.action_fragment_login_to_fragment_account
