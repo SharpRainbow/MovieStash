@@ -138,6 +138,8 @@ class ReviewFragment : Fragment() {
     }
 
     private fun displayActionButtons(isAuthor: Boolean, isModerator: Boolean) {
+        binding.actionsGroup.visibility =
+            if (isAuthor || isModerator) View.VISIBLE else View.GONE
         binding.floatingActionButtonEdit.visibility =
             if (isAuthor) View.VISIBLE else View.GONE
         binding.floatingActionButtonDelete.visibility =

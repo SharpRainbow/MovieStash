@@ -1,12 +1,11 @@
 package ru.mirea.moviestash.presentation.news
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +17,6 @@ import kotlinx.coroutines.launch
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentNewsBinding
 import ru.mirea.moviestash.domain.entities.NewsEntity
-import kotlin.getValue
 
 class NewsFragment : Fragment() {
 
