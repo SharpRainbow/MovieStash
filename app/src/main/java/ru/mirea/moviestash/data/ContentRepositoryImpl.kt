@@ -13,11 +13,14 @@ import ru.mirea.moviestash.data.source.ContentFromPublicCollectionPagingSource
 import ru.mirea.moviestash.data.source.ContentFromUserCollectionPagingSource
 import ru.mirea.moviestash.data.source.ContentSearchPagingSource
 import ru.mirea.moviestash.data.source.ContentTopRatedPagingSource
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.ContentRepository
 import ru.mirea.moviestash.domain.entities.ContentEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
+import javax.inject.Inject
 
-class ContentRepositoryImpl(
+@ApplicationScope
+class ContentRepositoryImpl @Inject constructor(
     private val movieStashApi: MovieStashApi
 ) : ContentRepository {
 

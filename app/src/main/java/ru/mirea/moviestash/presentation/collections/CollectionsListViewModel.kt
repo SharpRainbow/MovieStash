@@ -1,7 +1,6 @@
 package ru.mirea.moviestash.presentation.collections
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,39 +10,22 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.CollectionRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.usecases.collection.GetPublicCollectionsUseCase
 import ru.mirea.moviestash.domain.usecases.collection.HideCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsModeratorUseCase
+import javax.inject.Inject
 
-class CollectionsListViewModel(
-    private val application: Application
-) : AndroidViewModel(application) {
+class CollectionsListViewModel @Inject constructor(
+    private val getPublicCollectionsUseCase: GetPublicCollectionsUseCase,
+    private val hideCollectionUseCase: HideCollectionUseCase,
+    private val isModeratorUseCase: IsModeratorUseCase
+): ViewModel() {
 
     private val _state = MutableStateFlow(
         CollectionsListScreenState()
     )
     val state = _state.asStateFlow()
 
-    private val collectionsRepository = CollectionRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val getPublicCollectionsUseCase = GetPublicCollectionsUseCase(
-        collectionsRepository
-    )
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi
-    )
-    private val isModeratorUseCase = IsModeratorUseCase(
-        authRepository
-    )
-    private val hideCollectionUseCase = HideCollectionUseCase(
-        collectionsRepository,
-        authRepository
-    )
     private val refreshCollectionsFlow = MutableSharedFlow<Unit>(1)
     val collectionsFlow =
         refreshCollectionsFlow

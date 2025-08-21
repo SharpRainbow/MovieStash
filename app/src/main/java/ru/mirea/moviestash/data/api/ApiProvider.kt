@@ -19,7 +19,7 @@ object ApiProvider {
         Retrofit.Builder()
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("http://192.168.0.122:8080/api/v1/")
+            .baseUrl(BASE_URL)
             .build()
     }
 
@@ -29,4 +29,5 @@ object ApiProvider {
 
     const val FIRST_PAGE_INDEX = 1
     const val NETWORK_PAGE_SIZE = 10
+    const val BASE_URL = "http://192.168.0.122:8080/api/v1/"
 }

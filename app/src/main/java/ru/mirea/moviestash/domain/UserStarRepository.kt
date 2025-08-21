@@ -1,17 +1,14 @@
 package ru.mirea.moviestash.domain
 
 import kotlinx.coroutines.flow.Flow
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.domain.entities.UserStarEntity
 
 interface UserStarRepository {
 
-    val userStarFlow: Flow<Result<UserStarEntity>>
-
-    suspend fun getUserStarByContentId(
+    fun getUserStarByContentId(
         token: String,
         contentId: Int,
-    )
+    ): Flow<UserStarEntity>
 
     suspend fun addUserStar(
         token: String,

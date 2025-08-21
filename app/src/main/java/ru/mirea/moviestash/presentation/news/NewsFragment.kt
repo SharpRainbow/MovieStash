@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.news
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentNewsBinding
 import ru.mirea.moviestash.domain.entities.NewsEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class NewsFragment : Fragment() {
 
@@ -24,11 +28,20 @@ class NewsFragment : Fragment() {
     private val binding: FragmentNewsBinding
         get() = _binding!!
     private val arguments by navArgs<NewsFragmentArgs>()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: NewsPageViewModel by viewModels {
-        NewsPageViewModel.provideFactory(
-            requireActivity().application,
-            arguments.newsId
-        )
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .newsComponentFactory()
+            .create(arguments.newsId)
+            .inject(this)
     }
 
     override fun onCreateView(
@@ -78,7 +91,6 @@ class NewsFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.getNews()
                 viewModel.state.collect { state ->
                     binding.progressBarNews.visibility = View.INVISIBLE
                     when (state) {
@@ -96,7 +108,6 @@ class NewsFragment : Fragment() {
                                 binding.linearLayoutModeratorActions.visibility = View.GONE
                             }
                         }
-
                         NewsPageState.Deleted -> {
                             findNavController().popBackStack()
                         }

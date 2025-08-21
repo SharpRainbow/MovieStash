@@ -1,23 +1,20 @@
 package ru.mirea.moviestash.data
 
-import android.content.Context
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ru.mirea.moviestash.data.database.CredentialsDbModel
+import ru.mirea.moviestash.data.database.CredentialsDao
 import ru.mirea.moviestash.data.mappers.toEntity
 import ru.mirea.moviestash.data.mappers.toEntityList
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.CredentialsRepository
 import ru.mirea.moviestash.domain.entities.CredentialsEntity
-import ru.mirea.moviestash.data.database.CredentialsDbModel
-import ru.mirea.moviestash.data.database.CredentialsDatabase
-import kotlin.getValue
+import javax.inject.Inject
 
-class CredentialsRepositoryImpl(
-    private val context: Context
+@ApplicationScope
+class CredentialsRepositoryImpl @Inject constructor(
+    private val credentialsDao: CredentialsDao
 ) : CredentialsRepository {
-
-    private val credentialsDao by lazy {
-        CredentialsDatabase.getDatabase(context).credsDao()
-    }
 
     override fun getCredentials(): Flow<List<CredentialsEntity>> {
         return credentialsDao.getAll().map {

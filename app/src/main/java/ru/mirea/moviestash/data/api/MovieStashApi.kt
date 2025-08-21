@@ -185,7 +185,8 @@ interface MovieStashApi {
     suspend fun getReviewsByContentId(
         @Path("id") contentId: Int,
         @Query("page") page: Int,
-        @Query("limit") limit: Int
+        @Query("limit") limit: Int,
+        @Header("Authorization") token: String? = null
     ): List<ReviewDto>
 
     @GET("genres")

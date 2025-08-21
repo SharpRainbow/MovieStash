@@ -2,29 +2,19 @@
 
 package ru.mirea.moviestash.presentation.user_collections
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.filter
-import androidx.paging.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.CollectionRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.usecases.collection.AddCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.DeleteCollectionUseCase
@@ -33,50 +23,23 @@ import ru.mirea.moviestash.domain.usecases.collection.GetUserCollectionsUseCase
 import ru.mirea.moviestash.domain.usecases.collection.PublishCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.UpdateCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsModeratorUseCase
+import javax.inject.Inject
 
-class UserCollectionsViewModel(
-    private val application: Application
-) : AndroidViewModel(application) {
+class UserCollectionsViewModel @Inject constructor(
+    private val getUserCollectionsUseCase: GetUserCollectionsUseCase,
+    private val addCollectionUseCase: AddCollectionUseCase,
+    private val getUserCollectionInfoUseCase: GetUserCollectionInfoUseCase,
+    private val deleteCollectionUseCase: DeleteCollectionUseCase,
+    private val updateCollectionUseCase: UpdateCollectionUseCase,
+    private val publicCollectionsUseCase: PublishCollectionUseCase,
+    private val isModeratorUseCase: IsModeratorUseCase,
+): ViewModel() {
 
     private val _state = MutableStateFlow(
         UserCollectionsScreenState()
     )
     val state = _state.asStateFlow()
 
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi
-    )
-    private val collectionsRepository = CollectionRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val getUserCollectionsUseCase = GetUserCollectionsUseCase(
-        collectionsRepository,
-        authRepository,
-    )
-    private val addCollectionUseCase = AddCollectionUseCase(
-        collectionsRepository,
-        authRepository
-    )
-    private val deleteCollectionUseCase = DeleteCollectionUseCase(
-        collectionsRepository,
-        authRepository
-    )
-    private val getUserCollectionInfoUseCase = GetUserCollectionInfoUseCase(
-        collectionsRepository,
-        authRepository
-    )
-    private val updateCollectionUseCase = UpdateCollectionUseCase(
-        collectionsRepository,
-        authRepository
-    )
-    private val publicCollectionsUseCase = PublishCollectionUseCase(
-        collectionsRepository,
-        authRepository
-    )
-    private val isModeratorUseCase = IsModeratorUseCase(
-        authRepository
-    )
     private val refreshCollectionsFlow = MutableSharedFlow<Unit>(1)
     val collectionFlow: Flow<PagingData<CollectionEntity>> =
         refreshCollectionsFlow

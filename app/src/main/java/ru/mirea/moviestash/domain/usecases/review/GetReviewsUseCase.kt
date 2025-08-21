@@ -1,12 +1,11 @@
 package ru.mirea.moviestash.domain.usecases.review
 
 import ru.mirea.moviestash.domain.ReviewRepository
+import javax.inject.Inject
 
-class GetReviewsUseCase(
+class GetReviewsUseCase @Inject constructor(
     private val reviewRepository: ReviewRepository
 ) {
 
-    suspend operator fun invoke(contentId: Int, page: Int, limit: Int, preview: Boolean) {
-        reviewRepository.getReviewsByContentId(contentId, page, limit, preview)
-    }
+    operator fun invoke(contentId: Int) = reviewRepository.getReviewsByContentId(contentId)
 }

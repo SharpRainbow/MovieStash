@@ -2,9 +2,9 @@ package ru.mirea.moviestash.domain.usecases.review
 
 import ru.mirea.moviestash.domain.AuthRepository
 import ru.mirea.moviestash.domain.ReviewRepository
-import ru.mirea.moviestash.domain.UserRepository
+import javax.inject.Inject
 
-class UpdateReviewUseCase(
+class UpdateReviewUseCase @Inject constructor(
     private val reviewRepository: ReviewRepository,
     private val authRepository: AuthRepository
 ) {

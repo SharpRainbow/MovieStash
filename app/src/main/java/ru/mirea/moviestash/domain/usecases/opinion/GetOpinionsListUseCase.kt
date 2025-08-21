@@ -1,8 +1,9 @@
 package ru.mirea.moviestash.domain.usecases.opinion
 
 import ru.mirea.moviestash.domain.OpinionRepository
+import javax.inject.Inject
 
-class GetOpinionsListUseCase(
+class GetOpinionsListUseCase @Inject constructor(
     private val repository: OpinionRepository
 ) {
 

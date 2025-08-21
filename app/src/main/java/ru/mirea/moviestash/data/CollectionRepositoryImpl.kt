@@ -10,10 +10,13 @@ import ru.mirea.moviestash.data.api.dto.CreateCollectionDto
 import ru.mirea.moviestash.data.mappers.toEntity
 import ru.mirea.moviestash.data.source.CollectionByEditorPagingSource
 import ru.mirea.moviestash.data.source.CollectionByUserPagingSource
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.CollectionRepository
 import ru.mirea.moviestash.domain.entities.CollectionEntity
+import javax.inject.Inject
 
-class CollectionRepositoryImpl(
+@ApplicationScope
+class CollectionRepositoryImpl @Inject constructor(
     private val movieStashApi: MovieStashApi
 ) : CollectionRepository {
 

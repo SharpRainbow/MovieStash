@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.registration
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,15 +14,32 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentRegisterBinding
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding: FragmentRegisterBinding
         get() = _binding!!
-    private val viewModel: RegisterViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: RegisterViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

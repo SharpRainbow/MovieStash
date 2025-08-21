@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.user_collections
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -19,10 +20,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.DialogAddListBinding
 import ru.mirea.moviestash.databinding.FragmentUserCollectionsBinding
+import ru.mirea.moviestash.presentation.ViewModelFactory
 import ru.mirea.moviestash.presentation.collections.CollectionPagedAdapter
+import javax.inject.Inject
 
 class UserCollectionsFragment : Fragment() {
 
@@ -30,7 +34,12 @@ class UserCollectionsFragment : Fragment() {
     private val binding
         get() = _binding!!
     private var dialogBinding: DialogAddListBinding? = null
-    private val viewModel: UserCollectionsViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: UserCollectionsViewModel by viewModels {
+        viewModelFactory
+    }
     private val collectionAdapter: CollectionPagedAdapter by lazy {
         CollectionPagedAdapter(true).apply {
             onCollectionClick = { collection ->
@@ -40,6 +49,15 @@ class UserCollectionsFragment : Fragment() {
                 )
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
     }
 
     override fun onCreateView(

@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.collections
 
+import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -19,9 +20,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentCollectionBinding
 import ru.mirea.moviestash.domain.entities.CollectionEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class CollectionFragment : Fragment() {
 
@@ -38,7 +42,21 @@ class CollectionFragment : Fragment() {
             }
         }
     }
-    private val viewModel: CollectionsListViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: CollectionsListViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?

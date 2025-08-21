@@ -1,10 +1,11 @@
 package ru.mirea.moviestash.domain.usecases.news
 
 import ru.mirea.moviestash.domain.NewsRepository
+import javax.inject.Inject
 
-class GetNewsListUseCase(
+class GetNewsListUseCase @Inject constructor(
     private val repository: NewsRepository
 ) {
 
-    suspend operator fun invoke(page: Int, limit: Int) = repository.getNews(page, limit)
+    operator fun invoke() = repository.getNews()
 }

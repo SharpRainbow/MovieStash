@@ -36,10 +36,13 @@ class MvstshInstrumentedTest {
     fun logInAppTest() {
         onView(withId(R.id.fragment_account_holder)).perform(ViewActions.click())
         try {
-            onView(withId(R.id.buttonExit)).check(matches(isDisplayed()))
-            onView(withId(R.id.buttonExit)).perform(ViewActions.click())
-        }
-        catch (e: NoMatchingViewException) {
+            onView(withId(R.id.button_exit)).check(
+                matches(
+                    isDisplayed()
+                )
+            )
+            onView(withId(R.id.button_exit)).perform(ViewActions.click())
+        } catch (e: NoMatchingViewException) {
 
         }
         logInIfNeeded()
@@ -49,37 +52,53 @@ class MvstshInstrumentedTest {
     fun addCollectionTest() {
         logInIfNeeded()
         onView(withId(R.id.fragment_account_holder)).perform(ViewActions.click())
-        onView(withId(R.id.buttonPersonalCollections))
+        onView(withId(R.id.button_personal_collections))
             .perform(ViewActions.click())
         onView(withId(R.id.floating_action_button_add_collection))
             .perform(ViewActions.click())
-        onView(withId(R.id.editTextCollectionName))
+        onView(withId(R.id.edit_text_collection_name))
             .perform(
                 ViewActions.typeText(TEST_COLLECTION_NAME),
                 ViewActions.closeSoftKeyboard()
             )
         onView(withText(R.string.save)).perform(ViewActions.click())
-        onView(allOf(withId(R.id.colName), withText(TEST_COLLECTION_NAME)))
-            .check(matches(isDisplayed()))
-        onView(allOf(withId(R.id.colName), withText(TEST_COLLECTION_NAME)))
-            .perform(ViewActions.longClick())
+        onView(
+            allOf(
+                withId(R.id.text_view_collection_name),
+                withText(TEST_COLLECTION_NAME)
+            )
+        ).check(matches(isDisplayed()))
+        onView(
+            allOf(
+                withId(R.id.text_view_collection_name),
+                withText(TEST_COLLECTION_NAME)
+            )
+        ).perform(ViewActions.longClick())
         onView(withText(R.string.delete)).perform(ViewActions.click())
         TimeUnit.SECONDS.sleep(1)
-        onView(allOf(withId(R.id.colName), withText(TEST_COLLECTION_NAME)))
-            .check(doesNotExist())
+        onView(
+            allOf(
+                withId(R.id.text_view_collection_name),
+                withText(TEST_COLLECTION_NAME)
+            )
+        ).check(doesNotExist())
     }
 
     @Test
     fun searchContentTest() {
-        onView(withId(R.id.searchTrigger)).perform(ViewActions.click())
+        onView(withId(R.id.text_view_search_trigger)).perform(ViewActions.click())
         onView(withId(R.id.edit_text_search_query))
             .perform(
                 ViewActions.replaceText(TEST_SEARCH_INPUT),
                 ViewActions.closeSoftKeyboard()
             )
         TimeUnit.SECONDS.sleep(5)
-        onView(allOf(withId(R.id.searchName), withText(TEST_SEARCH_RESULT)))
-            .check(matches(isDisplayed()))
+        onView(
+            allOf(
+                withId(R.id.text_view_search_name),
+                withText(TEST_SEARCH_RESULT)
+            )
+        ).check(matches(isDisplayed()))
     }
 
     @Test
@@ -88,27 +107,49 @@ class MvstshInstrumentedTest {
 
         onView(withId(R.id.fragment_news_list)).perform(ViewActions.click())
         TimeUnit.SECONDS.sleep(1)
-        onView(withId(R.id.addButton)).perform(ViewActions.click())
+        onView(withId(R.id.floating_action_button_add_main))
+            .perform(ViewActions.click())
         onView(withId(R.id.edit_text_news_title))
-            .perform(ViewActions.typeText(TEST_NEWS_HEADER), ViewActions.closeSoftKeyboard())
+            .perform(
+                ViewActions.typeText(TEST_NEWS_HEADER),
+                ViewActions.closeSoftKeyboard()
+            )
         onView(withId(R.id.edit_text_news_description))
-            .perform(ViewActions.typeText(TEST_NEWS_TEXT), ViewActions.closeSoftKeyboard())
+            .perform(
+                ViewActions.typeText(TEST_NEWS_TEXT),
+                ViewActions.closeSoftKeyboard()
+            )
         onView(withId(R.id.button_save_news)).perform(ViewActions.click())
-        onView(withId(R.id.swipeRefreshLayoutNewsList)).perform(ViewActions.swipeDown())
-        TimeUnit.SECONDS.sleep(1)
-        onView(withId(R.id.newsRcVw))
-            .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(0))
-        onView(allOf(withId(R.id.text_view_title_item_news), withText(TEST_NEWS_HEADER)))
-            .perform(ViewActions.click())
-        onView(withId(R.id.floating_action_buttons_delete_news))
-            .perform(ViewActions.click())
-        onView(withId(R.id.swipeRefreshLayoutNewsList))
+        onView(withId(R.id.swipe_refresh_layout_news_list))
             .perform(ViewActions.swipeDown())
         TimeUnit.SECONDS.sleep(1)
-        onView(withId(R.id.newsRcVw))
-            .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(0))
-        onView(allOf(withId(R.id.text_view_title_item_news), withText(TEST_NEWS_HEADER)))
-            .check(doesNotExist())
+        onView(withId(R.id.recycler_view_news_list))
+            .perform(
+                RecyclerViewActions
+                    .scrollToPosition<RecyclerView.ViewHolder>(0)
+            )
+        onView(
+            allOf(
+                withId(R.id.text_view_title_item_news),
+                withText(TEST_NEWS_HEADER)
+            )
+        ).perform(ViewActions.click())
+        onView(withId(R.id.floating_action_buttons_delete_news))
+            .perform(ViewActions.click())
+        onView(withId(R.id.swipe_refresh_layout_news_list))
+            .perform(ViewActions.swipeDown())
+        TimeUnit.SECONDS.sleep(1)
+        onView(withId(R.id.recycler_view_news_list))
+            .perform(
+                RecyclerViewActions
+                    .scrollToPosition<RecyclerView.ViewHolder>(0)
+            )
+        onView(
+            allOf(
+                withId(R.id.text_view_title_item_news),
+                withText(TEST_NEWS_HEADER)
+            )
+        ).check(doesNotExist())
     }
 
     private fun logInIfNeeded() {
@@ -126,7 +167,9 @@ class MvstshInstrumentedTest {
                 )
             onView(withId(R.id.button_enter)).perform(ViewActions.click())
             TimeUnit.SECONDS.sleep(1)
-            onView(withId(R.id.buttonExit)).check(matches(isDisplayed()))
+            onView(
+                withId(R.id.button_exit)
+            ).check(matches(isDisplayed()))
         } catch (e: NoMatchingViewException) {
             // Already logged in
         }

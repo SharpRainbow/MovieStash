@@ -1,9 +1,8 @@
 package ru.mirea.moviestash.presentation.login
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,48 +10,27 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.MovieStashApplication
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.CredentialsRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CredentialsEntity
 import ru.mirea.moviestash.domain.usecases.credentials.GetCredentialByLoginUseCase
 import ru.mirea.moviestash.domain.usecases.credentials.GetSavedCredentialsUseCase
 import ru.mirea.moviestash.domain.usecases.credentials.RemoveCredentialUseCase
 import ru.mirea.moviestash.domain.usecases.credentials.SaveCredentialsUseCase
 import ru.mirea.moviestash.domain.usecases.user.LoginUseCase
+import javax.inject.Inject
 
-class LoginViewModel(
-    private val application: Application
-) : AndroidViewModel(application) {
+class LoginViewModel @Inject constructor(
+    private val getCredentialsUseCase: GetSavedCredentialsUseCase,
+    private val getCredentialByLoginUseCase: GetCredentialByLoginUseCase,
+    private val loginUseCase: LoginUseCase,
+    private val saveCredentialsUseCase: SaveCredentialsUseCase,
+    private val removeCredentialUseCase: RemoveCredentialUseCase,
+    private val externalScope: CoroutineScope
+): ViewModel() {
 
     private val _state = MutableStateFlow<LoginState>(
         LoginState.Initial()
     )
     val state = _state.asStateFlow()
-
-    private val userRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi
-    )
-    private val credentialsRepository = CredentialsRepositoryImpl(
-        application
-    )
-    private val loginUseCase = LoginUseCase(
-        userRepository
-    )
-    private val getCredentialsUseCase = GetSavedCredentialsUseCase(
-        credentialsRepository
-    )
-    private val saveCredentialsUseCase = SaveCredentialsUseCase(
-        credentialsRepository
-    )
-    private val getCredentialByLoginUseCase = GetCredentialByLoginUseCase(
-        credentialsRepository
-    )
-    private val removeCredentialUseCase = RemoveCredentialUseCase(
-        credentialsRepository
-    )
 
     init {
         getCredentialsUseCase().onEach { credentialsEntities ->
@@ -108,7 +86,7 @@ class LoginViewModel(
     }
 
     fun saveCredentials() {
-        (application as MovieStashApplication).applicationScope.launch(Dispatchers.IO) {
+        externalScope.launch(Dispatchers.IO) {
             val currentState = state.value
             if (currentState is LoginState.Success) {
                 saveCredentialsUseCase(

@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.search
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,23 +16,29 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentSearchBinding
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding
         get() = _binding!!
-    private val viewModel: SearchViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: SearchViewModel by viewModels {
+        viewModelFactory
+    }
     private val celebrityPagingAdapter: SearchPagingCelebrityAdapter by lazy {
         SearchPagingCelebrityAdapter().apply {
             onCelebrityClick = { celebrity ->
@@ -45,6 +52,15 @@ class SearchFragment : Fragment() {
                 navigateToContentFragment(content.id)
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
     }
 
     override fun onCreateView(

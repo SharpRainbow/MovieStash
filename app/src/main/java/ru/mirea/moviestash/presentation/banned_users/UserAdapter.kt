@@ -4,14 +4,14 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.ItemUserBinding
 import ru.mirea.moviestash.domain.entities.BannedUserEntity
 
 class BannedUserAdapter
-    : ListAdapter<BannedUserEntity, BannedUserAdapter.UserViewHolder>(
+    : PagingDataAdapter<BannedUserEntity, BannedUserAdapter.UserViewHolder>(
     BannedUserDiffCallback()
     ) {
 
@@ -32,19 +32,20 @@ class BannedUserAdapter
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val bannedUser = getItem(position)
-        with(holder.binding) {
-            textViewCollectionDescription.isSingleLine = false
-            textViewCollectionName.text = "${bannedUser.nickname} ${bannedUser.email}"
-            textViewCollectionDescription.text =
-                holder.itemView.context.getString(
-                    R.string.banned_reason_label,
-                    bannedUser.banDate,
-                    bannedUser.banReason
-                )
-        }
-        holder.itemView.setOnClickListener {
-            onUserClick?.invoke(holder.itemView, bannedUser)
+        getItem(position)?.let { bannedUser ->
+            with(holder.binding) {
+                textViewCollectionDescription.isSingleLine = false
+                textViewCollectionName.text = "${bannedUser.nickname} ${bannedUser.email}"
+                textViewCollectionDescription.text =
+                    holder.itemView.context.getString(
+                        R.string.banned_reason_label,
+                        bannedUser.banDate,
+                        bannedUser.banReason
+                    )
+            }
+            holder.itemView.setOnClickListener {
+                onUserClick?.invoke(holder.itemView, bannedUser)
+            }
         }
     }
 

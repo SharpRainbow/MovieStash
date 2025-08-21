@@ -1,74 +1,50 @@
 package ru.mirea.moviestash.presentation.user_data
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.savedstate.savedState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.UserRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.UserEntity
 import ru.mirea.moviestash.domain.usecases.user.GetUserDataUseCase
-import ru.mirea.moviestash.domain.usecases.user.ObserveUserDataUseCase
 import ru.mirea.moviestash.domain.usecases.user.UpdateUserDataUseCase
+import javax.inject.Inject
 
-class UpdateUserDataViewModel(
-    private val application: Application
-) : AndroidViewModel(application) {
+class UpdateUserDataViewModel @Inject constructor(
+    private val getUserDataUseCase: GetUserDataUseCase,
+    private val updateUserDataUseCase: UpdateUserDataUseCase
+): ViewModel() {
 
     private val _state = MutableStateFlow<UpdateUserDataScreenState>(
         UpdateUserDataScreenState.Loading
     )
     val state = _state.asStateFlow()
 
-    private val userRepository = UserRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi,
-    )
-    private val observeUserDataUseCase = ObserveUserDataUseCase(
-        userRepository
-    )
-    private val getUserDataUseCase = GetUserDataUseCase(
-        userRepository,
-        authRepository
-    )
-    private val updateUserDataUseCase = UpdateUserDataUseCase(
-        userRepository,
-        authRepository
-    )
-
     init {
         getUserData()
-        observeUserDataUseCase().onEach { userDataResult ->
-            when(userDataResult) {
-                Result.Empty -> {}
-                is Result.Error -> {
+    }
+
+    private fun getUserData() {
+        viewModelScope.launch {
+            getUserDataUseCase().onEach { userDataResult ->
+                if (userDataResult.isSuccess) {
+                    _state.update {
+                        UpdateUserDataScreenState.Editing(
+                            userData = userDataResult.getOrThrow()
+                        )
+                    }
+                } else {
                     _state.update {
                         UpdateUserDataScreenState.Error(
                             dataError = true
                         )
                     }
                 }
-                is Result.Success<UserEntity> -> {
-                    _state.update {
-                        UpdateUserDataScreenState.Editing(
-                            userData = userDataResult.data
-                        )
-                    }
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.collect()
+        }
     }
 
     fun updateUserData(
@@ -124,11 +100,6 @@ class UpdateUserDataViewModel(
         }
     }
 
-    fun getUserData() {
-        viewModelScope.launch {
-            getUserDataUseCase()
-        }
-    }
 }
 
 sealed interface UpdateUserDataScreenState {

@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import ru.mirea.moviestash.data.database.CredsDao
 
-@Database(entities = [CredentialsDbModel::class], version = 1)
+@Database(entities = [CredentialsDbModel::class], version = 1, exportSchema = false)
 abstract class CredentialsDatabase : RoomDatabase() {
 
-    abstract fun credsDao(): CredsDao
+    abstract fun credsDao(): CredentialsDao
 
     companion object {
         private var Instance: CredentialsDatabase? = null

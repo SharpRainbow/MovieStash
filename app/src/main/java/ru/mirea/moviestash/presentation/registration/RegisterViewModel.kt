@@ -1,32 +1,22 @@
 package ru.mirea.moviestash.presentation.registration
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.usecases.user.RegisterUseCase
+import javax.inject.Inject
 
-class RegisterViewModel(
-    private val application: Application
-): AndroidViewModel(application) {
+class RegisterViewModel @Inject constructor(
+    private val registerUseCase: RegisterUseCase
+): ViewModel() {
 
     private val _state = MutableStateFlow<RegisterScreenState>(
         RegisterScreenState.Initial
     )
     val state = _state.asStateFlow()
-
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi
-    )
-    private val registerUseCase = RegisterUseCase(
-        authRepository
-    )
 
     fun register(
         login: String?,

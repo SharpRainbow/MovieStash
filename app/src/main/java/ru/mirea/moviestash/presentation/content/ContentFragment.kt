@@ -1,7 +1,7 @@
 package ru.mirea.moviestash.presentation.content
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,19 +17,17 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
-import ru.mirea.moviestash.databinding.DialogAddListBinding
 import ru.mirea.moviestash.databinding.DialogCollectionsBinding
 import ru.mirea.moviestash.databinding.DialogRatingBinding
 import ru.mirea.moviestash.databinding.FragmentContentBinding
-import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntity
-import ru.mirea.moviestash.presentation.review.ReviewAdapter
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class ContentFragment : Fragment() {
 
@@ -37,11 +35,11 @@ class ContentFragment : Fragment() {
     private val binding: FragmentContentBinding
         get() = _binding!!
     private val arguments by navArgs<ContentFragmentArgs>()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: ContentViewModel by viewModels{
-        ContentViewModel.provideFactory(
-            arguments.contentId,
-            requireActivity().application
-        )
+        viewModelFactory
     }
     private val castAdapter by lazy {
         CelebrityAdapter().apply {
@@ -70,6 +68,14 @@ class ContentFragment : Fragment() {
     }
     private val collectionContentAdapter by lazy {
         DialogCollectionPagedAdapter()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication).appComponent
+            .contentComponentFactory()
+            .create(arguments.contentId)
+            .inject(this)
     }
 
     override fun onCreateView(
@@ -105,17 +111,7 @@ class ContentFragment : Fragment() {
                         binding.progressBarContent.visibility = View.VISIBLE
                     } else {
                         binding.progressBarContent.visibility = View.INVISIBLE
-                        if (state.error != null) {
-                            showToast(getString(R.string.loading_error))
-                        }
-                        state.content?.let {
-                            showContent(it)
-                        }
-                        binding.linearLayoutContentUserActions.visibility =
-                            if (state.isLoggedIn) View.VISIBLE else View.GONE
-                        castAdapter.submitList(state.castList)
-                        crewAdapter.submitList(state.crewList)
-                        reviewAdapter.submitList(state.reviews)
+                        displayCurrentState(state)
                     }
                 }.launchIn(this)
                 viewModel.userCollections.onEach { collectionPagedData ->
@@ -155,6 +151,22 @@ class ContentFragment : Fragment() {
             textViewBudget.text = content.budget.toString()
             textViewBoxOffice.text = content.boxOffice.toString()
         }
+    }
+
+    private fun displayCurrentState(state: ContentScreenState) {
+        if (state.error != null) {
+            showToast(getString(R.string.loading_error))
+        }
+        state.content?.let {
+            showContent(it)
+        }
+        binding.buttonAddReview.visibility =
+            if (state.isLoggedIn && state.canAddReview) View.VISIBLE else View.GONE
+        binding.linearLayoutContentUserActions.visibility =
+            if (state.isLoggedIn) View.VISIBLE else View.GONE
+        castAdapter.submitList(state.castList)
+        crewAdapter.submitList(state.crewList)
+        reviewAdapter.submitList(state.reviews)
     }
 
     private fun bindViews() {

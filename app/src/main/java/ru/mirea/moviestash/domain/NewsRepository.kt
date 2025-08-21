@@ -1,21 +1,16 @@
 package ru.mirea.moviestash.domain
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.domain.entities.NewsEntity
-import java.io.File
 
 interface NewsRepository {
 
-    val newsListFlow: Flow<Result<List<NewsEntity>>>
+    suspend fun getNLatestNews(limit: Int): List<NewsEntity>
 
-    val newsFlow: Flow<Result<NewsEntity>>
+    fun getNews(): Flow<PagingData<NewsEntity>>
 
-    suspend fun getLatestNews(limit: Int)
-
-    suspend fun getNews(page: Int, limit: Int)
-
-    suspend fun getNewsById(newsId: Int)
+    fun getNewsById(newsId: Int): Flow<Result<NewsEntity>>
 
     suspend fun deleteNews(token: String, newsId: Int)
 

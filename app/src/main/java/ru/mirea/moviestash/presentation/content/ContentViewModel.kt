@@ -1,9 +1,6 @@
 package ru.mirea.moviestash.presentation.content
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -11,21 +8,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.CelebrityRepositoryImpl
-import ru.mirea.moviestash.data.CollectionRepositoryImpl
-import ru.mirea.moviestash.data.ContentRepositoryImpl
-import ru.mirea.moviestash.data.ReviewRepositoryImpl
-import ru.mirea.moviestash.data.UserStarRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CelebrityInContentEntity
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntity
@@ -36,79 +24,28 @@ import ru.mirea.moviestash.domain.usecases.celebrity.GetCrewByContentUseCase
 import ru.mirea.moviestash.domain.usecases.collection.AddContentToCollectionUseCase
 import ru.mirea.moviestash.domain.usecases.collection.GetUserCollectionsUseCase
 import ru.mirea.moviestash.domain.usecases.content.GetContentUseCase
-import ru.mirea.moviestash.domain.usecases.review.GetReviewsUseCase
-import ru.mirea.moviestash.domain.usecases.review.ObserveReviewsUseCase
+import ru.mirea.moviestash.domain.usecases.review.GetLatestReviewsUseCase
 import ru.mirea.moviestash.domain.usecases.stars.GetRatingUseCase
-import ru.mirea.moviestash.domain.usecases.stars.ObserveRatingUseCase
 import ru.mirea.moviestash.domain.usecases.stars.RateContentUseCase
 import ru.mirea.moviestash.domain.usecases.stars.UpdateRatingUseCase
+import ru.mirea.moviestash.domain.usecases.user.GetUserIdUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsLoggedInUseCase
+import javax.inject.Inject
 
-class ContentViewModel(
+class ContentViewModel @Inject constructor(
     private val contentId: Int,
-    private val application: Application
+    private val getUserCollectionsUseCase: GetUserCollectionsUseCase,
+    private val getContentUseCase: GetContentUseCase,
+    private val getCastListUseCase: GetCastByContentUseCase,
+    private val getCrewListUseCase: GetCrewByContentUseCase,
+    private val getLatestReviewsUseCase: GetLatestReviewsUseCase,
+    private val getRatingUseCase: GetRatingUseCase,
+    private val rateContentUseCase: RateContentUseCase,
+    private val updateRatingUseCase: UpdateRatingUseCase,
+    private val addToCollectionUseCase: AddContentToCollectionUseCase,
+    private val isLoggedInUseCase: IsLoggedInUseCase,
+    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
-
-    private val contentRepository = ContentRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val celebrityRepository = CelebrityRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val reviewRepository = ReviewRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val userStarRepository = UserStarRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi
-    )
-    private val collectionRepository = CollectionRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val observeReviewsUseCase = ObserveReviewsUseCase(
-        reviewRepository
-    )
-    private val getContentUseCase = GetContentUseCase(
-        contentRepository
-    )
-    private val getCrewListUseCase = GetCrewByContentUseCase(
-        celebrityRepository
-    )
-    private val getCastListUseCase = GetCastByContentUseCase(
-        celebrityRepository
-    )
-    private val getReviewUseCase = GetReviewsUseCase(
-        reviewRepository
-    )
-    private val observeRatingUseCase = ObserveRatingUseCase(
-        userStarRepository
-    )
-    private val getRatingUseCase = GetRatingUseCase(
-        userStarRepository,
-        authRepository
-    )
-    private val rateContentUseCase = RateContentUseCase(
-        userStarRepository,
-        authRepository
-    )
-    private val updateRatingUseCase = UpdateRatingUseCase(
-        userStarRepository,
-        authRepository
-    )
-    private val getUserCollectionsUseCase = GetUserCollectionsUseCase(
-        collectionRepository,
-        authRepository
-    )
-    private val addToCollectionUseCase = AddContentToCollectionUseCase(
-        collectionRepository,
-        authRepository
-    )
-    private val isLoggedInUseCase = IsLoggedInUseCase(
-        authRepository
-    )
 
     private val _state = MutableStateFlow<ContentScreenState>(
         ContentScreenState()
@@ -127,55 +64,9 @@ class ContentViewModel(
         getContent()
         getCast()
         getCrew()
-        getRating()
-        observeRatingUseCase().onEach { ratingResult ->
-            when (ratingResult) {
-                is Result.Success -> {
-                    _state.update { state ->
-                        state.copy(
-                            userStar = ratingResult.data
-                        )
-                    }
-                }
-
-                is Result.Error -> {
-                    _state.update { state ->
-                        if (state.isLoggedIn) {
-                            state.copy(
-                                isLoading = false,
-                                error = ratingResult.exception
-                            )
-                        } else {
-                            state
-                        }
-                    }
-                }
-
-                Result.Empty -> {}
-            }
-        }.launchIn(viewModelScope)
-        observeReviewsUseCase().onEach { reviewsResult ->
-            when (reviewsResult) {
-                is Result.Success -> {
-                    _state.update { state ->
-                        state.copy(
-                            reviews = reviewsResult.data
-                        )
-                    }
-                }
-
-                is Result.Error -> {
-                    _state.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            error = reviewsResult.exception
-                        )
-                    }
-                }
-
-                Result.Empty -> {}
-            }
-        }.launchIn(viewModelScope)
+        if (isLoggedInUseCase()) {
+            getRating()
+        }
     }
 
     private fun getContent() {
@@ -251,12 +142,24 @@ class ContentViewModel(
 
     fun getReviews() {
         viewModelScope.launch {
-            getReviewUseCase(
-                contentId,
-                FIRST_PAGE,
-                5,
-                true
-            )
+            try {
+                val reviewList = getLatestReviewsUseCase(
+                    contentId
+                )
+                _state.update { state ->
+                    state.copy(
+                        reviews = reviewList,
+                        canAddReview =
+                            reviewList.getOrNull(0)?.userId != getUserIdUseCase()
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
+                }
+            }
         }
     }
 
@@ -281,8 +184,6 @@ class ContentViewModel(
                             userStar = null
                         )
                     }
-                } else {
-                    getRating()
                 }
                 getContent()
             } catch (e: Exception) {
@@ -297,7 +198,19 @@ class ContentViewModel(
 
     private fun getRating() {
         viewModelScope.launch {
-            getRatingUseCase(contentId)
+            getRatingUseCase(contentId).onEach { rating ->
+                _state.update { state ->
+                    state.copy(
+                        userStar = rating
+                    )
+                }
+            }.catch { error ->
+                _state.update { state ->
+                    state.copy(
+                        error = error
+                    )
+                }
+            }.collect()
         }
     }
 
@@ -335,14 +248,6 @@ class ContentViewModel(
     companion object {
 
         private const val PREVIEW_ITEMS_COUNT = 5
-        private const val FIRST_PAGE = 1
-
-        fun provideFactory(contentId: Int, application: Application) =
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ContentViewModel(contentId, application) as T
-                }
-            }
     }
 
 }
@@ -355,5 +260,6 @@ data class ContentScreenState(
     val crewList: List<CelebrityInContentEntity> = emptyList(),
     val reviews: List<ReviewEntity> = emptyList(),
     val isLoggedIn: Boolean = false,
+    val canAddReview: Boolean = false,
     val userStar: UserStarEntity? = null
-)// TODO: Add flag to indicate if user already added review
+)

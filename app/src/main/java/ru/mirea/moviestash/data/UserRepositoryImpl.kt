@@ -1,41 +1,64 @@
 package ru.mirea.moviestash.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import ru.mirea.moviestash.Result
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.api.dto.BanRequestDto
 import ru.mirea.moviestash.data.api.dto.UpdateUserDto
-import ru.mirea.moviestash.data.api.dto.UserDto
 import ru.mirea.moviestash.data.mappers.toEntity
-import ru.mirea.moviestash.data.mappers.toEntityList
+import ru.mirea.moviestash.data.source.BannedUserPagingSource
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.UserRepository
 import ru.mirea.moviestash.domain.entities.BannedUserEntity
 import ru.mirea.moviestash.domain.entities.UserEntity
+import javax.inject.Inject
 
-class UserRepositoryImpl(
-    private val movieStashApi: MovieStashApi
+@ApplicationScope
+class UserRepositoryImpl @Inject constructor(
+    private val movieStashApi: MovieStashApi,
+    private val externalScope: CoroutineScope
 ) : UserRepository {
 
-    private val _userListFlow = MutableStateFlow<Result<List<BannedUserEntity>>>(
-        Result.Empty
-    )
-    override val userListFlow: Flow<Result<List<BannedUserEntity>>>
-        get() = _userListFlow.asStateFlow()
-    private val _userDataFlow = MutableStateFlow<Result<UserEntity>>(Result.Empty)
-    override val userDataFlow: Flow<Result<UserEntity>>
-        get() = _userDataFlow.asStateFlow()
+    @Volatile
+    private var cachedUserData: Flow<Result<UserEntity>>? = null
+    private val updateUserDataFlow = MutableSharedFlow<Unit>()
 
-    override suspend fun getUserData(token: String) {
-        try {
-            _userDataFlow.emit(
-                Result.Success(
-                    movieStashApi.getCurrentUserData(token).toEntity()
-                )
-            )
+    override fun getUserData(token: String): Flow<Result<UserEntity>> {
+        return cachedUserData ?: flow<Result<UserEntity>> {
+            emit(fetchUserData(token))
+            updateUserDataFlow
+                .onEach {
+                    emit(fetchUserData(token))
+                }
+                .collect()
+        }.onCompletion {
+            cachedUserData = null
+        }.shareIn(
+            scope = externalScope,
+            started = SharingStarted.WhileSubscribed(1_000),
+            replay = 1
+        ).also {
+            cachedUserData = it
+        }
+    }
+
+    private suspend fun fetchUserData(token: String): Result<UserEntity> {
+        return try {
+            val userDto = movieStashApi.getCurrentUserData(token)
+            Result.success(userDto.toEntity())
         } catch (e: Exception) {
-            _userDataFlow.emit(Result.Error(e))
+            Result.failure(e)
         }
     }
 
@@ -53,22 +76,22 @@ class UserRepositoryImpl(
                 password = password
             )
         )
-        getUserData(token)
+        updateUserDataFlow.emit(Unit)
     }
 
-    override suspend fun getBannedUsers(token: String, page: Int, limit: Int) {
-        try {
-            _userListFlow.emit(
-                Result.Success(
-                    movieStashApi.getBannedUsers(token, page, limit).toEntityList()
+    override fun getBannedUsers(token: String): Flow<PagingData<BannedUserEntity>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = ApiProvider.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                BannedUserPagingSource(
+                    apiService = movieStashApi,
+                    token = token
                 )
-            )
-        } catch (e: Exception) {
-            _userListFlow.emit(
-                Result.Error(e)
-            )
-            return
-        }
+            }
+        ).flow
     }
 
     override suspend fun ban(token: String, userId: Int, reason: String) {

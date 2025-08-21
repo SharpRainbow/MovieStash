@@ -2,9 +2,9 @@ package ru.mirea.moviestash.domain.usecases.collection
 
 import ru.mirea.moviestash.domain.AuthRepository
 import ru.mirea.moviestash.domain.CollectionRepository
-import ru.mirea.moviestash.domain.UserRepository
+import javax.inject.Inject
 
-class PublishCollectionUseCase(
+class PublishCollectionUseCase @Inject constructor(
     private val collectionRepository: CollectionRepository,
     private val authRepository: AuthRepository
 ) {

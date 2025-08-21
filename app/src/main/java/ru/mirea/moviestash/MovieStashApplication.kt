@@ -1,13 +1,12 @@
 package ru.mirea.moviestash
 
 import android.app.Application
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import ru.mirea.moviestash.di.ApplicationComponent
+import ru.mirea.moviestash.di.DaggerApplicationComponent
 
 class MovieStashApplication: Application() {
 
-    val applicationScope: CoroutineScope by lazy {
-        CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    val appComponent: ApplicationComponent by lazy {
+        DaggerApplicationComponent.factory().create(this)
     }
 }

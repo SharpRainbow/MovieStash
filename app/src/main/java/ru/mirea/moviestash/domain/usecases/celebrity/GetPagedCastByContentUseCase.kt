@@ -1,8 +1,9 @@
 package ru.mirea.moviestash.domain.usecases.celebrity
 
 import ru.mirea.moviestash.domain.CelebrityRepository
+import javax.inject.Inject
 
-class GetPagedCastByContentUseCase(
+class GetPagedCastByContentUseCase @Inject constructor(
     private val repository: CelebrityRepository
 ) {
 

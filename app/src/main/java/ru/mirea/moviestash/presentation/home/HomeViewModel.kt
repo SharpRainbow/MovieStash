@@ -1,92 +1,32 @@
 package ru.mirea.moviestash.presentation.home
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.ContentRepositoryImpl
-import ru.mirea.moviestash.data.GenreRepositoryImpl
-import ru.mirea.moviestash.data.NewsRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.domain.entities.GenreEntity
 import ru.mirea.moviestash.domain.entities.NewsEntity
-import ru.mirea.moviestash.domain.usecases.news.GetLatestNewsUseCase
 import ru.mirea.moviestash.domain.usecases.content.GetMainPageContentUseCase
 import ru.mirea.moviestash.domain.usecases.genre.GetPresentGenresUseCase
-import ru.mirea.moviestash.domain.usecases.user.IsLoggedInUseCase
-import ru.mirea.moviestash.domain.usecases.news.ObserveNewsListUseCase
+import ru.mirea.moviestash.domain.usecases.news.GetLatestNewsUseCase
+import javax.inject.Inject
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel @Inject constructor(
+    private val getLatestNewsUseCase: GetLatestNewsUseCase,
+    private val getMainPageContentUseCase: GetMainPageContentUseCase,
+    private val getPresentGenresUseCase: GetPresentGenresUseCase
+): ViewModel() {
 
     private val _state = MutableStateFlow(
         HomeScreenState()
     )
     val state = _state.asStateFlow()
 
-    private val contentRepository = ContentRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val genreRepository = GenreRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val newsRepository = NewsRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi,
-    )
-    private val getMainPageContentUseCase = GetMainPageContentUseCase(
-        contentRepository
-    )
-    private val getPresentGenresUseCase = GetPresentGenresUseCase(
-        genreRepository
-    )
-    private val observeLatestNewsUseCase = ObserveNewsListUseCase(
-        newsRepository
-    )
-    private val getLatestNewsUseCase = GetLatestNewsUseCase(
-        newsRepository
-    )
-    private val isLoggedInUseCase = IsLoggedInUseCase(
-        authRepository
-    )
-
     init {
         reloadPage()
-        observeLatestNewsUseCase()
-            .onEach { result ->
-                when (result) {
-                    is Result.Error -> {
-                        _state.value = _state.value.copy(
-                            error = result.exception
-                        )
-                    }
-
-                    is Result.Success<List<NewsEntity>> -> {
-                        _state.update { state ->
-                            state.copy(
-                                error = null,
-                                news = result.data
-                            )
-                        }
-                    }
-
-                    Result.Empty -> {
-
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
     }
 
     fun getPresentGenres() {
@@ -142,10 +82,24 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _state.update { state ->
                 state.copy(
+                    error = null,
                     isLoading = true
                 )
             }
-            getLatestNewsUseCase(NEWS_LIMIT)
+            try {
+                val newsResult = getLatestNewsUseCase(NEWS_LIMIT)
+                _state.update { state ->
+                    state.copy(
+                        news = newsResult
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = e
+                    )
+                }
+            }
             _state.update { state ->
                 state.copy(
                     isLoading = false

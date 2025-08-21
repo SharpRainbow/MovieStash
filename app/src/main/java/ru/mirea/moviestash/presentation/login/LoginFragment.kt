@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.login
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,16 +17,33 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentLoginBinding
 import ru.mirea.moviestash.domain.entities.CredentialsEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding: FragmentLoginBinding
         get() = _binding!!
-    private val viewModel: LoginViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: LoginViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -168,7 +186,7 @@ class LoginFragment : Fragment() {
 
     private fun hideKeyboard() {
         val imm = requireContext().getSystemService(
-            android.content.Context.INPUT_METHOD_SERVICE
+            Context.INPUT_METHOD_SERVICE
         ) as android.view.inputmethod.InputMethodManager
         imm.hideSoftInputFromWindow(requireView().windowToken, 0)
     }

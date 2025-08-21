@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.celebrity_list
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentCelebrityListBinding
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class CelebrityListFragment : Fragment() {
 
@@ -26,11 +30,11 @@ class CelebrityListFragment : Fragment() {
     private val binding: FragmentCelebrityListBinding
         get() = _binding!!
     private val arguments by navArgs<CelebrityListFragmentArgs>()
-    private val viewModel: PersonListViewModel by viewModels {
-        PersonListViewModel.provideFactory(
-            arguments.contentId,
-            arguments.isActors
-        )
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: CelebrityListViewModel by viewModels {
+        viewModelFactory
     }
     private val celebrityAdapter by lazy {
         CelebrityPagingAdapter().apply {
@@ -38,6 +42,18 @@ class CelebrityListFragment : Fragment() {
                 navigateToCelebrityFragment(celebrity.id)
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .celebrityListComponentFactory()
+            .create(
+                arguments.contentId,
+                arguments.isActors
+            )
+            .inject(this)
     }
 
     override fun onCreateView(

@@ -10,12 +10,15 @@ import ru.mirea.moviestash.data.mappers.toEntity
 import ru.mirea.moviestash.data.mappers.toListEntity
 import ru.mirea.moviestash.data.source.CelebrityByContentIdPagingSource
 import ru.mirea.moviestash.data.source.CelebritySearchPagingSource
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.CelebrityRepository
 import ru.mirea.moviestash.domain.entities.CelebrityEntity
 import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
 import ru.mirea.moviestash.domain.entities.CelebrityInContentEntity
+import javax.inject.Inject
 
-class CelebrityRepositoryImpl(
+@ApplicationScope
+class CelebrityRepositoryImpl @Inject constructor(
     private val movieStashApi: MovieStashApi
 ) : CelebrityRepository {
 

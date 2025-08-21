@@ -1,9 +1,9 @@
 package ru.mirea.moviestash.domain.usecases.user
 
 import ru.mirea.moviestash.domain.AuthRepository
-import ru.mirea.moviestash.domain.UserRepository
+import javax.inject.Inject
 
-class LoginUseCase(
+class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
 

@@ -1,6 +1,8 @@
 package ru.mirea.moviestash.presentation.account
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,22 +10,38 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentAccountBinding
 import ru.mirea.moviestash.domain.entities.UserEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class AccountFragment : Fragment() {
 
     private var _binding: FragmentAccountBinding? = null
     private val binding
         get() = _binding!!
-    private val viewModel: AccountViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: AccountViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -51,18 +69,24 @@ class AccountFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect { state ->
-                    when(state) {
+                    when (state) {
                         is AccountState.Loading -> {
 
                         }
+
                         is AccountState.Success -> {
                             displayUserData(
                                 state.userData,
                                 state.isModerator
                             )
                         }
+
                         is AccountState.Error -> {
                             showToast(getString(R.string.loading_error))
+                        }
+
+                        AccountState.LoggedOut -> {
+                            navigateToLoginFragment()
                         }
                     }
                 }
@@ -94,7 +118,6 @@ class AccountFragment : Fragment() {
     private fun bindListeners() {
         binding.buttonExit.setOnClickListener {
             viewModel.logout()
-            navigateToLoginFragment()
         }
         binding.buttonPersonalCollections.setOnClickListener {
             navigateToCollectionsFragment()

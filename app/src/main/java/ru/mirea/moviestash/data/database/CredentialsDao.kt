@@ -7,7 +7,7 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface CredsDao {
+interface CredentialsDao {
 
     @Query("SELECT * FROM credentials")
     fun getAll(): Flow<List<CredentialsDbModel>>

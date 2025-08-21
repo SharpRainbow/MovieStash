@@ -1,4 +1,4 @@
-package ru.mirea.moviestash.presentation.review
+package ru.mirea.moviestash.presentation.content
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.mirea.moviestash.databinding.ItemReviewBinding
 import ru.mirea.moviestash.domain.entities.ReviewEntity
+import ru.mirea.moviestash.presentation.review_list.ReviewDiffCallback
 
 class ReviewAdapter :
     ListAdapter<ReviewEntity, ReviewAdapter.ReviewViewHolder>(
@@ -13,7 +14,6 @@ class ReviewAdapter :
     ) {
 
     var onReviewClick: ((ReviewEntity) -> Unit)? = null
-    var onReachEnd: (() -> Unit)? = null // TODO: implement pagination
 
     class ReviewViewHolder(
         val binding: ItemReviewBinding
@@ -29,16 +29,16 @@ class ReviewAdapter :
     }
 
     override fun onBindViewHolder(holder: ReviewViewHolder, position: Int) {
-        val review = getItem(position)
-        holder.binding.textViewReviewDate.text = review.date
-        holder.binding.textViewUserNickname.text = review.userName
-        holder.binding.textViewReviewTitle.text = review.title
-        holder.binding.textViewReviewDescription.text = review.description
-        holder.itemView.setOnClickListener {
-            onReviewClick?.invoke(review)
-        }
-        if (position >= itemCount - 5) {
-            onReachEnd?.invoke()
+        getItem(position)?.let { review ->
+            with(holder.binding) {
+                textViewReviewDate.text = review.date
+                textViewUserNickname.text = review.userName
+                textViewReviewTitle.text = review.title
+                textViewReviewDescription.text = review.description
+            }
+            holder.itemView.setOnClickListener {
+                onReviewClick?.invoke(review)
+            }
         }
     }
 

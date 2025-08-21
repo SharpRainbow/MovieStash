@@ -1,4 +1,4 @@
-package ru.mirea.moviestash.presentation.news
+package ru.mirea.moviestash.presentation.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.ItemNewsBinding
 import ru.mirea.moviestash.domain.entities.NewsEntity
+import ru.mirea.moviestash.presentation.news_list.NewsDiffCallback
 
 class NewsAdapter :
     ListAdapter<NewsEntity, NewsAdapter.NewsViewHolder>(

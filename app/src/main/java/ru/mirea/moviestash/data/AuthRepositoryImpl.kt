@@ -1,26 +1,24 @@
 package ru.mirea.moviestash.data
 
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
-import android.util.Log
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import org.json.JSONObject
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.api.dto.CredentialsDto
 import ru.mirea.moviestash.data.api.dto.RegisterDto
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.AuthRepository
 import ru.mirea.moviestash.domain.entities.Role
 import ru.mirea.moviestash.domain.entities.UserData
+import javax.inject.Inject
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class AuthRepositoryImpl(
-    private val context: Context,
+@ApplicationScope
+class AuthRepositoryImpl @Inject constructor(
+    private val sharedPreferences: SharedPreferences,
     private val movieStashApi: MovieStashApi
-) : AuthRepository {
-    private val sharedPreferences by lazy {
-        context.getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE)
-    }
+): AuthRepository {
 
     override suspend fun register(
         login: String,
@@ -104,9 +102,12 @@ class AuthRepositoryImpl(
 
     @OptIn(ExperimentalEncodingApi::class)
     private fun parseJwtToken(token: String): UserData {
-        val payload = JSONObject(String(
-            Base64.withPadding(Base64.PaddingOption.PRESENT_OPTIONAL).decode(token.split('.')[1])
-        ))
+        val payload = JSONObject(
+            String(
+                Base64.withPadding(Base64.PaddingOption.PRESENT_OPTIONAL)
+                    .decode(token.split('.')[1])
+            )
+        )
         return UserData(
             userId = payload.getString("sub").toInt(),
             role = payload.getJSONArray("aud").getString(0).let {
@@ -121,11 +122,13 @@ class AuthRepositoryImpl(
     @OptIn(ExperimentalEncodingApi::class)
     private fun isTokenValid(token: String): Boolean {
         return try {
-            val payload = JSONObject(String(
-                Base64.withPadding(
-                    Base64.PaddingOption.PRESENT_OPTIONAL
-                ).decode(token.split('.')[1])
-            ))
+            val payload = JSONObject(
+                String(
+                    Base64.withPadding(
+                        Base64.PaddingOption.PRESENT_OPTIONAL
+                    ).decode(token.split('.')[1])
+                )
+            )
             payload.getLong("exp") > System.currentTimeMillis() / 1000
         } catch (e: Exception) {
             false
@@ -145,7 +148,6 @@ class AuthRepositoryImpl(
     }
 
     companion object {
-        private const val PREFERENCE_NAME = "AUTH"
         private const val LOGIN_KEY = "LOGIN"
         private const val PASSWORD_KEY = "PASS"
         private const val TOKEN_KEY = "TOKEN"

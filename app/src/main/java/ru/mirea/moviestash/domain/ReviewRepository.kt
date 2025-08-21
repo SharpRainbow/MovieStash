@@ -1,23 +1,22 @@
 package ru.mirea.moviestash.domain
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.domain.entities.ReviewEntity
 
 interface ReviewRepository {
 
-    val contentReviews: Flow<Result<List<ReviewEntity>>>
-
-    val review: Flow<Result<ReviewEntity>>
-
-    suspend fun getReviewsByContentId(
+    suspend fun getFirstNReviewsByContentId(
         contentId: Int,
-        page: Int,
         limit: Int,
-        preview: Boolean
-    )
+        token: String?
+    ): List<ReviewEntity>
 
-    suspend fun getReviewById(reviewId: Int)
+    fun getReviewsByContentId(
+        contentId: Int,
+    ): Flow<PagingData<ReviewEntity>>
+
+    fun getReviewById(reviewId: Int): Flow<Result<ReviewEntity>>
 
     suspend fun addReview(
         token: String,

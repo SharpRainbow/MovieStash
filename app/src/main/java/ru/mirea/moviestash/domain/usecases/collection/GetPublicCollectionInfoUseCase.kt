@@ -1,8 +1,9 @@
 package ru.mirea.moviestash.domain.usecases.collection
 
 import ru.mirea.moviestash.domain.CollectionRepository
+import javax.inject.Inject
 
-class GetPublicCollectionInfoUseCase(
+class GetPublicCollectionInfoUseCase @Inject constructor(
     private val collectionRepository: CollectionRepository
 ) {
 

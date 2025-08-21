@@ -1,17 +1,13 @@
 package ru.mirea.moviestash.domain
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.domain.entities.BannedUserEntity
 import ru.mirea.moviestash.domain.entities.UserEntity
 
 interface UserRepository {
 
-    val userListFlow: Flow<Result<List<BannedUserEntity>>>
-
-    val userDataFlow: Flow<Result<UserEntity>>
-
-    suspend fun getUserData(token: String)
+    fun getUserData(token: String): Flow<Result<UserEntity>>
 
     suspend fun updateUserData(
         token: String,
@@ -20,7 +16,7 @@ interface UserRepository {
         password: String? = null
     )
 
-    suspend fun getBannedUsers(token: String, page: Int, limit: Int)
+    fun getBannedUsers(token: String): Flow<PagingData<BannedUserEntity>>
 
     suspend fun ban(token: String, userId: Int, reason: String)
 

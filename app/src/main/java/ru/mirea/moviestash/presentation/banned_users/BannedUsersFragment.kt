@@ -1,15 +1,14 @@
 package ru.mirea.moviestash.presentation.banned_users
 
-import android.R.attr.theme
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,10 +16,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentBannedUsersBinding
 import ru.mirea.moviestash.domain.entities.BannedUserEntity
-import kotlin.getValue
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class BannedUsersFragment : Fragment() {
 
@@ -35,7 +36,21 @@ class BannedUsersFragment : Fragment() {
             }
         }
     }
-    private val viewModel: BannedUsersViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: BannedUsersViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,15 +91,22 @@ class BannedUsersFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { state ->
-                    if (state.error != null) {
-                        showToast(getString(R.string.error_connection))
-                    } else {
-                        if (state.bannedUsers.isEmpty()) {
-                            binding.textViewPlaceholder.visibility = View.VISIBLE
-                        } else {
-                            binding.textViewPlaceholder.visibility = View.GONE
-                            userAdapter.submitList(state.bannedUsers)
+                launch {
+                    viewModel.state.collect { state ->
+                        if (state.error != null) {
+                            showToast(getString(R.string.error_connection))
+                        }
+                    }
+                }
+                launch {
+                    viewModel.bannedUsers.collect { pagingData ->
+                        userAdapter.submitData(pagingData)
+                    }
+                }
+                launch {
+                    userAdapter.loadStateFlow.collect { state ->
+                        if (state.hasError) {
+                            showToast(getString(R.string.loading_error))
                         }
                     }
                 }

@@ -1,26 +1,44 @@
 package ru.mirea.moviestash.presentation.user_data
 
-import androidx.fragment.app.viewModels
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentUpdateUserDataBinding
 import ru.mirea.moviestash.domain.entities.UserEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class UpdateUserDataFragment : Fragment() {
 
     private var _binding: FragmentUpdateUserDataBinding? = null
     private val binding: FragmentUpdateUserDataBinding
         get() = _binding!!
-    private val viewModel: UpdateUserDataViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: UpdateUserDataViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -1,10 +1,6 @@
 package ru.mirea.moviestash.presentation.review
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,95 +8,52 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.Result
-import ru.mirea.moviestash.data.AuthRepositoryImpl
-import ru.mirea.moviestash.data.ReviewRepositoryImpl
-import ru.mirea.moviestash.data.UserRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.ReviewEntity
 import ru.mirea.moviestash.domain.usecases.review.DeleteReviewUseCase
 import ru.mirea.moviestash.domain.usecases.review.GetReviewByIdUseCase
-import ru.mirea.moviestash.domain.usecases.review.ObserveReviewUseCase
 import ru.mirea.moviestash.domain.usecases.user.BanUserUseCase
 import ru.mirea.moviestash.domain.usecases.user.GetUserIdUseCase
 import ru.mirea.moviestash.domain.usecases.user.IsModeratorUseCase
+import javax.inject.Inject
 
-class ReviewViewModel(
+class ReviewViewModel @Inject constructor(
     private val reviewId: Int,
-    private val application: Application
-) : AndroidViewModel(application) {
+    private val getReviewByIdUseCase: GetReviewByIdUseCase,
+    private val deleteReviewUseCase: DeleteReviewUseCase,
+    private val banUserUseCase: BanUserUseCase,
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val isModeratorUseCase: IsModeratorUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow<ReviewScreenState>(
         ReviewScreenState.Initial
     )
     val state = _state.asStateFlow()
 
-    private val reviewRepository = ReviewRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi
-    )
-    private val userRepository = UserRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val observeReviewViewModel = ObserveReviewUseCase(
-        reviewRepository
-    )
-    private val getReviewByIdUseCase = GetReviewByIdUseCase(
-        reviewRepository
-    )
-    private val isModeratorUseCase = IsModeratorUseCase(
-        authRepository
-    )
-    private val getUserIdUseCase = GetUserIdUseCase(
-        authRepository
-    )
-    private val deleteReviewUseCase = DeleteReviewUseCase(
-        reviewRepository,
-        authRepository
-    )
-    private val banUserUseCase = BanUserUseCase(
-        userRepository,
-        authRepository
-    )
-
     init {
-        observeReviewViewModel()
+        getReviewByIdUseCase(reviewId)
             .onEach { reviewResult ->
-                when (reviewResult) {
-                    is Result.Error -> {
-                        _state.update {
-                            ReviewScreenState.Loaded(
+                if (reviewResult.isSuccess) {
+                    val review = reviewResult.getOrThrow()
+                    _state.update {
+                        ReviewScreenState.Loaded(
+                            review = review,
+                            isAuthor = review.userId == getUserIdUseCase(),
+                            isModerator = isModeratorUseCase()
+                        )
+                    }
+                } else {
+                    _state.update { state ->
+                        if (state is ReviewScreenState.Loaded) {
+                            state.copy(
                                 dataError = true
                             )
+                        } else {
+                            state
                         }
-                    }
-
-                    is Result.Success<ReviewEntity> -> {
-                        _state.update {
-                            ReviewScreenState.Loaded(
-                                review = reviewResult.data,
-                                isAuthor = reviewResult.data.userId == getUserIdUseCase(),
-                                isModerator = isModeratorUseCase()
-                            )
-                        }
-                    }
-
-                    Result.Empty -> {
-
                     }
                 }
-
-            }
-            .launchIn(viewModelScope)
-    }
-
-    fun loadReview() {
-        viewModelScope.launch {
-            getReviewByIdUseCase(reviewId)
-        }
+            }.launchIn(viewModelScope)
     }
 
     fun deleteReview() {
@@ -166,17 +119,6 @@ class ReviewViewModel(
                 state
             }
         }
-    }
-
-    companion object {
-
-        fun provideFactory(reviewId: Int, application: Application) =
-            object : ViewModelProvider.Factory {
-
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ReviewViewModel(reviewId, application) as T
-                }
-            }
     }
 
 }

@@ -12,11 +12,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentNewsListBinding
-import ru.mirea.moviestash.presentation.news.NewsAdapter
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class NewsListFragment : Fragment() {
 
@@ -24,8 +27,8 @@ class NewsListFragment : Fragment() {
     private val binding: FragmentNewsListBinding
         get() = _binding!!
     private var addButtonProvider: AddButtonProvider? = null
-    private val newsAdapter: NewsAdapter by lazy {
-        NewsAdapter().apply {
+    private val newsAdapter: NewsPagingAdapter by lazy {
+        NewsPagingAdapter().apply {
             onNewsClick = { news ->
                 navigateToNewsFragment(
                     news.id
@@ -33,7 +36,12 @@ class NewsListFragment : Fragment() {
             }
         }
     }
-    private val viewModel: NewsListViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: NewsListViewModel by viewModels {
+        viewModelFactory
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,6 +53,11 @@ class NewsListFragment : Fragment() {
         } else {
             throw IllegalStateException("Activity must implement AddButtonProvider")
         }
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
     }
 
     override fun onCreateView(
@@ -74,21 +87,27 @@ class NewsListFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.isModerator()
-                viewModel.state.collect { state ->
-                    if (state.isLoading) {
-                        binding.swipeRefreshLayoutNewsList.isRefreshing = true
-                    } else {
-                        binding.swipeRefreshLayoutNewsList.isRefreshing = false
-                        if (state.error == null) {
-                            newsAdapter.submitList(state.newsList)
-                            if (state.isModerator) {
-                                addButtonProvider?.showAddButton()
-                            } else {
-                                addButtonProvider?.hideAddButton()
-                            }
+                launch {
+                    viewModel.state.collect { state ->
+                        if (state.isModerator) {
+                            addButtonProvider?.showAddButton()
                         } else {
+                            addButtonProvider?.hideAddButton()
+                        }
+                    }
+                }
+                launch {
+                    viewModel.newsList.collect { pagingData ->
+                        newsAdapter.submitData(pagingData)
+                    }
+                }
+                launch {
+                    newsAdapter.loadStateFlow.collect { state ->
+                        if (state.hasError) {
                             showToast(getString(R.string.loading_error))
                         }
+                        binding.swipeRefreshLayoutNewsList.isRefreshing =
+                            state.refresh is LoadState.Loading
                     }
                 }
             }
@@ -104,8 +123,7 @@ class NewsListFragment : Fragment() {
 
     private fun bindListeners() {
         binding.swipeRefreshLayoutNewsList.setOnRefreshListener {
-            viewModel.resetPage()
-            viewModel.getNewsList()
+            newsAdapter.refresh()
         }
     }
 

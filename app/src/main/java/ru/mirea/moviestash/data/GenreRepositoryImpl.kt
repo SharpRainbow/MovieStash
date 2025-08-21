@@ -1,17 +1,15 @@
 package ru.mirea.moviestash.data
 
-import android.util.Log
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.mappers.toEntity
 import ru.mirea.moviestash.data.mappers.toListEntity
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.GenreRepository
 import ru.mirea.moviestash.domain.entities.GenreEntity
+import javax.inject.Inject
 
-class GenreRepositoryImpl(
+@ApplicationScope
+class GenreRepositoryImpl @Inject constructor(
     private val movieStashApi: MovieStashApi
 ) : GenreRepository {
 

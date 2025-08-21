@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.news_editor
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,9 +19,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentNewsEditorBinding
 import ru.mirea.moviestash.domain.entities.NewsEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class NewsEditorFragment : Fragment() {
 
@@ -28,7 +32,12 @@ class NewsEditorFragment : Fragment() {
     private val binding: FragmentNewsEditorBinding
         get() = _binding!!
     private val arguments by navArgs<NewsEditorFragmentArgs>()
-    private val viewModel: NewsEditorViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: NewsEditorViewModel by viewModels {
+        viewModelFactory
+    }
     private var imageUri: Uri? = null
 
     private val pickImageIntent =
@@ -38,6 +47,15 @@ class NewsEditorFragment : Fragment() {
                 imageUri = pictureUri
             }
         }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .newsEditorComponentFactory()
+            .create(arguments.newsId)
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,10 +83,8 @@ class NewsEditorFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                if (arguments.newsId != -1) {
-                    viewModel.getNewsById(arguments.newsId)
-                }
-                viewModel.state.collect { state ->
+                viewModel.state
+                    .collect { state ->
                     when (state) {
                         is NewsEditorState.Success -> {
                             displayNews(state.news)

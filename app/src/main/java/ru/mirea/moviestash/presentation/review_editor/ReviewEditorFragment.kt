@@ -1,7 +1,7 @@
 package ru.mirea.moviestash.presentation.review_editor
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +16,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentReviewEditorBinding
 import ru.mirea.moviestash.domain.entities.OpinionEntity
 import ru.mirea.moviestash.domain.entities.ReviewEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
+import javax.inject.Inject
 
 class ReviewEditorFragment : Fragment() {
 
@@ -27,15 +30,22 @@ class ReviewEditorFragment : Fragment() {
     private val binding: FragmentReviewEditorBinding
         get() = _binding!!
     private val arguments by navArgs<ReviewEditorFragmentArgs>()
-    private val viewModel: ReviewEditorViewModel by viewModels(
-        factoryProducer = {
-            ReviewEditorViewModel.provideFactory(
-                requireActivity().application,
-                arguments.contentId
-            )
-        }
-    )
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: ReviewEditorViewModel by viewModels {
+        viewModelFactory
+    }
     private lateinit var spinnerAdapter: ArrayAdapter<String>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .reviewEditorComponentFactory()
+            .create(arguments.reviewId, arguments.contentId)
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,9 +73,6 @@ class ReviewEditorFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                if (arguments.reviewId > 0) {
-                    viewModel.loadReview(arguments.reviewId)
-                }
                 viewModel.state.collect { state ->
                     when(state) {
                         is ReviewEditorState.Editing -> {

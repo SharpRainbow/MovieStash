@@ -1,34 +1,51 @@
 package ru.mirea.moviestash.data
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import ru.mirea.moviestash.Result
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import retrofit2.HttpException
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.api.dto.AddUserStarDto
 import ru.mirea.moviestash.data.mappers.toEntity
+import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.UserStarRepository
 import ru.mirea.moviestash.domain.entities.UserStarEntity
+import javax.inject.Inject
 
-class UserStarRepositoryImpl(
+@ApplicationScope
+class UserStarRepositoryImpl @Inject constructor(
     private val movieStashApi: MovieStashApi
 ) : UserStarRepository {
 
-    private val _userStarFlow = MutableStateFlow<Result<UserStarEntity>>(
-        Result.Empty
-    )
-    override val userStarFlow: Flow<Result<UserStarEntity>>
-        get() = _userStarFlow.asStateFlow()
+    private val refreshUserStarFlow = MutableSharedFlow<Unit>()
 
-    override suspend fun getUserStarByContentId(token: String, contentId: Int) {
-        try {
-            val userStars = movieStashApi.getUserStarByContentId(token, contentId)
-            _userStarFlow.emit(Result.Success(userStars.toEntity()))
-        } catch (e: Exception) {
-            if (e.message?.contains(NOT_FOUND) == false) {
-                _userStarFlow.emit(Result.Error(e))
+    override fun getUserStarByContentId(
+        token: String,
+        contentId: Int
+    ): Flow<UserStarEntity> {
+        return flow {
+            try {
+                val star = movieStashApi.getUserStarByContentId(token, contentId)
+                emit(star.toEntity())
+            } catch (e: Exception) {
+                if (e !is HttpException || e.code() != 404) {
+                    throw e
+                }
             }
+            refreshUserStarFlow
+                .onEach {
+                    try {
+                        val star = movieStashApi.getUserStarByContentId(token, contentId)
+                        emit(star.toEntity())
+                    } catch (e: Exception) {
+                        if (e !is HttpException || e.code() != 404) {
+                            throw e
+                        }
+                    }
+                }
+                .collect()
         }
     }
 
@@ -44,6 +61,7 @@ class UserStarRepositoryImpl(
                 contentId = contentId,
             )
         )
+        refreshUserStarFlow.emit(Unit)
     }
 
     override suspend fun updateUserStar(
@@ -63,10 +81,7 @@ class UserStarRepositoryImpl(
                 starId
             )
         }
+        refreshUserStarFlow.emit(Unit)
     }
 
-    companion object {
-
-        private const val NOT_FOUND = "HTTP 404 Not Found"
-    }
 }

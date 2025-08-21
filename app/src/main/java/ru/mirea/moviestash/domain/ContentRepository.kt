@@ -2,7 +2,6 @@ package ru.mirea.moviestash.domain
 
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import ru.mirea.moviestash.Result
 import ru.mirea.moviestash.domain.entities.ContentEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 

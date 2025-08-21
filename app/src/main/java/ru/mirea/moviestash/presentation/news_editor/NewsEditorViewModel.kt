@@ -3,8 +3,7 @@ package ru.mirea.moviestash.presentation.news_editor
 import android.app.Application
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,74 +11,49 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.data.NewsRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.NewsEntity
-import ru.mirea.moviestash.domain.usecases.news.GetNewsByIdUseCase
-import ru.mirea.moviestash.domain.usecases.news.ObserveNewsUseCase
-import ru.mirea.moviestash.Result
-import ru.mirea.moviestash.data.AuthRepositoryImpl
 import ru.mirea.moviestash.domain.usecases.news.AddNewsUseCase
+import ru.mirea.moviestash.domain.usecases.news.GetNewsByIdUseCase
 import ru.mirea.moviestash.domain.usecases.news.UpdateNewsUseCase
 import java.io.IOException
+import javax.inject.Inject
 
-class NewsEditorViewModel(
+class NewsEditorViewModel @Inject constructor(
+    private val newsId: Int,
+    private val getNewsByIdUseCase: GetNewsByIdUseCase,
+    private val addNewsUseCase: AddNewsUseCase,
+    private val updateNewsUseCase: UpdateNewsUseCase,
     private val application: Application
-): AndroidViewModel(application) {
+): ViewModel() {
 
     private val _state = MutableStateFlow<NewsEditorState>(
         NewsEditorState.Initial
     )
     val state = _state.asStateFlow()
 
-    private val newsRepository = NewsRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val authRepository = AuthRepositoryImpl(
-        application,
-        ApiProvider.movieStashApi
-    )
-    private val observeNewsUseCase = ObserveNewsUseCase(
-        newsRepository
-    )
-    private val getNewsByIdUseCase = GetNewsByIdUseCase(
-        newsRepository
-    )
-    private val addNewsUseCase = AddNewsUseCase(
-        newsRepository,
-        authRepository
-    )
-    private val updateNewsUseCase = UpdateNewsUseCase(
-        newsRepository,
-        authRepository,
-    )
-
     init {
-        observeNewsUseCase().onEach { newsResult ->
-            when (newsResult) {
-                is Result.Success<NewsEntity> -> {
-                    _state.emit(
+        if (newsId > 0) {
+            getNewsById()
+        }
+    }
+
+    fun getNewsById() {
+        getNewsByIdUseCase(newsId)
+            .onEach { newsResult ->
+                if (newsResult.isSuccess) {
+                    _state.update {
                         NewsEditorState.Success(
-                            newsResult.data
+                            news = newsResult.getOrThrow()
                         )
-                    )
-                }
-                is Result.Error -> {
-                    _state.emit(
+                    }
+                } else {
+                    _state.update {
                         NewsEditorState.Error(
                             dataError = true
                         )
-                    )
+                    }
                 }
-                Result.Empty -> {}
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun getNewsById(id: Int) {
-        viewModelScope.launch {
-            getNewsByIdUseCase(id)
-        }
+            }.launchIn(viewModelScope)
     }
 
     fun addNews(title: String?, content: String?, image: Uri?) {

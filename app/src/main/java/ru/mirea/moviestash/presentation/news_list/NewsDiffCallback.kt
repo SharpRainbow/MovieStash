@@ -1,4 +1,4 @@
-package ru.mirea.moviestash.presentation.news
+package ru.mirea.moviestash.presentation.news_list
 
 import androidx.recyclerview.widget.DiffUtil
 import ru.mirea.moviestash.domain.entities.NewsEntity

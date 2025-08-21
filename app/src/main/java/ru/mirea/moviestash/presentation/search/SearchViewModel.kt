@@ -14,15 +14,16 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.mirea.moviestash.data.CelebrityRepositoryImpl
-import ru.mirea.moviestash.data.ContentRepositoryImpl
-import ru.mirea.moviestash.data.api.ApiProvider
 import ru.mirea.moviestash.domain.entities.CelebrityEntityBase
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.domain.usecases.celebrity.SearchCelebrityUseCase
 import ru.mirea.moviestash.domain.usecases.content.SearchContentUseCase
+import javax.inject.Inject
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val searchCelebrityUseCase: SearchCelebrityUseCase,
+    private val searchContentUseCase: SearchContentUseCase
+): ViewModel() {
 
     private val _state = MutableStateFlow(
         SearchScreenState()
@@ -30,18 +31,6 @@ class SearchViewModel : ViewModel() {
     val state = _state.asStateFlow()
     private val searchFlow = MutableStateFlow<String>("")
 
-    private val contentRepository = ContentRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val celebrityRepository = CelebrityRepositoryImpl(
-        ApiProvider.movieStashApi
-    )
-    private val searchCelebrityUseCase = SearchCelebrityUseCase(
-        celebrityRepository
-    )
-    private val searchContentUseCase = SearchContentUseCase(
-        contentRepository
-    )
     val pagedCelebrityList: Flow<PagingData<CelebrityEntityBase>> =
         searchFlow
             .filter {

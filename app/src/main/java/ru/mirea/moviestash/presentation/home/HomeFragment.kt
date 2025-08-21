@@ -1,5 +1,6 @@
 package ru.mirea.moviestash.presentation.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,22 +14,29 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentHomeBinding
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
 import ru.mirea.moviestash.domain.entities.GenreEntity
 import ru.mirea.moviestash.domain.entities.NewsEntity
+import ru.mirea.moviestash.presentation.ViewModelFactory
 import ru.mirea.moviestash.presentation.collections.CollectionAdapter
 import ru.mirea.moviestash.presentation.content.ContentAdapter
-import ru.mirea.moviestash.presentation.news.NewsAdapter
+import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding
         get() = _binding!!
-    private val viewModel: HomeViewModel by viewModels()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: HomeViewModel by viewModels {
+        viewModelFactory
+    }
     private val contentAdapter by lazy {
         ContentAdapter().apply {
             onContentClick = { content ->
@@ -56,6 +64,15 @@ class HomeFragment : Fragment() {
                 )
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication)
+            .appComponent
+            .rootDestinationsComponentFactory()
+            .create()
+            .inject(this)
     }
 
     override fun onCreateView(

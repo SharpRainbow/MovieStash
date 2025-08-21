@@ -1,32 +1,33 @@
 package ru.mirea.moviestash.presentation.collection_content
 
+import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentCollectionContentBinding
 import ru.mirea.moviestash.domain.entities.CollectionEntity
 import ru.mirea.moviestash.domain.entities.ContentEntityBase
-import ru.mirea.moviestash.presentation.content.ContentAdapter
+import ru.mirea.moviestash.presentation.ViewModelFactory
 import ru.mirea.moviestash.presentation.content.ContentPagedAdapter
-import kotlin.getValue
+import javax.inject.Inject
 
 
 class CollectionContentFragment : Fragment() {
@@ -35,12 +36,11 @@ class CollectionContentFragment : Fragment() {
     private var _binding: FragmentCollectionContentBinding? = null
     private val binding
         get() = _binding!!
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: CollectionContentViewModel by viewModels {
-        CollectionContentViewModel.provideFactory(
-            requireActivity().application,
-            arguments.collectionId,
-            arguments.userId
-        )
+        viewModelFactory
     }
     private val collectionContentAdapter by lazy {
         ContentPagedAdapter().apply {
@@ -55,6 +55,17 @@ class CollectionContentFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as MovieStashApplication).appComponent
+            .collectionContentComponentFactory()
+            .create(
+                collectionId = arguments.collectionId,
+                userId = arguments.userId
+            )
+            .inject(this)
     }
 
     override fun onCreateView(
