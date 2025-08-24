@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -29,13 +28,11 @@ class SearchViewModel @Inject constructor(
         SearchScreenState()
     )
     val state = _state.asStateFlow()
-    private val searchFlow = MutableStateFlow<String>("")
+    private val celebritySearchFlow = MutableStateFlow<String>("")
+    private val contentSearchFlow = MutableStateFlow<String>("")
 
     val pagedCelebrityList: Flow<PagingData<CelebrityEntityBase>> =
-        searchFlow
-            .filter {
-                state.value.currentTab == SearchTab.CELEBRITY
-            }
+        celebritySearchFlow
             .debounce(500)
             .map {
                 it.trim()
@@ -49,10 +46,7 @@ class SearchViewModel @Inject constructor(
             }.cachedIn(viewModelScope)
 
     val pagedContentList: Flow<PagingData<ContentEntityBase>> =
-        searchFlow
-            .filter {
-                state.value.currentTab == SearchTab.CONTENT
-            }
+        contentSearchFlow
             .debounce(500)
             .map {
                 it.trim()
@@ -67,8 +61,25 @@ class SearchViewModel @Inject constructor(
 
     fun search(input: String?) {
         input?.let { searchValue ->
+            when (state.value.currentTab) {
+                SearchTab.CELEBRITY -> searchCelebrity(searchValue)
+                SearchTab.CONTENT -> searchContent(searchValue)
+            }
+        }
+    }
+
+    private fun searchCelebrity(input: String?) {
+        input?.let { searchValue ->
             viewModelScope.launch {
-                searchFlow.emit(searchValue)
+                celebritySearchFlow.emit(searchValue)
+            }
+        }
+    }
+
+    private fun searchContent(input: String?) {
+        input?.let { searchValue ->
+            viewModelScope.launch {
+                contentSearchFlow.emit(searchValue)
             }
         }
     }
@@ -78,6 +89,10 @@ class SearchViewModel @Inject constructor(
             state.copy(
                 currentTab = searchTab,
             )
+        }
+        when (searchTab) {
+            SearchTab.CELEBRITY -> searchCelebrity(contentSearchFlow.value)
+            SearchTab.CONTENT -> searchContent(celebritySearchFlow.value)
         }
     }
 

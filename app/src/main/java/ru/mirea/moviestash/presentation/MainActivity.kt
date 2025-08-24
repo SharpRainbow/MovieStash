@@ -92,4 +92,8 @@ class MainActivity : AppCompatActivity(), NewsListFragment.AddButtonProvider {
     override fun setOnAddButtonClickListener(listener: View.OnClickListener) {
         binding.floatingActionButtonAddMain.setOnClickListener(listener)
     }
+
+    override fun removeOnAddButtonClickListener() {
+        binding.floatingActionButtonAddMain.setOnClickListener(null)
+    }
 }

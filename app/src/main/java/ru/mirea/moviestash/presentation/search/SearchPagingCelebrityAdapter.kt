@@ -37,7 +37,7 @@ class SearchPagingCelebrityAdapter :
         getItem(position)?.let { celebrity ->
             with(holder.binding) {
                 textViewSearchName.text = celebrity.name
-                textViewSearchName.text = celebrity.birthDate
+                textViewSearchDescription.text = celebrity.birthDate
                 Glide
                     .with(imageViewSearchImage)
                     .load(celebrity.image)

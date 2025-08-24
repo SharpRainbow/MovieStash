@@ -108,12 +108,20 @@ class SearchFragment : Fragment() {
                 }.launchIn(this)
                 viewModel.pagedContentList.onEach {
                     contentPagingAdapter.submitData(it)
+                    resetRecyclerViewPosition()
                 }.launchIn(this)
                 viewModel.pagedCelebrityList.onEach {
                     celebrityPagingAdapter.submitData(it)
+                    resetRecyclerViewPosition()
                 }.launchIn(this)
             }
         }
+    }
+
+    private fun resetRecyclerViewPosition() {
+        binding.recyclerViewSearch.postDelayed({
+            binding.recyclerViewSearch.scrollToPosition(0)
+        }, 100)
     }
 
     private fun selectCorrectTab(currentTab: SearchTab) {

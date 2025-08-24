@@ -83,6 +83,11 @@ class NewsListFragment : Fragment() {
         _binding = null
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        addButtonProvider?.removeOnAddButtonClickListener()
+    }
+
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -161,5 +166,7 @@ class NewsListFragment : Fragment() {
         fun hideAddButton()
 
         fun setOnAddButtonClickListener(listener: View.OnClickListener)
+
+        fun removeOnAddButtonClickListener()
     }
 }
