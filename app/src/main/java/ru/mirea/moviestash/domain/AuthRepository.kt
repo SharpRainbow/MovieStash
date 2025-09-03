@@ -1,10 +1,16 @@
 package ru.mirea.moviestash.domain
 
+import kotlinx.coroutines.flow.Flow
+
 interface AuthRepository {
 
-    suspend fun login(login: String, password: String)
+    suspend fun login(login: String, password: String): String
 
-    fun logout()
+    suspend fun logout()
+
+    suspend fun saveCredentials(login: String, password: String, token: String)
+
+    suspend fun saveToken(token: String)
 
     suspend fun register(
         login: String,
@@ -13,13 +19,10 @@ interface AuthRepository {
         email: String
     )
 
-    fun getToken(): String
+    fun getToken(): Flow<String>
 
-    suspend fun getValidToken(): String
+    fun getSavedLogin(): Flow<String>
 
-    fun isLoggedIn(): Boolean
+    fun getSavedPassword(): Flow<String>
 
-    fun isModerator(): Boolean
-
-    fun getUserId(): Int
 }

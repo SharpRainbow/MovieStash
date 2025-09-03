@@ -4,8 +4,8 @@ import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(modules = [ApplicationModule::class, DatabaseModule::class, PreferenceModule::class,
-    ApiModule::class, RepositoryModule::class])
+@Component(modules = [ApplicationModule::class, DatabaseModule::class,
+    ApiModule::class, RepositoryModule::class, EncryptionModule::class])
 @ApplicationScope
 interface ApplicationComponent {
 

@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import ru.mirea.moviestash.MovieStashApplication
 import ru.mirea.moviestash.R
 import ru.mirea.moviestash.databinding.FragmentAccountHolderBinding
@@ -48,14 +51,20 @@ class AccountHolderFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (viewModel.isLoggedIn()) {
-            navigateToAccountFragment()
-        }
+        observeViewModel()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            if (viewModel.isLoggedIn.first()) {
+                navigateToAccountFragment()
+            }
+        }
     }
 
     private fun navigateToAccountFragment() {

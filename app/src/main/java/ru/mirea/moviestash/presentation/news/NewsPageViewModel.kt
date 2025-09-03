@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ class NewsPageViewModel @Inject constructor(
                 if (newsResult.isSuccess) {
                     NewsPageState.Success(
                         news = newsResult.getOrThrow(),
-                        isModerator = isModeratorUseCase()
+                        isModerator = isModeratorUseCase().first()
                     )
                 } else {
                     NewsPageState.Error

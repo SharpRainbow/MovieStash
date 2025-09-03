@@ -1,12 +1,12 @@
 package ru.mirea.moviestash.domain.usecases.collection
 
-import ru.mirea.moviestash.domain.AuthRepository
 import ru.mirea.moviestash.domain.CollectionRepository
+import ru.mirea.moviestash.domain.JwtManager
 import javax.inject.Inject
 
 class UpdateCollectionUseCase @Inject constructor(
     private val collectionRepository: CollectionRepository,
-    private val authRepository: AuthRepository
+    private val jwtManager: JwtManager
 ) {
 
     suspend operator fun invoke(
@@ -15,7 +15,7 @@ class UpdateCollectionUseCase @Inject constructor(
         description: String?
     ) {
         collectionRepository.updateCollection(
-            authRepository.getValidToken(),
+            jwtManager.getValidToken(),
             collectionId,
             name,
             description,

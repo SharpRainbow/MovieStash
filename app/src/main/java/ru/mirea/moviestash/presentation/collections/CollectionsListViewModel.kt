@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,6 +38,10 @@ class CollectionsListViewModel @Inject constructor(
                 getPublicCollectionsUseCase()
             }.cachedIn(viewModelScope)
 
+    init {
+        observeRole()
+    }
+
     fun hideCollection(collectionId: Int) {
         viewModelScope.launch {
             try {
@@ -51,12 +57,14 @@ class CollectionsListViewModel @Inject constructor(
         }
     }
 
-    fun isModerator() {
-        _state.update {
-            it.copy(
-                isModerator = isModeratorUseCase()
-            )
-        }
+    private fun observeRole() {
+        isModeratorUseCase().onEach { isModerator ->
+            _state.update { previousState ->
+                previousState.copy(
+                    isModerator = isModerator
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun refreshCollections() {

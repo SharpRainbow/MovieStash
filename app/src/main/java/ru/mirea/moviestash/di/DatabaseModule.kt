@@ -17,6 +17,6 @@ object DatabaseModule {
 
     @Provides
     fun provideCredentialsDao(credentialsDatabase: CredentialsDatabase): CredentialsDao {
-        return credentialsDatabase.credsDao()
+        return credentialsDatabase.credentialsDao()
     }
 }

@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -64,8 +67,11 @@ class ContentViewModel @Inject constructor(
         getContent()
         getCast()
         getCrew()
-        if (isLoggedInUseCase()) {
-            getRating()
+        viewModelScope.launch {
+            val loggedIn = isLoggedInUseCase().firstOrNull() ?: false
+            if (loggedIn) {
+                getRating()
+            }
         }
     }
 
@@ -150,7 +156,7 @@ class ContentViewModel @Inject constructor(
                     state.copy(
                         reviews = reviewList,
                         canAddReview =
-                            reviewList.getOrNull(0)?.userId != getUserIdUseCase()
+                            reviewList.getOrNull(0)?.userId != getUserIdUseCase().first()
                     )
                 }
             } catch (e: Exception) {
@@ -238,11 +244,13 @@ class ContentViewModel @Inject constructor(
     }
 
     private fun isLoggedIn() {
-        _state.update { state ->
-            state.copy(
-                isLoggedIn = isLoggedInUseCase()
-            )
-        }
+        isLoggedInUseCase().onEach { loggedIn ->
+            _state.update { state ->
+                state.copy(
+                    isLoggedIn = loggedIn
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     companion object {

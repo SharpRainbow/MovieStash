@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -38,8 +39,8 @@ class ReviewViewModel @Inject constructor(
                     _state.update {
                         ReviewScreenState.Loaded(
                             review = review,
-                            isAuthor = review.userId == getUserIdUseCase(),
-                            isModerator = isModeratorUseCase()
+                            isAuthor = review.userId == getUserIdUseCase().first(),
+                            isModerator = isModeratorUseCase().first()
                         )
                     }
                 } else {

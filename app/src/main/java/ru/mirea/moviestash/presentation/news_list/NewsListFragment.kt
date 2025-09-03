@@ -91,10 +91,9 @@ class NewsListFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.isModerator()
                 launch {
-                    viewModel.state.collect { state ->
-                        if (state.isModerator) {
+                    viewModel.state.collect { isModerator ->
+                        if (isModerator) {
                             addButtonProvider?.showAddButton()
                         } else {
                             addButtonProvider?.hideAddButton()

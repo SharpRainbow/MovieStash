@@ -1,12 +1,12 @@
 package ru.mirea.moviestash.domain.usecases.stars
 
-import ru.mirea.moviestash.domain.AuthRepository
+import ru.mirea.moviestash.domain.JwtManager
 import ru.mirea.moviestash.domain.UserStarRepository
 import javax.inject.Inject
 
 class UpdateRatingUseCase @Inject constructor(
     private val userStarRepository: UserStarRepository,
-    private val authRepository: AuthRepository
+    private val jwtManager: JwtManager
 ) {
 
     suspend operator fun invoke(
@@ -14,7 +14,7 @@ class UpdateRatingUseCase @Inject constructor(
         rating: Int
     ) {
         userStarRepository.updateUserStar(
-            authRepository.getValidToken(),
+            jwtManager.getValidToken(),
             starId,
             rating
         )

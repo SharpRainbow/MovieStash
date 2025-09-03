@@ -16,3 +16,5 @@
 - Kotlin Coroutines и Flow для фоновых задач
 - Dependency Injection с помощью Dagger2
 - Retrofit для сетевых запросов и Glide для загрузки изображений
+- DataStore для хранения данных ключ-значение
+- Шифрование чувствительных данных с помощью Google Tink

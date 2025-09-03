@@ -1,12 +1,12 @@
 package ru.mirea.moviestash.domain.usecases.news
 
-import ru.mirea.moviestash.domain.AuthRepository
+import ru.mirea.moviestash.domain.JwtManager
 import ru.mirea.moviestash.domain.NewsRepository
 import javax.inject.Inject
 
 class AddNewsUseCase @Inject constructor(
     private val newsRepository: NewsRepository,
-    private val authRepository: AuthRepository
+    private val jwtManager: JwtManager
 ) {
 
     suspend operator fun invoke(
@@ -16,7 +16,7 @@ class AddNewsUseCase @Inject constructor(
         image: ByteArray?
     ) {
         newsRepository.addNews(
-            authRepository.getValidToken(),
+            jwtManager.getValidToken(),
             title = title,
             description = content,
             imageName = imageName,

@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,7 +51,7 @@ class UserCollectionsViewModel @Inject constructor(
             }.cachedIn(viewModelScope)
 
     init {
-        isModerator()
+        observeRole()
     }
 
     fun addCollection(name: String?, description: String?) {
@@ -179,12 +181,14 @@ class UserCollectionsViewModel @Inject constructor(
         }
     }
 
-    private fun isModerator() {
-        _state.update { state ->
-            state.copy(
-                isModerator = isModeratorUseCase()
-            )
-        }
+    private fun observeRole() {
+        isModeratorUseCase().onEach { isModerator ->
+            _state.update { previousState ->
+                previousState.copy(
+                    isModerator = isModerator
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
 }

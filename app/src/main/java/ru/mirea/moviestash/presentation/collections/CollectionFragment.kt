@@ -84,7 +84,6 @@ class CollectionFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.isModerator()
                 viewModel.state.onEach { state ->
                     if (state.error != null) {
                         showToast(getString(R.string.loading_error))

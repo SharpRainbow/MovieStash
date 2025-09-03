@@ -1,12 +1,12 @@
 package ru.mirea.moviestash.domain.usecases.user
 
-import ru.mirea.moviestash.domain.AuthRepository
+import ru.mirea.moviestash.domain.JwtManager
 import ru.mirea.moviestash.domain.UserRepository
 import javax.inject.Inject
 
 class UpdateUserDataUseCase @Inject constructor(
     private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val jwtManager: JwtManager
 ) {
 
     suspend operator fun invoke(
@@ -15,7 +15,7 @@ class UpdateUserDataUseCase @Inject constructor(
         password: String?
     ) {
         userRepository.updateUserData(
-            authRepository.getValidToken(),
+            jwtManager.getValidToken(),
             nickname,
             email,
             password

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,10 +32,10 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             getUserDataUseCase().onEach { userData ->
                 if (userData.isSuccess) {
-                    _state.update {
+                    _state.update { previousState ->
                         AccountState.Success(
                             userData = userData.getOrThrow(),
-                            isModerator = isModeratorUseCase()
+                            isModerator = isModeratorUseCase().first()
                         )
                     }
                 } else {
@@ -47,8 +48,8 @@ class AccountViewModel @Inject constructor(
     }
 
     fun logout() {
-        logoutUseCase()
         viewModelScope.launch {
+            logoutUseCase()
             _state.emit(AccountState.LoggedOut)
         }
     }

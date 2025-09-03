@@ -1,24 +1,32 @@
 package ru.mirea.moviestash.data
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
-import org.json.JSONObject
+import android.app.Application
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import ru.mirea.moviestash.data.api.MovieStashApi
 import ru.mirea.moviestash.data.api.dto.CredentialsDto
 import ru.mirea.moviestash.data.api.dto.RegisterDto
 import ru.mirea.moviestash.di.ApplicationScope
 import ru.mirea.moviestash.domain.AuthRepository
-import ru.mirea.moviestash.domain.entities.Role
-import ru.mirea.moviestash.domain.entities.UserData
 import javax.inject.Inject
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
+
+private const val PREFERENCE_NAME = "authentication"
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCE_NAME)
 
 @ApplicationScope
 class AuthRepositoryImpl @Inject constructor(
-    private val sharedPreferences: SharedPreferences,
+    private val application: Application,
     private val movieStashApi: MovieStashApi
 ): AuthRepository {
+
+    private val context: Context = application.applicationContext
 
     override suspend fun register(
         login: String,
@@ -36,122 +44,51 @@ class AuthRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun login(login: String, password: String) {
-        val token = movieStashApi.login(
+    override suspend fun login(login: String, password: String): String {
+        return movieStashApi.login(
             CredentialsDto(
                 login = login,
                 password = password
             )
-        )
-        cachedUser = parseJwtToken(token.token)
-        sharedPreferences.edit {
-            putString(LOGIN_KEY, login)
-            putString(PASSWORD_KEY, password)
-            putString(TOKEN_KEY, token.token)
+        ).token
+    }
+
+    override suspend fun saveCredentials(login: String, password: String, token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[LOGIN_KEY] = login
+            preferences[PASSWORD_KEY] = password
+            preferences[TOKEN_KEY] = token
         }
     }
 
-    override fun logout() {
-        cachedUser = null
-        sharedPreferences.edit {
-            clear()
+    override suspend fun saveToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[TOKEN_KEY] = token
         }
     }
 
-    override fun isLoggedIn(): Boolean {
-        return !getToken().isEmpty()
-    }
-
-    override fun getToken(): String {
-        return sharedPreferences.getString(TOKEN_KEY, "") ?: ""
-    }
-
-    override suspend fun getValidToken(): String {
-        val token = getToken()
-        if (isTokenValid(token)) {
-            return token
-        } else {
-            val login = getLogin()
-            val password = getPassword()
-            if (!login.isNullOrBlank() && !password.isNullOrBlank()) {
-                login(login, password)
-            }
-            return getToken()
+    override suspend fun logout() {
+        context.dataStore.edit {
+            it.clear()
         }
     }
 
-    private fun getLogin(): String? {
-        return sharedPreferences.getString(LOGIN_KEY, "")
+    override fun getToken(): Flow<String> {
+        return context.dataStore.data.map { it[TOKEN_KEY] ?: "" }
     }
 
-    private fun getPassword(): String? {
-        return sharedPreferences.getString(PASSWORD_KEY, "")
+    override fun getSavedLogin(): Flow<String> {
+        return context.dataStore.data.map { it[LOGIN_KEY] ?: "" }
     }
 
-    override fun isModerator(): Boolean {
-        if (cachedUser != null) {
-            return cachedUser?.role == Role.MODERATOR
-        } else {
-            val token = getToken().ifEmpty {
-                return false
-            }
-            cachedUser = parseJwtToken(token)
-            return cachedUser?.role == Role.MODERATOR
-        }
-    }
-
-    @OptIn(ExperimentalEncodingApi::class)
-    private fun parseJwtToken(token: String): UserData {
-        val payload = JSONObject(
-            String(
-                Base64.withPadding(Base64.PaddingOption.PRESENT_OPTIONAL)
-                    .decode(token.split('.')[1])
-            )
-        )
-        return UserData(
-            userId = payload.getString("sub").toInt(),
-            role = payload.getJSONArray("aud").getString(0).let {
-                when (it) {
-                    "moderator" -> Role.MODERATOR
-                    else -> Role.USER
-                }
-            }
-        )
-    }
-
-    @OptIn(ExperimentalEncodingApi::class)
-    private fun isTokenValid(token: String): Boolean {
-        return try {
-            val payload = JSONObject(
-                String(
-                    Base64.withPadding(
-                        Base64.PaddingOption.PRESENT_OPTIONAL
-                    ).decode(token.split('.')[1])
-                )
-            )
-            payload.getLong("exp") > System.currentTimeMillis() / 1000
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    override fun getUserId(): Int {
-        if (cachedUser != null) {
-            return cachedUser?.userId ?: 0
-        } else {
-            val token = getToken().ifEmpty {
-                return 0
-            }
-            cachedUser = parseJwtToken(token)
-            return cachedUser?.userId ?: 0
-        }
+    override fun getSavedPassword(): Flow<String> {
+        return context.dataStore.data.map { it[PASSWORD_KEY] ?: "" }
     }
 
     companion object {
-        private const val LOGIN_KEY = "LOGIN"
-        private const val PASSWORD_KEY = "PASS"
-        private const val TOKEN_KEY = "TOKEN"
-        private var cachedUser: UserData? = null
+        private val LOGIN_KEY = stringPreferencesKey("LOGIN")
+        private val PASSWORD_KEY = stringPreferencesKey("PASS")
+        private val TOKEN_KEY = stringPreferencesKey("TOKEN")
 
     }
 }

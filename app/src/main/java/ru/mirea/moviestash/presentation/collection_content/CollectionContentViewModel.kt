@@ -6,6 +6,7 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -52,7 +53,7 @@ class CollectionContentViewModel @Inject constructor(
                     getContentByGenreUseCase(
                         collectionId
                     )
-                } else if (userId != 0 && getUserIdUseCase() == userId) {
+                } else if (userId != 0 && getUserIdUseCase().first() == userId) {
                     getContentFromUserCollectionUseCase(
                         collectionId
                     )
@@ -82,7 +83,7 @@ class CollectionContentViewModel @Inject constructor(
                             )
                         )
                     }
-                } else if (userId != 0 && getUserIdUseCase() == userId) {
+                } else if (userId != 0 && getUserIdUseCase().first() == userId) {
                     _state.update { state ->
                         state.copy(
                             collectionInfo = getUserCollectionInfoUseCase(collectionId)

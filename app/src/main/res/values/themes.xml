@@ -55,7 +55,7 @@
         <item name="cardMaxElevation">4dp</item>
         <item name="cardBackgroundColor">@color/md_theme_secondaryContainer</item>
     </style>
-    <style name="Theme.MovieStash.Starting" parent="Theme.SplashScreen">
+    <style name="Theme.MovieStash.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.MovieStash</item>
     </style>

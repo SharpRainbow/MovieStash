@@ -71,7 +71,7 @@ class LoginViewModel @Inject constructor(
                     LoginState.Success(
                         login = login,
                         password = password,
-                        isSaved = credentials != null && credentials.password == password
+                        isSaved = credentials != null
                     )
                 )
             } catch (e: Exception) {
